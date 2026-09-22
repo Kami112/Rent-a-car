@@ -85,13 +85,13 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   /* ---------- Car detail gallery ---------- */
-  var thumbs = document.querySelectorAll('.gallery-thumbs img');
-  var mainImg = document.querySelector('.gallery-main img');
+  var thumbs = document.querySelectorAll('.gallery-thumb');
+  var mainTile = document.getElementById('gallery-main-tile');
   thumbs.forEach(function (thumb) {
     thumb.addEventListener('click', function () {
       thumbs.forEach(function (t) { t.classList.remove('active'); });
       thumb.classList.add('active');
-      if (mainImg) mainImg.src = thumb.src;
+      if (mainTile) mainTile.className = 'illus-tile ' + thumb.getAttribute('data-illus');
     });
   });
 
