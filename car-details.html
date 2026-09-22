@@ -64,13 +64,21 @@
       <div class="car-detail-main">
 
         <div class="gallery-main">
-          <img src="https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=1200&q=80" alt="Range Rover Sport front view">
+          <div class="illus-tile illus-1" id="gallery-main-tile" role="img" aria-label="Range Rover Sport front view"><svg class="car-glyph" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path class="body" d="M15,70 Q15,50 35,50 L55,50 L72,28 Q80,18 98,18 L138,18 Q158,18 168,34 L180,50 Q195,50 195,64 L195,72 Q195,78 189,78 L172,78 Q172,64 156,64 Q140,64 140,78 L65,78 Q65,64 49,64 Q33,64 33,78 L21,78 Q15,78 15,72 Z"/><path class="glass" d="M78,50 L90,32 Q95,26 104,26 L128,26 Q140,26 146,36 L154,50 Z"/><circle class="wheel" cx="49" cy="78" r="13"/><circle class="wheel" cx="156" cy="78" r="13"/></svg></div>
         </div>
         <div class="gallery-thumbs">
-          <img src="https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=400&q=80" class="active" alt="Front view">
-          <img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=400&q=80" alt="Side view">
-          <img src="https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=400&q=80" alt="Interior view">
-          <img src="https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=400&q=80" alt="Dashboard view">
+          <button type="button" class="gallery-thumb active" data-illus="illus-1" aria-label="Front view">
+            <div class="illus-tile illus-1"><svg class="car-glyph" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path class="body" d="M15,70 Q15,50 35,50 L55,50 L72,28 Q80,18 98,18 L138,18 Q158,18 168,34 L180,50 Q195,50 195,64 L195,72 Q195,78 189,78 L172,78 Q172,64 156,64 Q140,64 140,78 L65,78 Q65,64 49,64 Q33,64 33,78 L21,78 Q15,78 15,72 Z"/><path class="glass" d="M78,50 L90,32 Q95,26 104,26 L128,26 Q140,26 146,36 L154,50 Z"/><circle class="wheel" cx="49" cy="78" r="13"/><circle class="wheel" cx="156" cy="78" r="13"/></svg></div>
+          </button>
+          <button type="button" class="gallery-thumb" data-illus="illus-3" aria-label="Side view">
+            <div class="illus-tile illus-3"><svg class="car-glyph" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path class="body" d="M15,70 Q15,50 35,50 L55,50 L72,28 Q80,18 98,18 L138,18 Q158,18 168,34 L180,50 Q195,50 195,64 L195,72 Q195,78 189,78 L172,78 Q172,64 156,64 Q140,64 140,78 L65,78 Q65,64 49,64 Q33,64 33,78 L21,78 Q15,78 15,72 Z"/><path class="glass" d="M78,50 L90,32 Q95,26 104,26 L128,26 Q140,26 146,36 L154,50 Z"/><circle class="wheel" cx="49" cy="78" r="13"/><circle class="wheel" cx="156" cy="78" r="13"/></svg></div>
+          </button>
+          <button type="button" class="gallery-thumb" data-illus="illus-5" aria-label="Interior view">
+            <div class="illus-tile illus-5"><svg class="car-glyph" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path class="body" d="M15,70 Q15,50 35,50 L55,50 L72,28 Q80,18 98,18 L138,18 Q158,18 168,34 L180,50 Q195,50 195,64 L195,72 Q195,78 189,78 L172,78 Q172,64 156,64 Q140,64 140,78 L65,78 Q65,64 49,64 Q33,64 33,78 L21,78 Q15,78 15,72 Z"/><path class="glass" d="M78,50 L90,32 Q95,26 104,26 L128,26 Q140,26 146,36 L154,50 Z"/><circle class="wheel" cx="49" cy="78" r="13"/><circle class="wheel" cx="156" cy="78" r="13"/></svg></div>
+          </button>
+          <button type="button" class="gallery-thumb" data-illus="illus-2" aria-label="Dashboard view">
+            <div class="illus-tile illus-2"><svg class="car-glyph" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path class="body" d="M15,70 Q15,50 35,50 L55,50 L72,28 Q80,18 98,18 L138,18 Q158,18 168,34 L180,50 Q195,50 195,64 L195,72 Q195,78 189,78 L172,78 Q172,64 156,64 Q140,64 140,78 L65,78 Q65,64 49,64 Q33,64 33,78 L21,78 Q15,78 15,72 Z"/><path class="glass" d="M78,50 L90,32 Q95,26 104,26 L128,26 Q140,26 146,36 L154,50 Z"/><circle class="wheel" cx="49" cy="78" r="13"/><circle class="wheel" cx="156" cy="78" r="13"/></svg></div>
+          </button>
         </div>
 
         <span class="car-cat">SUV · Full-Size</span>
@@ -194,7 +202,7 @@
     <div class="cars-grid">
       <article class="car-card">
         <div class="car-media">
-          <img src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=800&q=80" alt="Mercedes-Benz C-Class">
+          <div class="illus-tile illus-4" role="img" aria-label="Mercedes-Benz C-Class"><svg class="car-glyph" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path class="body" d="M15,70 Q15,50 35,50 L55,50 L72,28 Q80,18 98,18 L138,18 Q158,18 168,34 L180,50 Q195,50 195,64 L195,72 Q195,78 189,78 L172,78 Q172,64 156,64 Q140,64 140,78 L65,78 Q65,64 49,64 Q33,64 33,78 L21,78 Q15,78 15,72 Z"/><path class="glass" d="M78,50 L90,32 Q95,26 104,26 L128,26 Q140,26 146,36 L154,50 Z"/><circle class="wheel" cx="49" cy="78" r="13"/><circle class="wheel" cx="156" cy="78" r="13"/></svg></div>
         </div>
         <div class="car-body">
           <span class="car-cat">Luxury Sedan</span>
@@ -208,7 +216,7 @@
       </article>
       <article class="car-card">
         <div class="car-media">
-          <img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&q=80" alt="Honda CR-V">
+          <div class="illus-tile illus-1" role="img" aria-label="Honda CR-V"><svg class="car-glyph" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path class="body" d="M15,70 Q15,50 35,50 L55,50 L72,28 Q80,18 98,18 L138,18 Q158,18 168,34 L180,50 Q195,50 195,64 L195,72 Q195,78 189,78 L172,78 Q172,64 156,64 Q140,64 140,78 L65,78 Q65,64 49,64 Q33,64 33,78 L21,78 Q15,78 15,72 Z"/><path class="glass" d="M78,50 L90,32 Q95,26 104,26 L128,26 Q140,26 146,36 L154,50 Z"/><circle class="wheel" cx="49" cy="78" r="13"/><circle class="wheel" cx="156" cy="78" r="13"/></svg></div>
         </div>
         <div class="car-body">
           <span class="car-cat">SUV</span>
@@ -222,7 +230,7 @@
       </article>
       <article class="car-card">
         <div class="car-media">
-          <img src="https://images.unsplash.com/photo-1609520505218-7421df709453?auto=format&fit=crop&w=800&q=80" alt="Chevrolet Suburban">
+          <div class="illus-tile illus-6" role="img" aria-label="Chevrolet Suburban"><svg class="car-glyph" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg"><path class="body" d="M15,70 Q15,50 35,50 L55,50 L72,28 Q80,18 98,18 L138,18 Q158,18 168,34 L180,50 Q195,50 195,64 L195,72 Q195,78 189,78 L172,78 Q172,64 156,64 Q140,64 140,78 L65,78 Q65,64 49,64 Q33,64 33,78 L21,78 Q15,78 15,72 Z"/><path class="glass" d="M78,50 L90,32 Q95,26 104,26 L128,26 Q140,26 146,36 L154,50 Z"/><circle class="wheel" cx="49" cy="78" r="13"/><circle class="wheel" cx="156" cy="78" r="13"/></svg></div>
         </div>
         <div class="car-body">
           <span class="car-cat">Van / 8-Seater</span>
