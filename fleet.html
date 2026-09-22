@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Fleet | DriveNow Rentals</title>
+<meta name="description" content="Browse our full fleet of economy, SUV, luxury and van rental vehicles. Transparent daily pricing and instant booking.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚗</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="container">
+    <div class="topbar-contacts">
+      <a href="tel:+18005551234">📞 +1 (800) 555-1234</a>
+      <a href="mailto:hello@drivenow.com">✉️ hello@drivenow.com</a>
+    </div>
+    <div class="topbar-social">
+      <a href="#" aria-label="Facebook">f</a>
+      <a href="#" aria-label="Instagram">i</a>
+      <a href="#" aria-label="Twitter">t</a>
+    </div>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="logo">
+      <span class="logo-mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14M5 17a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm14 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM5 17l1.5-6.5A2 2 0 0 1 8.4 9h7.2a2 2 0 0 1 1.9 1.5L19 17M3 13h18"/></svg></span>
+      Drive<span>Now</span>
+    </a>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="fleet.html" class="active">Fleet</a>
+      <a href="car-details.html">Car Details</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="header-actions">
+      <div class="header-phone">
+        <span class="header-phone-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+        <span><small>Call us anytime</small><strong>+1 (800) 555-1234</strong></span>
+      </div>
+      <a href="fleet.html" class="btn btn-primary">Book Now</a>
+      <button class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="container">
+    <h1>Our Fleet</h1>
+    <div class="breadcrumb"><a href="index.html">Home</a><span>/</span><span>Fleet</span></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+
+    <div class="filter-tabs">
+      <button class="active" data-filter="all">All Cars</button>
+      <button data-filter="economy">Economy</button>
+      <button data-filter="suv">SUV</button>
+      <button data-filter="luxury">Luxury</button>
+      <button data-filter="van">Van</button>
+      <button data-filter="convertible">Convertible</button>
+    </div>
+
+    <div class="fleet-toolbar">
+      <span style="color:var(--color-text-light);font-weight:600;">Showing 8 of 8 vehicles</span>
+      <select class="sort-select">
+        <option>Sort by: Popularity</option>
+        <option>Price: Low to High</option>
+        <option>Price: High to Low</option>
+        <option>Newest First</option>
+      </select>
+    </div>
+
+    <div class="cars-grid">
+
+      <article class="car-card" data-category="economy">
+        <div class="car-media">
+          <img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=800&q=80" alt="Toyota Corolla">
+          <span class="car-badge">Best Value</span>
+          <span class="car-fav">♥</span>
+        </div>
+        <div class="car-body">
+          <span class="car-cat">Economy</span>
+          <h3 class="car-title">Toyota Corolla</h3>
+          <div class="car-specs"><span>👤 5 Seats</span><span>⚙️ Automatic</span><span>⛽ Hybrid</span></div>
+          <div class="car-footer">
+            <div class="car-price"><strong>$39</strong><span>/day</span></div>
+            <a href="car-details.html" class="btn btn-outline btn-sm">Rent Now</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="car-card" data-category="economy">
+        <div class="car-media">
+          <img src="https://images.unsplash.com/photo-1541443131876-44b03de101c5?auto=format&fit=crop&w=800&q=80" alt="Volkswagen Golf">
+          <span class="car-fav">♥</span>
+        </div>
+        <div class="car-body">
+          <span class="car-cat">Economy</span>
+          <h3 class="car-title">Volkswagen Golf</h3>
+          <div class="car-specs"><span>👤 5 Seats</span><span>⚙️ Manual</span><span>⛽ Petrol</span></div>
+          <div class="car-footer">
+            <div class="car-price"><strong>$42</strong><span>/day</span></div>
+            <a href="car-details.html" class="btn btn-outline btn-sm">Rent Now</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="car-card" data-category="suv">
+        <div class="car-media">
+          <img src="https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=800&q=80" alt="Range Rover Sport">
+          <span class="car-badge">New</span>
+          <span class="car-fav">♥</span>
+        </div>
+        <div class="car-body">
+          <span class="car-cat">SUV</span>
+          <h3 class="car-title">Range Rover Sport</h3>
+          <div class="car-specs"><span>👤 5 Seats</span><span>⚙️ Automatic</span><span>⛽ Petrol</span></div>
+          <div class="car-footer">
+            <div class="car-price"><strong>$120</strong><span>/day</span></div>
+            <a href="car-details.html" class="btn btn-outline btn-sm">Rent Now</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="car-card" data-category="suv">
+        <div class="car-media">
+          <img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&q=80" alt="Honda CR-V">
+          <span class="car-fav">♥</span>
+        </div>
+        <div class="car-body">
+          <span class="car-cat">SUV</span>
+          <h3 class="car-title">Honda CR-V</h3>
+          <div class="car-specs"><span>👤 5 Seats</span><span>⚙️ Automatic</span><span>⛽ Hybrid</span></div>
+          <div class="car-footer">
+            <div class="car-price"><strong>$65</strong><span>/day</span></div>
+            <a href="car-details.html" class="btn btn-outline btn-sm">Rent Now</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="car-card" data-category="luxury">
+        <div class="car-media">
+          <img src="https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=800&q=80" alt="Audi A4">
+          <span class="car-badge">Popular</span>
+          <span class="car-fav">♥</span>
+        </div>
+        <div class="car-body">
+          <span class="car-cat">Luxury Sedan</span>
+          <h3 class="car-title">Audi A4 Premium</h3>
+          <div class="car-specs"><span>👤 5 Seats</span><span>⚙️ Automatic</span><span>⛽ Petrol</span></div>
+          <div class="car-footer">
+            <div class="car-price"><strong>$89</strong><span>/day</span></div>
+            <a href="car-details.html" class="btn btn-outline btn-sm">Rent Now</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="car-card" data-category="luxury">
+        <div class="car-media">
+          <img src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=800&q=80" alt="Mercedes-Benz C-Class">
+          <span class="car-fav">♥</span>
+        </div>
+        <div class="car-body">
+          <span class="car-cat">Luxury Sedan</span>
+          <h3 class="car-title">Mercedes-Benz C-Class</h3>
+          <div class="car-specs"><span>👤 5 Seats</span><span>⚙️ Automatic</span><span>⛽ Diesel</span></div>
+          <div class="car-footer">
+            <div class="car-price"><strong>$110</strong><span>/day</span></div>
+            <a href="car-details.html" class="btn btn-outline btn-sm">Rent Now</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="car-card" data-category="convertible">
+        <div class="car-media">
+          <img src="https://images.unsplash.com/photo-1584345604476-8ec5f452d1f2?auto=format&fit=crop&w=800&q=80" alt="Ford Mustang GT">
+          <span class="car-badge">Sporty</span>
+          <span class="car-fav">♥</span>
+        </div>
+        <div class="car-body">
+          <span class="car-cat">Convertible</span>
+          <h3 class="car-title">Ford Mustang GT</h3>
+          <div class="car-specs"><span>👤 4 Seats</span><span>⚙️ Automatic</span><span>⛽ Petrol</span></div>
+          <div class="car-footer">
+            <div class="car-price"><strong>$95</strong><span>/day</span></div>
+            <a href="car-details.html" class="btn btn-outline btn-sm">Rent Now</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="car-card" data-category="van">
+        <div class="car-media">
+          <img src="https://images.unsplash.com/photo-1609520505218-7421df709453?auto=format&fit=crop&w=800&q=80" alt="Chevrolet Suburban">
+          <span class="car-fav">♥</span>
+        </div>
+        <div class="car-body">
+          <span class="car-cat">Van / 8-Seater</span>
+          <h3 class="car-title">Chevrolet Suburban</h3>
+          <div class="car-specs"><span>👤 8 Seats</span><span>⚙️ Automatic</span><span>⛽ Petrol</span></div>
+          <div class="car-footer">
+            <div class="car-price"><strong>$85</strong><span>/day</span></div>
+            <a href="car-details.html" class="btn btn-outline btn-sm">Rent Now</a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    <div class="pagination">
+      <a href="#" class="active">1</a>
+      <a href="#">2</a>
+      <a href="#">3</a>
+      <a href="#">→</a>
+    </div>
+
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-about">
+        <a href="index.html" class="logo" style="color:#fff;">
+          <span class="logo-mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14M5 17a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm14 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM5 17l1.5-6.5A2 2 0 0 1 8.4 9h7.2a2 2 0 0 1 1.9 1.5L19 17M3 13h18"/></svg></span>
+          Drive<span>Now</span>
+        </a>
+        <p>DriveNow Rentals offers a wide range of vehicles at competitive prices, with a commitment to customer satisfaction and hassle-free bookings.</p>
+        <div class="footer-social"><a href="#">f</a><a href="#">i</a><a href="#">t</a><a href="#">in</a></div>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul><li><a href="index.html">Home</a></li><li><a href="fleet.html">Fleet</a></li><li><a href="about.html">About Us</a></li><li><a href="contact.html">Contact</a></li></ul>
+      </div>
+      <div class="footer-col">
+        <h4>Fleet Categories</h4>
+        <ul><li><a href="fleet.html">Economy Cars</a></li><li><a href="fleet.html">SUVs</a></li><li><a href="fleet.html">Luxury Cars</a></li><li><a href="fleet.html">Vans</a></li></ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact Us</h4>
+        <ul class="footer-contact">
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> 123 Main Street, New York, NY 10001</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> +1 (800) 555-1234</li>
+          <li>✉️ hello@drivenow.com</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 DriveNow Rentals. All rights reserved.</span>
+      <div class="payment-icons"><span>VISA</span><span>MC</span><span>AMEX</span></div>
+    </div>
+  </div>
+</footer>
+
+<button class="back-to-top" aria-label="Back to top">↑</button>
+<script src="js/main.js"></script>
+</body>
+</html>
