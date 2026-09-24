@@ -60,20 +60,6 @@ CREATE TABLE IF NOT EXISTS hotels (
   active INTEGER NOT NULL DEFAULT 1
 );
 
-CREATE TABLE IF NOT EXISTS flight_schedules (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  airline TEXT NOT NULL,
-  airline_code TEXT NOT NULL,
-  flight_no TEXT NOT NULL,
-  origin TEXT NOT NULL,
-  destination TEXT NOT NULL,
-  depart_time TEXT NOT NULL,  -- HH:MM local
-  duration_min INTEGER NOT NULL,
-  base_fare INTEGER NOT NULL, -- economy, halalas
-  stops INTEGER NOT NULL DEFAULT 0,
-  active INTEGER NOT NULL DEFAULT 1
-);
-
 CREATE TABLE IF NOT EXISTS visas (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   country_en TEXT NOT NULL,
@@ -219,7 +205,24 @@ function open(file = config.dbPath) {
   const db = new DatabaseSync(file);
   db.exec('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;');
   db.exec(SCHEMA);
+  migrate(db);
   return db;
+}
+
+// Additive column migrations for databases created by earlier versions.
+const COLUMNS = {
+  bookings: {
+    ticket_status: "TEXT NOT NULL DEFAULT 'not_applicable'", // not_applicable | pending | held | issued | manual | failed
+    pnr: 'TEXT',
+    tickets: "TEXT NOT NULL DEFAULT '[]'",
+    provider_order_id: 'TEXT',
+  },
+};
+function migrate(db) {
+  for (const [table, cols] of Object.entries(COLUMNS)) {
+    const have = new Set(db.prepare(`PRAGMA table_info(${table})`).all().map((c) => c.name));
+    for (const [name, def] of Object.entries(cols)) if (!have.has(name)) db.exec(`ALTER TABLE ${table} ADD COLUMN ${name} ${def}`);
+  }
 }
 
 /** Run fn inside a transaction; rolls back on throw. */

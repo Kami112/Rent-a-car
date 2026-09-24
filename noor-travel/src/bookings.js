@@ -4,6 +4,7 @@ const config = require('./config');
 const dbm = require('./db');
 const pricing = require('./pricing');
 const notify = require('./notify');
+const ticketing = require('./ticketing');
 const zatca = require('./zatca');
 const { AppError } = require('./errors');
 const { randomToken } = require('./auth');
@@ -31,22 +32,55 @@ function normalisePhone(raw) {
   return p;
 }
 
+const DATE = /^\d{4}-\d{2}-\d{2}$/;
+
 function cleanTravelers(list, count) {
   const arr = Array.isArray(list) ? list.slice(0, count) : [];
   return arr.map((t) => ({
-    title: String(t?.title || '').slice(0, 10),
+    title: ['mr', 'mrs', 'ms'].includes(t?.title) ? t.title : 'mr',
+    gender: t?.gender === 'f' || ['mrs', 'ms'].includes(t?.title) ? 'f' : 'm',
     firstName: String(t?.firstName || '').trim().slice(0, 60),
     lastName: String(t?.lastName || '').trim().slice(0, 60),
-    dob: /^\d{4}-\d{2}-\d{2}$/.test(t?.dob || '') ? t.dob : '',
-    nationality: String(t?.nationality || '').slice(0, 40),
-    passport: String(t?.passport || '').trim().toUpperCase().slice(0, 20),
+    dob: DATE.test(t?.dob || '') ? t.dob : '',
+    nationality: /^[A-Z]{2}$/.test(String(t?.nationality || '').toUpperCase()) ? String(t.nationality).toUpperCase() : String(t?.nationality || '').slice(0, 40),
+    passport: String(t?.passport || '').trim().toUpperCase().replace(/\s/g, '').slice(0, 20),
+    passportExpiry: DATE.test(t?.passportExpiry || '') ? t.passportExpiry : '',
     type: ['adult', 'child', 'infant'].includes(t?.type) ? t.type : 'adult',
   }));
 }
 
+/** Airlines need exact names, dates of birth and (for international trips) passport data. */
+function validateFlightTravelers(travelers, q) {
+  const bad = (en, ar) => { throw new AppError(en, { ar }); };
+  const counts = { adult: 0, child: 0, infant: 0 };
+  const travelDate = q.endDate || q.date;
+  for (const t of travelers) {
+    counts[t.type]++;
+    if (!/^[A-Za-z][A-Za-z '-]*$/.test(t.firstName) || !/^[A-Za-z][A-Za-z '-]*$/.test(t.lastName)) {
+      bad('Passenger names must be in English letters exactly as in the passport.', 'يجب كتابة أسماء المسافرين بالأحرف الإنجليزية كما في جواز السفر.');
+    }
+    if (!t.dob) bad('Please enter the date of birth for every passenger.', 'يرجى إدخال تاريخ الميلاد لكل مسافر.');
+    const age = (Date.parse(q.date) - Date.parse(t.dob)) / (365.25 * 864e5);
+    if (t.type === 'adult' && age < 12) bad('Adult passengers must be 12 or older on the travel date.', 'يجب أن يكون عمر البالغ 12 سنة فأكثر في تاريخ السفر.');
+    if (t.type === 'child' && (age < 2 || age >= 12)) bad('Child passengers must be 2–11 years old on the travel date.', 'يجب أن يكون عمر الطفل بين 2 و11 سنة في تاريخ السفر.');
+    if (t.type === 'infant' && (age < 0 || age >= 2)) bad('Infants must be under 2 years old on the travel date.', 'يجب أن يكون عمر الرضيع أقل من سنتين في تاريخ السفر.');
+    if (!q.meta.domestic) {
+      if (!t.passport || !/^[A-Z]{2}$/.test(t.nationality) || !t.passportExpiry) {
+        bad('Passport number, nationality and passport expiry are required for international flights.', 'رقم الجواز والجنسية وتاريخ انتهاء الجواز مطلوبة للرحلات الدولية.');
+      }
+      if (Date.parse(t.passportExpiry) < Date.parse(travelDate) + 182 * 864e5) {
+        bad('Passports must be valid for at least 6 months after travel.', 'يجب أن يكون الجواز سارياً لمدة 6 أشهر على الأقل بعد السفر.');
+      }
+    }
+  }
+  if (counts.adult !== q.adults || counts.child !== q.children || counts.infant !== q.infants) {
+    bad('Please complete the details for every passenger.', 'يرجى إكمال بيانات جميع المسافرين.');
+  }
+}
+
 /** Create a booking from a quote request + contact details. */
-function create(db, input, { user = null, source = 'web', createdBy = null } = {}) {
-  const q = pricing.quote(db, input);
+async function create(db, input, { user = null, source = 'web', createdBy = null } = {}) {
+  const q = await pricing.quote(db, input);
   const c = input.contact || {};
   const name = String(c.name || '').trim();
   const email = String(c.email || '').trim().toLowerCase();
@@ -54,6 +88,7 @@ function create(db, input, { user = null, source = 'web', createdBy = null } = {
   if (!EMAIL.test(email)) throw new AppError('Please enter a valid email address.', { ar: 'يرجى إدخال بريد إلكتروني صحيح.' });
   const phone = normalisePhone(c.phone);
   const travelers = cleanTravelers(input.travelers, q.adults + q.children + q.infants);
+  if (q.type === 'flight') validateFlightTravelers(travelers, q);
   if (q.type !== 'hotel' && travelers.some((t) => !t.firstName || !t.lastName)) {
     throw new AppError('Please enter the first and last name of every traveler as shown in the passport.', { ar: 'يرجى إدخال الاسم الأول والأخير لكل مسافر كما في جواز السفر.' });
   }
@@ -79,6 +114,7 @@ function create(db, input, { user = null, source = 'web', createdBy = null } = {
     dbm.logActivity(db, { userId: createdBy ?? user?.id ?? null, bookingId: bid, action: 'booking.created', detail: `${source} ${q.type}` });
     return bid;
   });
+  if (q.type === 'flight') await ticketing.onCreated(db, db.prepare('SELECT * FROM bookings WHERE id = ?').get(id));
   const booking = db.prepare('SELECT * FROM bookings WHERE id = ?').get(id);
   notify.bookingCreated(db, booking);
   return booking;
@@ -109,6 +145,7 @@ function view(db, b) {
     paid: b.paid_amount, outstanding: Math.max(0, b.total - b.paid_amount), currency: b.currency,
     status: b.status, paymentStatus: b.payment_status, paymentMethod: b.payment_method,
     invoiceNo: b.invoice_no, createdAt: b.created_at,
+    ticketStatus: b.ticket_status, pnr: b.pnr, tickets: JSON.parse(b.tickets || '[]'),
     payments: pays.map((p) => ({ ...p, sandbox: !!p.sandbox })),
   };
 }

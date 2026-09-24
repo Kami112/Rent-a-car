@@ -11,6 +11,8 @@ const { randomToken } = require('../auth');
 const moyasar = require('./moyasar');
 const tabby = require('./tabby');
 const tamara = require('./tamara');
+const ticketing = require('../ticketing');
+const flights = require('../flights');
 
 const PROVIDERS = { card: moyasar, tabby, tamara };
 const ONLINE = Object.keys(PROVIDERS);
@@ -60,6 +62,18 @@ function assertPayable(booking) {
   if (outstanding(booking) <= 0) throw new AppError('This booking is already paid.', { ar: 'تم دفع هذا الحجز مسبقاً.' });
 }
 
+/** Live airline fares expire and can change: re-check before charging (held seats are guaranteed). */
+async function assertFareStillValid(db, booking) {
+  if (booking.type !== 'flight' || booking.ticket_status === 'held' || !booking.item_id.startsWith('off_')) return;
+  const offer = await flights.getOffer(db, booking.item_id);
+  const fareLine = JSON.parse(booking.details).lines[0];
+  if (offer.total !== fareLine.unit) {
+    throw new AppError('The airline has changed this fare. Please search again for the latest price.', {
+      ar: 'قامت شركة الطيران بتغيير هذا السعر. يرجى البحث مرة أخرى للحصول على أحدث سعر.',
+    });
+  }
+}
+
 /**
  * Begin a payment. Returns one of:
  *   { action: 'redirect', url }
@@ -73,6 +87,7 @@ async function start(db, booking, { method, lang = 'en', instalments = 4, custom
   if (!offered.includes(method)) {
     throw new AppError('This payment method is not available for this booking.', { ar: 'طريقة الدفع هذه غير متاحة لهذا الحجز.' });
   }
+  await assertFareStillValid(db, booking);
   db.prepare("UPDATE bookings SET payment_method = ?, updated_at = datetime('now') WHERE id = ?").run(method, booking.id);
 
   if (method === 'bank_transfer') {
@@ -198,7 +213,11 @@ function markPaid(db, paymentId, { userId = null } = {}) {
     }
     dbm.logActivity(db, { userId, bookingId: b.id, action: `payment.${p.provider}.paid`, detail: `${p.amount} halalas${p.sandbox ? ' (sandbox)' : ''}` });
   });
-  if (confirmedNow) notify.bookingConfirmed(db, getBooking(db, confirmedNow));
+  if (confirmedNow) {
+    const b = getBooking(db, confirmedNow);
+    notify.bookingConfirmed(db, b);
+    if (b.type === 'flight') ticketing.issue(db, b.id, { userId }).catch((e) => console.error('[ticketing]', e));
+  }
 }
 
 function markFailed(db, payment, reason = '') {

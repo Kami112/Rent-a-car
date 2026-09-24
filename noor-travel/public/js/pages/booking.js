@@ -32,6 +32,7 @@
         <button class="btn btn-ghost btn-sm" id="copy-ref" type="button">⧉</button></div>
     </div>
     <div id="bank-box"></div>
+    <div id="flight-box"></div>
     <div class="card panel mt-3">
       <div class="flex between"><h3 class="mb-0">${esc(lang === 'ar' ? b.titleAr || b.title : b.title)}</h3>
         <div class="flex">${statusBadge('st', b.status)} ${statusBadge('ps', b.paymentStatus)}</div></div>
@@ -58,6 +59,22 @@
     ${canPay && methods.length ? `<div class="card panel mt-3 no-print" id="pay-panel"><h3>${esc(t('complete_payment'))} · <span class="num">${money(b.outstanding)}</span></h3>
       <div class="flex">${methods.map((m) => `<button class="btn btn-outline" data-m="${m.key}">${esc(t(`m_${m.key}`))}</button>`).join('')}</div>
       <div id="moyasar-box"></div></div>` : ''}`;
+
+  if (b.type === 'flight' && b.meta?.slices) {
+    const F = Noor.flightUI;
+    const m = b.meta;
+    const tk = b.ticketStatus || 'pending';
+    const ticket = b.pnr && tk === 'issued'
+      ? `<div class="ticket-box"><div><div class="small muted">${esc(t('pnr'))}</div><div class="pnr">${esc(b.pnr)}</div></div>
+          ${b.tickets.length ? `<div><div class="small muted">${esc(t('e_tickets'))}</div><strong class="num">${b.tickets.map(esc).join('<br>')}</strong></div>` : ''}
+          <span class="status s-confirmed" style="margin-inline-start:auto">✓ ${esc(t('tk_issued'))}</span></div>`
+      : `<div class="alert ${b.paymentStatus === 'paid' ? 'alert-info' : 'alert-warn'}"><strong>${esc(t(b.paymentStatus === 'paid' ? `tk_${tk}` : (tk === 'held' ? 'tk_held' : 'pay_pending_t')))}</strong>${b.pnr ? ` · PNR <span class="num">${esc(b.pnr)}</span>` : ''}<div class="small">${esc(t('tk_note'))}</div></div>`;
+    $('#flight-box').innerHTML = `<div class="card panel mt-3"><h3>✈ ${esc(t('flight_summary'))}</h3>${ticket}
+      <div class="fl-box mt-2"><div class="fl-main"><div class="fl-airline">${F.logo(m.owner)}<div><strong>${esc(m.owner.name)}</strong><div class="small muted">${esc(L(Noor.site.cabins[m.cabin] || Noor.site.cabins.economy))}</div></div></div>
+        <div class="fl-slices">${m.slices.map(F.sliceRow).join('')}</div></div>
+        <div class="fl-details">${m.slices.map((sl, i) => F.sliceDetails(sl, t(i ? 'inbound' : 'outbound'))).join('')}</div>
+        <div class="fl-foot"><div class="perks">${F.perks({ baggage: m.baggage, refundable: m.refundable })}</div></div></div></div>`;
+  }
 
   $('#copy-ref').addEventListener('click', () => navigator.clipboard?.writeText(b.ref).then(() => toast('✓')));
   $('#cancel-btn')?.addEventListener('click', async () => {

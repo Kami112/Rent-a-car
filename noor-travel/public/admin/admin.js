@@ -34,7 +34,7 @@
   // ------------------------------------------------------------ shell
   const NAV = [
     ['dashboard', 'Dashboard'], ['bookings', 'Bookings'], ['new', 'New booking'], ['payments', 'Payments'],
-    ['sep', 'Catalogue'], ['packages', 'Packages'], ['inventory', 'Hotels · Flights · Visas'], ['promos', 'Promo codes'],
+    ['sep', 'Catalogue'], ['packages', 'Packages'], ['inventory', 'Hotels · Visas'], ['promos', 'Promo codes'],
     ['sep', 'Customers'], ['customers', 'Customers'], ['inquiries', 'Inquiries'], ['reviews', 'Reviews'], ['messages', 'Messages outbox'],
     ['sep', 'System'], ['staff', 'Staff', true], ['settings', 'Settings'],
   ];
@@ -108,8 +108,9 @@
           <div class="card kpi"><span>Revenue collected</span><strong>${SAR(k.revenue)}</strong><em>last ${d} days</em></div>
           <div class="card kpi"><span>Bookings</span><strong>${k.bookings}</strong><em>${k.confirmed} confirmed · ${k.conversion}% paid</em></div>
           <div class="card kpi"><span>Average order</span><strong>${SAR(k.avgOrder)}</strong><em>paid bookings</em></div>
-          <div class="card kpi"><span>VAT collected</span><strong>${SAR(k.vatCollected)}</strong><em>15% output VAT</em></div>
+          <div class="card kpi"><span>VAT collected</span><strong>${SAR(k.vatCollected)}</strong><em>output VAT</em></div>
           <div class="card kpi"><span>Awaiting payment</span><strong>${k.pendingPayment}</strong><em>${k.awaitingTransfer} bank transfers to verify</em></div>
+          <div class="card kpi"><span>Flights to ticket</span><strong style="color:${s.toTicket ? 'var(--danger)' : 'inherit'}">${s.toTicket}</strong><em><a href="#/bookings" onclick="setTimeout(()=>{const x=document.querySelector('#btk');if(x){x.value='manual';x.dispatchEvent(new Event('change'))}},300)">paid, awaiting e-ticket</a></em></div>
           <div class="card kpi"><span>New inquiries</span><strong>${k.newInquiries}</strong><em>${k.customers} registered customers</em></div>
         </div>
         <div class="two mt-2">
@@ -153,7 +154,7 @@
       ${rows.map((b) => `<tr class="click" data-ref="${esc(b.ref)}"><td class="mono"><strong>${esc(b.ref)}</strong></td>
         <td>${esc(b.contact_name)}${b.contact_phone ? `<div class="small muted">${esc(b.contact_phone)}</div>` : ''}</td>
         <td>${esc(b.title)}${b.travel_date ? `<div class="small muted">${fmtDate(b.travel_date)}</div>` : ''}</td>
-        <td>${badge(b.status)} ${badge(b.payment_status)}${b.payment_method ? `<div class="small muted">${esc(methodName[b.payment_method] || b.payment_method)}</div>` : ''}</td>
+        <td>${badge(b.status)} ${badge(b.payment_status)}${b.ticket_status && b.ticket_status !== 'not_applicable' ? ` ${badge(`ticket ${b.ticket_status}`.replace(' ', '_'))}` : ''}${b.payment_method ? `<div class="small muted">${esc(methodName[b.payment_method] || b.payment_method)}</div>` : ''}</td>
         <td class="r num">${SAR(b.total)}</td><td class="small muted">${fmtDate(b.created_at)}</td></tr>`).join('')}</tbody></table>`;
   }
   view.addEventListener('click', (e) => {
@@ -169,12 +170,13 @@
       <input class="input" id="bq" placeholder="Search ref, name, email, phone…" value="${esc(bState.q || '')}" style="min-width:260px">
       <select class="input" id="bs"><option value="">All statuses</option>${['pending_payment', 'confirmed', 'completed', 'cancelled', 'refunded'].map((s) => `<option ${bState.status === s ? 'selected' : ''} value="${s}">${s.replace('_', ' ')}</option>`).join('')}</select>
       <select class="input" id="bp"><option value="">All payments</option>${['unpaid', 'pending', 'paid', 'failed', 'refunded', 'partially_refunded'].map((s) => `<option ${bState.payment_status === s ? 'selected' : ''} value="${s}">${s.replace('_', ' ')}</option>`).join('')}</select>
+      <select class="input" id="btk"><option value="">Any ticket status</option>${['pending', 'held', 'manual', 'failed', 'issued'].map((s) => `<option ${bState.ticket_status === s ? 'selected' : ''}>${s}</option>`).join('')}</select>
       <select class="input" id="bt"><option value="">All products</option>${['package', 'flight', 'hotel', 'visa'].map((s) => `<option ${bState.type === s ? 'selected' : ''}>${s}</option>`).join('')}</select>
       <input class="input" type="date" id="bf" value="${esc(bState.from || '')}" title="From"><input class="input" type="date" id="bto" value="${esc(bState.to || '')}" title="To">
     </div><div class="card table-wrap" id="bl"></div>`;
     let timer;
     const load = async () => {
-      Object.assign(bState, { q: $('#bq').value, status: $('#bs').value, payment_status: $('#bp').value, type: $('#bt').value, from: $('#bf').value, to: $('#bto').value });
+      Object.assign(bState, { q: $('#bq').value, status: $('#bs').value, payment_status: $('#bp').value, ticket_status: $('#btk').value, type: $('#bt').value, from: $('#bf').value, to: $('#bto').value });
       const p = new URLSearchParams(Object.entries(bState).filter(([, v]) => v));
       const r = await api(`/admin/bookings?${p}`);
       $('#bl').innerHTML = bookingTable(r.rows) + `<div class="pager"><span class="muted">${r.total} bookings · page ${r.page} of ${Math.max(1, r.pages)}</span>
@@ -207,6 +209,15 @@
         <button class="btn btn-outline btn-sm" id="resend">Resend email/WhatsApp</button>
         <a class="btn btn-ghost btn-sm" target="_blank" href="${esc(b.paymentLink)}">Open customer view ↗</a>
       </div>
+      ${b.type === 'flight' ? `<div class="card panel mt-3" style="background:var(--brand-50)"><div class="flex between"><h3 class="mb-0">✈ Airline ticketing</h3>${badge(b.ticketStatus || 'pending')}</div>
+        ${b.meta?.slices ? `<div class="small mt-1">${esc(b.meta.owner.name)} · ${b.meta.slices.map((s) => `${esc(s.origin)}→${esc(s.destination)} ${esc(s.departAt.replace('T', ' '))} (${s.segments.map((g) => esc(g.flightNo)).join(', ')})`).join(' · ')} · source: <strong>${esc(b.meta.provider)}</strong></div>` : ''}
+        ${b.pnr ? `<div class="mt-1">PNR <strong class="mono">${esc(b.pnr)}</strong>${b.tickets.length ? ` · Tickets <span class="mono">${b.tickets.map(esc).join(', ')}</span>` : ''}</div>` : ''}
+        ${b.ticketStatus === 'manual' ? '<div class="alert alert-warn mt-1">Demo / offline fare — issue this ticket in your GDS or the airline portal, then record the PNR and ticket numbers below.</div>' : ''}
+        ${b.ticketStatus === 'failed' ? '<div class="alert alert-error mt-1">Automatic ticketing failed (fare expired or price changed). Retry, rebook manually, or refund the customer.</div>' : ''}
+        ${b.paymentStatus === 'paid' && b.ticketStatus !== 'issued' ? `<form class="toolbar mt-2" id="tk-form"><input class="input mono" name="pnr" placeholder="PNR e.g. ABC123" required style="width:150px">
+          <input class="input mono" name="tickets" placeholder="Ticket numbers (comma separated)" style="min-width:260px"><button class="btn btn-primary btn-sm">Record ticket</button>
+          ${b.meta?.provider === 'duffel' ? '<button class="btn btn-outline btn-sm" type="button" id="tk-retry">Retry automatic issue</button>' : ''}</form>` : ''}
+      </div>` : ''}
       <h3 class="mt-3">Lines</h3>
       <table class="table"><tbody>${b.lines.map((l) => `<tr><td>${esc(l.en)}</td><td class="r">× ${l.qty}</td><td class="r num">${SAR(l.amount)}</td></tr>`).join('')}
       ${b.discount ? `<tr><td>Discount ${esc(b.promo || '')}</td><td></td><td class="r num">−${SAR(b.discount)}</td></tr>` : ''}
@@ -248,6 +259,9 @@
     $('#copy-link', body).onclick = () => navigator.clipboard?.writeText(b.paymentLink).then(() => toast('Payment link copied'));
     $('#resend', body).onclick = guard(async () => { await api(`/admin/bookings/${ref}/resend`, { method: 'POST', body: {} }); toast('Sent', 'success'); });
     $('#save-notes', body).onclick = guard(async () => { await api(`/admin/bookings/${ref}/notes`, { method: 'PATCH', body: { notes: $('#notes').value } }); toast('Saved', 'success'); });
+    const tkf = $('#tk-form', body);
+    if (tkf) tkf.onsubmit = guard(async (e) => { e.preventDefault(); await api(`/admin/bookings/${ref}/ticket/manual`, { method: 'POST', body: Object.fromEntries(new FormData(tkf)) }); toast('Ticket recorded — customer notified', 'success'); reload(); });
+    $('#tk-retry', body)?.addEventListener('click', guard(async () => { const r = await api(`/admin/bookings/${ref}/ticket/issue`, { method: 'POST', body: {} }); toast(`Ticket status: ${r.ticketStatus}`); reload(); }));
     const off = $('#offline', body);
     if (off) off.onsubmit = guard(async (e) => { e.preventDefault(); await api(`/admin/bookings/${ref}/payments`, { method: 'POST', body: Object.fromEntries(new FormData(off)) }); toast('Payment recorded', 'success'); reload(); });
   }
@@ -383,8 +397,8 @@
 
   // ------------------------------------------------------------ inventory
   async function inventory() {
-    setTitle('Hotels · Flights · Visas');
-    const [hotels, flights, visas] = await Promise.all([api('/admin/hotels'), api('/admin/flights'), api('/admin/visas')]);
+    setTitle('Hotels · Visas');
+    const [hotels, visas] = await Promise.all([api('/admin/hotels'), api('/admin/visas')]);
     const dis = isAdmin ? '' : 'disabled';
     view.innerHTML = `<div class="card table-wrap"><div class="panel" style="padding-bottom:0"><h3>Hotels</h3></div><table class="table"><thead><tr><th>Hotel</th><th>City</th><th>★</th><th>Price / night (SAR)</th><th>Active</th><th></th></tr></thead><tbody>
       ${hotels.map((h) => `<tr data-kind="hotels" data-id="${h.id}"><td>${esc(h.name)}</td><td>${esc(h.city_en)}</td><td>${h.stars}</td><td><input class="input" style="height:36px;width:120px" type="number" name="price" value="${h.price_per_night / 100}" ${dis}></td>
@@ -392,10 +406,7 @@
       <div class="card table-wrap mt-2"><div class="panel" style="padding-bottom:0"><h3>Visa services</h3></div><table class="table"><thead><tr><th>Visa</th><th>Processing</th><th>Price (SAR)</th><th>Active</th><th></th></tr></thead><tbody>
       ${visas.map((v) => `<tr data-kind="visas" data-id="${v.id}"><td>${esc(v.flag)} ${esc(v.country_en)} — ${esc(v.type_en)}</td><td><input class="input" style="height:36px" name="processing" value="${esc(v.processing_days)}" ${dis}></td>
         <td><input class="input" style="height:36px;width:110px" type="number" name="price" value="${v.price / 100}" ${dis}></td><td><input type="checkbox" name="active" ${v.active ? 'checked' : ''} ${dis}></td><td>${isAdmin ? '<button class="btn btn-outline btn-sm" data-save>Save</button>' : ''}</td></tr>`).join('')}</tbody></table></div>
-      <div class="card table-wrap mt-2"><div class="panel" style="padding-bottom:0"><h3>Flight schedules</h3><p class="muted small">Fares are derived from the base economy fare with date, demand and cabin multipliers. Connect a GDS (Amadeus/Sabre) for live airline inventory.</p></div>
-      <table class="table"><thead><tr><th>Flight</th><th>Route</th><th>Departs</th><th>Duration</th><th>Base fare (SAR)</th><th>Active</th><th></th></tr></thead><tbody>
-      ${flights.map((f) => `<tr data-kind="flights" data-id="${f.id}"><td>${esc(f.airline)} <span class="mono">${esc(f.flight_no)}</span></td><td>${f.origin} → ${f.destination}</td><td>${f.depart_time}</td><td>${Math.floor(f.duration_min / 60)}h ${f.duration_min % 60}m</td>
-        <td><input class="input" style="height:36px;width:110px" type="number" name="baseFare" value="${f.base_fare / 100}" ${dis}></td><td><input type="checkbox" name="active" ${f.active ? 'checked' : ''} ${dis}></td><td>${isAdmin ? '<button class="btn btn-outline btn-sm" data-save>Save</button>' : ''}</td></tr>`).join('')}</tbody></table></div>`;
+`;
     $$('[data-save]').forEach((b) => {
       b.onclick = guard(async () => {
         const tr = b.closest('tr');
@@ -509,6 +520,10 @@
         <div class="field"><label>Tamara minimum</label><input class="input" name="tamara_min" type="number" value="${(lim.tamara?.min || 0) / 100}" ${dis}></div>
         <div class="field"><label>Tamara maximum</label><input class="input" name="tamara_max" type="number" value="${(lim.tamara?.max || 0) / 100}" ${dis}></div>
       </div>
+      <h3 class="mt-3">Flights</h3>
+      <p class="muted small">Provider: <strong>${s.flightProvider === 'duffel' ? 'Duffel (live airline content & ticketing)' : 'Demo fares — tickets issued manually by staff'}</strong>. Set DUFFEL_ACCESS_TOKEN to connect 300+ airlines.</p>
+      <div class="form-grid"><div class="field"><label>Service fee per passenger (SAR, incl. VAT)</label><input class="input" name="fee" type="number" min="0" step="1" value="${(s.flightFees.perPassenger || 0) / 100}" ${dis}></div>
+        <div class="field"><label>FX rates used for airline fares</label><div class="small mono muted">${Object.entries(s.fxRates).filter(([k]) => k !== 'SAR').slice(0, 6).map(([k, v]) => `${k} ${v}`).join(' · ')} …</div></div></div>
       <h3 class="mt-3">Bank transfer</h3>
       <label class="check"><input type="checkbox" name="bt_enabled" ${s.bankTransfer.enabled ? 'checked' : ''} ${dis}> Offer bank transfer at checkout</label>
       <div class="form-grid mt-2">
@@ -535,6 +550,7 @@
       await api('/admin/settings', { method: 'PUT', body: {
         paymentLimits: { tabby: { min: Number(d.tabby_min), max: Number(d.tabby_max) }, tamara: { min: Number(d.tamara_min), max: Number(d.tamara_max) } },
         bankTransfer: { enabled: !!d.bt_enabled, bank: d.bt_bank, accountName: d.bt_name, iban: d.bt_iban },
+        flightFees: { perPassenger: Number(d.fee || 0) },
       } });
       toast('Settings saved', 'success');
     });

@@ -10,6 +10,10 @@ hotels and visa services and pay online. Staff run the business from the back-of
 - Arabic (RTL) and English, switchable on every page; mobile-first design
 - Umrah & holiday packages with itinerary, inclusions, reviews and live pricing
 - Flight search (one-way / return, cabins, adults/children/infants)
+- **Flights (Almatar-style):** round-trip / one-way search, airport autocomplete (80+ airports, Arabic & English),
+  travellers & cabin picker, fare calendar, cheapest / recommended / fastest sorting, filters (stops, price,
+  departure time, airlines, baggage, refundable), expandable itineraries with layovers, airline-grade passenger
+  forms (English names, gender, DOB, passport & expiry, 6-month validity check), PNR & e-ticket display
 - Hotels (Makkah, Madinah, Riyadh, Jeddah, Dubai, Istanbul…) and visa services
 - Checkout with traveler details, add-ons (insurance, transfers, eSIM, baggage, express visa), promo codes
 - **Payments:** mada / Visa / Mastercard / Apple Pay / STC Pay (Moyasar), **Tabby** (split in 4),
@@ -35,7 +39,7 @@ cd noor-travel
 npm install
 cp .env.example .env     # optional
 npm start                # http://localhost:3000
-npm test                 # 13 automated tests
+npm test                 # 15 automated tests
 ```
 
 Back-office: <http://localhost:3000/admin/> — default dev login `admin@noortravel.sa` / `Admin@12345`
@@ -46,6 +50,18 @@ Back-office: <http://localhost:3000/admin/> — default dev login `admin@noortra
 With no provider keys, `PAYMENTS_MODE=sandbox` routes every method through a built-in simulator
 (`/pay-sandbox.html`) so you can test the whole flow. Test card `4111 1111 1111 1111` approves;
 any card ending `0002` is declined. In production (`PAYMENTS_MODE=live`) a method without keys is hidden.
+
+## Flights & airline ticketing
+
+| Mode | When | What happens |
+|---|---|---|
+| **Duffel (live)** | `DUFFEL_ACCESS_TOKEN` set | Live fares from 300+ airlines. Seats are **held** at booking when the airline allows; after payment the ticket is **issued automatically** and the PNR + e-ticket numbers are sent to the customer. The fare is re-checked before payment. |
+| **Demo** | no token | Realistic schedules/fares for any route between the 80+ airports. After payment the booking shows **“Flights to ticket”** in the back-office; staff issue it in their GDS / airline portal and record the PNR + ticket numbers, which are sent to the customer. |
+
+Duffel test tokens (`duffel_test_…`) book the fictional "Duffel Airways" — safe for end-to-end testing.
+Tickets are paid from your Duffel balance in the airline's currency; set `FX_RATES` so SAR prices match your costs,
+and set the agency service fee per passenger in **Back-office → Settings**. VAT: international air fares are
+zero-rated, domestic fares and service fees carry 15%.
 
 ## Going live — checklist
 
@@ -58,8 +74,8 @@ any card ending `0002` is declined. In production (`PAYMENTS_MODE=live`) a metho
 5. Replace the placeholder bank IBAN in **Back-office → Settings**.
 6. Connect email / WhatsApp delivery in `src/notify.js` (every message is already logged in the outbox).
 7. Have the terms/cancellation/privacy wording in `public/js/pages/policies.js` reviewed by your legal advisor.
-8. For live airline inventory, replace `src/flights.js` with a GDS/NDC connector (Amadeus, Sabre, Travelport);
-   for ZATCA Phase 2 (e-invoice integration), connect a certified EGS solution.
+8. **Flights:** open a Duffel account (or connect your IATA/consolidator GDS), fund the balance and set `DUFFEL_ACCESS_TOKEN`.
+9. For ZATCA Phase 2 (e-invoice integration), connect a certified EGS solution.
 
 Security design: all prices are computed on the server; payments are always re-verified with the
 provider API (browser redirects and webhooks are never trusted), amount and booking reference are

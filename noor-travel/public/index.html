@@ -16,12 +16,23 @@
 <body>
 <div id="site-header"></div>
 
-<section class="hero">
+<section class="hero hero-flights">
   <div class="hero-art" id="hero-art"></div>
   <div class="container">
     <span class="eyebrow" data-i18n="hero_eyebrow"></span>
-    <h1 data-i18n-html="hero_title"></h1>
-    <p class="lead" data-i18n="hero_lead"></p>
+    <h1 data-i18n-html="flights_hero_title"></h1>
+    <p class="lead" data-i18n="flights_hero_lead"></p>
+    <div class="hero-search">
+      <nav class="hero-tabs" aria-label="Products">
+        <a href="/" class="active"><span data-icon="plane"></span><span data-i18n="tab_flights"></span></a>
+        <a href="/hotels.html"><span data-icon="bed"></span><span data-i18n="tab_hotels"></span></a>
+        <a href="/packages.html?category=umrah"><span data-icon="moon"></span><span data-i18n="tab_umrah"></span></a>
+        <a href="/packages.html"><span data-icon="globe"></span><span data-i18n="tab_packages"></span></a>
+        <a href="/visas.html"><span data-icon="doc"></span><span data-i18n="tab_visas"></span></a>
+      </nav>
+      <div id="flight-search"></div>
+      <div class="recent" id="recent"></div>
+    </div>
     <div class="hero-badges">
       <span>✓ <span data-i18n="hero_b1"></span></span>
       <span>✓ <span data-i18n="hero_b2"></span></span>
@@ -30,61 +41,13 @@
   </div>
 </section>
 
-<div class="container">
-  <div class="search-card" id="search">
-    <div class="tabs" role="tablist">
-      <button class="tab active" role="tab" data-tab="umrah"><span data-icon="moon"></span><span data-i18n="tab_umrah"></span></button>
-      <button class="tab" role="tab" data-tab="packages"><span data-icon="globe"></span><span data-i18n="tab_packages"></span></button>
-      <button class="tab" role="tab" data-tab="flights"><span data-icon="plane"></span><span data-i18n="tab_flights"></span></button>
-      <button class="tab" role="tab" data-tab="hotels"><span data-icon="bed"></span><span data-i18n="tab_hotels"></span></button>
-      <button class="tab" role="tab" data-tab="visas"><span data-icon="doc"></span><span data-i18n="tab_visas"></span></button>
-    </div>
-
-    <form class="search-grid" data-pane="umrah" action="/packages.html">
-      <input type="hidden" name="category" value="umrah">
-      <div class="field"><label data-i18n="travel_date"></label><input class="input" type="date" name="date" id="umrah-date"></div>
-      <div class="field"><label data-i18n="adults"></label><select class="input" name="adults">
-        <option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>
-      <div class="field"><label data-i18n="sort"></label><select class="input" name="sort">
-        <option value="" data-i18n="sort_featured"></option><option value="price_asc" data-i18n="sort_price_asc"></option></select></div>
-      <button class="btn btn-primary"><span data-i18n="search"></span></button>
-    </form>
-
-    <form class="search-grid hidden" data-pane="packages" action="/packages.html">
-      <div class="field" style="grid-column: span 2"><label data-i18n="where_to"></label><input class="input" name="q" data-i18n-ph="any_destination"></div>
-      <div class="field"><label data-i18n="category"></label><select class="input" name="category">
-        <option value="" data-i18n="all"></option><option value="international" data-i18n="cat_international"></option>
-        <option value="domestic" data-i18n="cat_domestic"></option><option value="honeymoon" data-i18n="cat_honeymoon"></option></select></div>
-      <button class="btn btn-primary"><span data-i18n="search"></span></button>
-    </form>
-
-    <form class="search-grid hidden" data-pane="flights" action="/flights.html">
-      <div class="field"><label data-i18n="from"></label><select class="input airport" name="from" data-default="RUH"></select></div>
-      <div class="field"><label data-i18n="to"></label><select class="input airport" name="to" data-default="JED"></select></div>
-      <div class="field"><label data-i18n="depart"></label><input class="input" type="date" name="date" required></div>
-      <div class="field"><label><span data-i18n="return"></span> <span class="muted">(<span data-i18n="optional"></span>)</span></label><input class="input" type="date" name="returnDate"></div>
-      <div class="field"><label data-i18n="adults"></label><select class="input" name="adults"><option selected>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>
-      <div class="field"><label data-i18n="cabin"></label><select class="input" name="cabin" id="cabin-sel"></select></div>
-      <button class="btn btn-primary"><span data-i18n="search_flights"></span></button>
-    </form>
-
-    <form class="search-grid hidden" data-pane="hotels" action="/hotels.html">
-      <div class="field"><label data-i18n="city"></label><select class="input" name="city">
-        <option value="Makkah">Makkah · مكة</option><option value="Madinah">Madinah · المدينة</option><option value="Riyadh">Riyadh · الرياض</option>
-        <option value="Jeddah">Jeddah · جدة</option><option value="Dubai">Dubai · دبي</option><option value="Istanbul">Istanbul · إسطنبول</option>
-        <option value="Cairo">Cairo · القاهرة</option><option value="London">London · لندن</option><option value="Kuala Lumpur">Kuala Lumpur · كوالالمبور</option></select></div>
-      <div class="field"><label data-i18n="check_in"></label><input class="input" type="date" name="date" required></div>
-      <div class="field"><label data-i18n="check_out"></label><input class="input" type="date" name="endDate" required></div>
-      <div class="field"><label data-i18n="rooms"></label><select class="input" name="rooms"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
-      <button class="btn btn-primary"><span data-i18n="search_hotels"></span></button>
-    </form>
-
-    <form class="search-grid hidden" data-pane="visas" action="/visas.html">
-      <p class="muted mb-0" style="grid-column: span 3" data-i18n="visas_sub"></p>
-      <button class="btn btn-primary"><span data-i18n="browse_visas"></span></button>
-    </form>
+<section class="section" style="padding-bottom:0">
+  <div class="container">
+    <div class="section-head"><div><h2 data-i18n="popular_routes"></h2></div>
+      <div class="pay-logos"><span class="pay-logo mada">ma<b>da</b></span><span class="pay-logo apple">Apple Pay</span><span class="pay-logo tabby">tabby</span><span class="pay-logo tamara">tamara</span></div></div>
+    <div class="route-grid" id="routes"></div>
   </div>
-</div>
+</section>
 
 <section class="section">
   <div class="container">
@@ -154,6 +117,7 @@
 
 <div id="site-footer"></div>
 <script src="/js/app.js"></script>
+<script src="/js/flight-search.js"></script>
 <script src="/js/pages/home.js"></script>
 </body>
 </html>

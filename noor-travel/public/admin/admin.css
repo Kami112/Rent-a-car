@@ -57,3 +57,6 @@ pre.msg { white-space: pre-wrap; font-family: inherit; font-size: .85rem; margin
 .table .r, .table .num { white-space: nowrap; }
 .hbar span { white-space: nowrap; }
 #modal-body > .flex:first-child { padding-inline-end: 36px; }
+.status.s-ticket_issued, .status.s-issued { background: var(--success-50); color: var(--success); }
+.status.s-ticket_pending, .status.s-ticket_held, .status.s-pending, .status.s-held { background: var(--warn-50); color: var(--warn); }
+.status.s-ticket_manual, .status.s-ticket_failed, .status.s-manual { background: var(--danger-50); color: var(--danger); }

@@ -385,3 +385,180 @@ html[dir="rtl"] .toast-wrap { transform: translateX(50%); }
 .summary-row > span:last-child { white-space: nowrap; }
 @media (max-width: 560px) { #dest-grid { grid-template-columns: 1fr 1fr; gap: 12px; } .dest-tile .cap strong { font-size: 1rem; } }
 .table .r { white-space: nowrap; }
+
+/* ================= Flight search widget ================= */
+.fsw { position: relative; }
+.fsw-trip { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.pill { display: inline-flex; align-items: center; cursor: pointer; }
+.pill input { position: absolute; opacity: 0; pointer-events: none; }
+.pill span { padding: 7px 16px; border-radius: 999px; border: 1.5px solid var(--line); font-weight: 700; font-size: .88rem; background: #fff; transition: .15s; }
+.pill input:checked + span { background: var(--brand); border-color: var(--brand); color: #fff; }
+.pill input:focus-visible + span { outline: 3px solid color-mix(in srgb, var(--gold) 70%, transparent); }
+.fsw-grid { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(350px, 1.8fr) minmax(165px, 1fr) auto; gap: 10px; align-items: stretch; }
+.fsw-od { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fsw-dates { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fsw.is-oneway .fsw-dates { grid-template-columns: 1fr; }
+.fsw.is-oneway .fsw-grid { grid-template-columns: minmax(0, 2.2fr) minmax(170px, 1fr) minmax(170px, 1fr) auto; }
+.fsw.is-oneway .fsw-ret { display: none; }
+.fsw-field { position: relative; display: flex; flex-direction: column; background: #fff; border: 1.5px solid var(--line); border-radius: 12px; padding: 8px 14px; min-width: 0; transition: border-color .15s; }
+.fsw-field:focus-within { border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-50); }
+.fsw-field > label { font-size: .72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+html[lang="ar"] .fsw-field > label { letter-spacing: 0; text-transform: none; }
+.fsw-input { border: 0; padding: 2px 0; font-size: 1.05rem; font-weight: 700; background: none; width: 100%; min-width: 0; color: var(--ink); text-align: start; }
+.fsw-input:focus { outline: none; }
+.fsw-sub { font-size: .75rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fsw-swap { position: absolute; inset-inline-start: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 2; width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--line); background: #fff; color: var(--brand); font-size: 1.05rem; cursor: pointer; box-shadow: var(--shadow-sm); transition: transform .2s; }
+html[dir="rtl"] .fsw-swap { transform: translate(50%, -50%); }
+.fsw-swap:hover { transform: translate(-50%, -50%) rotate(180deg); }
+html[dir="rtl"] .fsw-swap:hover { transform: translate(50%, -50%) rotate(180deg); }
+.fsw-pax-btn { display: flex; flex-direction: column; cursor: pointer; }
+.fsw-pax-btn small { font-size: .75rem; color: var(--muted); font-weight: 500; }
+.fsw-pop { position: absolute; top: calc(100% + 8px); inset-inline-end: 0; width: 320px; max-width: calc(100vw - 32px); background: #fff; border-radius: 16px; box-shadow: var(--shadow-lg); border: 1px solid var(--line); padding: 16px; z-index: 30; display: grid; gap: 12px; }
+.fsw-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-weight: 600; }
+.fsw-row .stepper { width: 124px; height: 42px; flex-shrink: 0; }
+.fsw-row > span { font-size: .92rem; }
+.fsw-cabins { display: flex; flex-wrap: wrap; gap: 6px; border-top: 1px solid var(--line); padding-top: 12px; }
+.fsw-cabins .pill span { font-size: .8rem; padding: 6px 12px; }
+.fsw-go { height: auto; min-height: 60px; border-radius: 12px; }
+.ac-list { position: absolute; top: calc(100% + 6px); inset-inline-start: -2px; width: max(100%, 340px); max-width: calc(100vw - 32px); background: #fff; border-radius: 14px; box-shadow: var(--shadow-lg); border: 1px solid var(--line); z-index: 30; padding: 6px; max-height: 360px; overflow-y: auto; }
+.ac-item { display: flex; gap: 12px; align-items: center; width: 100%; text-align: start; border: 0; background: none; padding: 10px; border-radius: 10px; cursor: pointer; }
+.ac-item:hover, .ac-item.active { background: var(--brand-50); }
+.ac-item small { display: block; color: var(--muted); font-size: .78rem; }
+.ac-code { font-weight: 800; color: var(--brand); background: var(--brand-50); border-radius: 8px; padding: 6px 8px; font-size: .8rem; min-width: 46px; text-align: center; }
+@media (max-width: 1100px) { .fsw-grid, .fsw.is-oneway .fsw-grid { grid-template-columns: 1fr 1fr; } .fsw-od { grid-column: 1 / -1; } .fsw-go { grid-column: 1 / -1; min-height: 52px; } }
+@media (max-width: 640px) {
+  .fsw-grid, .fsw.is-oneway .fsw-grid { grid-template-columns: 1fr; }
+  .fsw-dates { grid-template-columns: 1fr 1fr; }
+  .fsw-od { grid-template-columns: 1fr; }
+  .fsw-swap { inset-inline-start: auto; inset-inline-end: 14px; transform: translateY(-50%) rotate(90deg); }
+  html[dir="rtl"] .fsw-swap { transform: translateY(-50%) rotate(90deg); }
+  .fsw-swap:hover, html[dir="rtl"] .fsw-swap:hover { transform: translateY(-50%) rotate(270deg); }
+}
+
+/* Home flight hero */
+.hero-flights { overflow: visible; z-index: 5; }
+.hero-flights .hero-art, .hero-flights::after { overflow: hidden; }
+.hero-flights .container { padding-block: 64px 40px; }
+.hero-search { position: relative; z-index: 3; background: #fff; color: var(--ink); border-radius: 22px; padding: 22px; box-shadow: var(--shadow-lg); margin-top: 28px; }
+.hero-tabs { display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; scrollbar-width: none; }
+.hero-tabs a { display: inline-flex; gap: 8px; align-items: center; padding: 10px 16px; border-radius: 12px; font-weight: 700; color: var(--ink-2); white-space: nowrap; }
+.hero-tabs a.active { background: var(--brand-50); color: var(--brand); }
+.hero-tabs a:hover { color: var(--brand); }
+.route-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+.route-card { display: flex; gap: 12px; align-items: center; padding: 14px; border-radius: 14px; background: #fff; border: 1px solid var(--line); color: var(--ink); transition: .18s; }
+.route-card:hover { border-color: var(--brand); transform: translateY(-2px); box-shadow: var(--shadow); color: var(--ink); }
+.route-card .rc-art { width: 64px; height: 64px; border-radius: 12px; overflow: hidden; flex-shrink: 0; }
+.route-card .rc-art svg { width: 100%; height: 100%; }
+.route-card strong { display: block; }
+.recent { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; font-size: .85rem; }
+.recent a { background: var(--bg); border-radius: 999px; padding: 6px 12px; color: var(--ink-2); }
+
+/* ================= Flight results ================= */
+.fl-top { background: linear-gradient(135deg, var(--brand-700), var(--brand)); color: #fff; padding: 20px 0; }
+.fl-summary { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.fl-route strong { display: block; font-size: 1.15rem; }
+.fl-route .muted { color: #b9d8d1; font-weight: 600; font-size: .9rem; }
+.fl-route .small { color: #d3e7e2; }
+.fl-search { background: #fff; color: var(--ink); border-radius: 18px; padding: 18px; margin-top: 16px; }
+.fl-cal { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 18px; scrollbar-width: thin; }
+.fl-day { flex: 1 0 118px; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px; border-radius: 12px; background: #fff; border: 1.5px solid var(--line); color: var(--ink-2); font-size: .8rem; text-align: center; }
+.fl-day strong { font-size: .95rem; color: var(--ink); }
+.fl-day.low strong { color: var(--success); }
+.fl-day.active { border-color: var(--brand); background: var(--brand-50); }
+.fl-day:hover { border-color: var(--brand); color: var(--ink); }
+.fl-layout { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 24px; align-items: start; }
+.fl-layout.no-filters { grid-template-columns: 1fr; }
+.fl-layout.no-filters .fl-filters, .fl-layout.no-filters .fl-bar { display: none; }
+.fl-filters { padding: 20px; position: sticky; top: 90px; display: flex; flex-direction: column; gap: 6px; max-height: calc(100vh - 110px); overflow-y: auto; }
+.f-group { border-top: 1px solid var(--line); padding-top: 14px; margin-top: 8px; }
+.f-group h4 { font-size: .9rem; margin-bottom: 10px; }
+.f-row { padding: 5px 0; font-size: .9rem; align-items: center; }
+.f-times { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.f-time { cursor: pointer; }
+.f-time input { position: absolute; opacity: 0; }
+.f-time span { display: flex; flex-direction: column; align-items: center; gap: 2px; border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 4px; font-size: .78rem; text-align: center; }
+.f-time b { font-size: .8rem; }
+.f-time input:checked + span { border-color: var(--brand); background: var(--brand-50); color: var(--brand); }
+.fl-apply, .fl-filter-btn { display: none; }
+.fl-bar { display: flex; gap: 10px; align-items: stretch; margin-bottom: 10px; }
+.fl-sort { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.fl-sort-tab { border: 0; background: none; padding: 12px 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; border-bottom: 3px solid transparent; font-weight: 700; color: var(--ink-2); }
+.fl-sort-tab + .fl-sort-tab { border-inline-start: 1px solid var(--line); }
+.fl-sort-tab strong { color: var(--ink); font-size: .95rem; }
+.fl-sort-tab small { color: var(--muted); font-weight: 500; font-size: .75rem; }
+.fl-sort-tab.active { border-bottom-color: var(--brand); background: var(--brand-50); color: var(--brand); }
+.fl-card { margin-bottom: 14px; overflow: hidden; transition: box-shadow .2s, border-color .2s; }
+.fl-card:hover { box-shadow: var(--shadow); border-color: #cfdcd8; }
+.fl-main { display: grid; grid-template-columns: 170px minmax(0, 1fr) 190px; gap: 18px; padding: 18px 20px; align-items: center; }
+.fl-airline { display: flex; gap: 10px; align-items: center; min-width: 0; }
+.fl-airline strong { font-size: .92rem; }
+.airline-img { width: 40px; height: 40px; object-fit: contain; }
+.fl-slices { display: grid; gap: 14px; }
+.fl-slice { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 14px; align-items: center; }
+.fl-t { display: flex; flex-direction: column; align-items: center; min-width: 58px; }
+.fl-t strong { font-size: 1.25rem; }
+.fl-t sup { color: var(--danger); font-size: .7rem; margin-inline-start: 2px; }
+.fl-t span { font-size: .8rem; color: var(--muted); font-weight: 700; }
+.fl-mid { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+.fl-line { position: relative; width: 100%; height: 2px; background: var(--line); display: flex; justify-content: space-evenly; align-items: center; }
+.fl-line::after { content: '✈'; position: absolute; inset-inline-end: -6px; top: -10px; color: var(--brand); font-size: .9rem; }
+html[dir="rtl"] .fl-line::after { transform: scaleX(-1); }
+.fl-line i { width: 8px; height: 8px; border-radius: 50%; background: #fff; border: 2px solid var(--gold-600); }
+.direct-txt { color: var(--success); font-weight: 700; }
+.stop-txt { color: var(--warn); font-weight: 700; }
+.fl-price { text-align: end; border-inline-start: 1px dashed var(--line); padding-inline-start: 18px; }
+.fl-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 20px; background: var(--bg); border-top: 1px solid var(--line); flex-wrap: wrap; }
+.perks { display: flex; gap: 8px; flex-wrap: wrap; }
+.perk { font-size: .75rem; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #fff; border: 1px solid var(--line); }
+.perk.ok { color: var(--success); }
+.perk.no { color: var(--muted); }
+.fl-details { padding: 6px 20px 18px; border-top: 1px solid var(--line); }
+.fl-detail { margin-top: 14px; }
+.fl-detail-h { font-size: .9rem; margin-bottom: 10px; color: var(--ink-2); }
+.fl-seg { display: grid; grid-template-columns: 70px 16px 1fr; gap: 12px; padding: 4px 0; }
+.fl-seg-times { display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; gap: 16px; }
+.fl-seg-track { display: flex; flex-direction: column; align-items: center; padding: 6px 0; }
+.fl-seg-track i { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--brand); background: #fff; }
+.fl-seg-track b { flex: 1; width: 2px; background: var(--brand); min-height: 30px; }
+.fl-seg-info { display: flex; flex-direction: column; justify-content: space-between; gap: 6px; font-size: .9rem; }
+.fl-layover { margin: 8px 0 8px 98px; background: var(--warn-50); color: var(--warn); padding: 7px 12px; border-radius: 10px; font-size: .82rem; font-weight: 600; }
+html[dir="rtl"] .fl-layover { margin: 8px 98px 8px 0; }
+.fl-fare { margin-top: 14px; font-size: .84rem; color: var(--ink-2); }
+.fl-fare span { font-weight: 700; }
+.fl-loading { text-align: center; padding: 30px; }
+.fl-loading .plane { font-size: 2rem; color: var(--brand); animation: fly 1.6s ease-in-out infinite; }
+@keyframes fly { 0%, 100% { transform: translateX(-40px); opacity: .3; } 50% { transform: translateX(40px); opacity: 1; } }
+body.no-scroll { overflow: hidden; }
+@media (max-width: 960px) {
+  .fl-layout { grid-template-columns: minmax(0, 1fr); }
+  .fl-filters { position: fixed; inset: 0; z-index: 90; border-radius: 0; max-height: none; transform: translateY(100%); transition: transform .25s; top: 0; }
+  .fl-filters.open { transform: none; }
+  .fl-apply { display: block; position: sticky; bottom: 0; margin-top: 12px; }
+  .fl-filter-btn { display: inline-flex; }
+}
+@media (max-width: 760px) {
+  .fl-main { grid-template-columns: 1fr; gap: 12px; padding: 16px; }
+  .fl-price { text-align: start; border: 0; padding: 0; display: grid; grid-template-columns: 1fr auto; align-items: center; column-gap: 12px; }
+  .fl-price .btn { grid-row: span 2; width: auto; margin: 0; }
+  .fl-sort-tab { padding: 10px 4px; font-size: .8rem; }
+  .fl-seg { grid-template-columns: 56px 14px 1fr; }
+  .fl-layover { margin-inline-start: 0 !important; margin-inline-end: 0 !important; }
+}
+
+/* Flight summary on checkout / booking */
+.fl-box { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.fl-box .fl-main { grid-template-columns: 150px minmax(0, 1fr); }
+.ticket-box { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; padding: 16px 18px; border-radius: 14px; background: var(--brand-50); border: 1px dashed var(--brand); }
+.ticket-box .pnr { font-size: 1.5rem; font-weight: 800; letter-spacing: .12em; font-family: ui-monospace, monospace; }
+
+.fl-day strong, .fl-sort-tab strong, .fl-price .price, .f-row .num { white-space: nowrap; }
+.fl-filter-btn { align-self: center; }
+@media (max-width: 640px) {
+  .fl-day { flex-basis: 104px; padding: 8px 6px; }
+  .fl-day strong, .fl-sort-tab strong { font-size: .82rem; }
+  .fl-sort-tab span { font-size: .75rem; }
+}
+.fl-layout > div { min-width: 0; }
+
+.fsw-input[type="date"] { font-size: .98rem; }
+@media (max-width: 960px) { .fl-bar { flex-direction: column; } .fl-filter-btn { align-self: flex-start; } }
