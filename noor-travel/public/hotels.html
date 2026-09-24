@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hotels | Noor Travel Agency</title>
+<meta name="description" content="Hotels in Makkah, Madinah, Riyadh, Jeddah, Dubai, Istanbul and more.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+<section class="page-hero"><div class="container">
+  <div class="crumbs"><a href="/" data-i18n="nav_home"></a> / <span data-i18n="hotels_title"></span></div>
+  <h1 data-i18n="hotels_title"></h1><p data-i18n="hotels_sub"></p>
+</div></section>
+<div class="container"><form class="search-card search-grid" id="hs" style="margin-top:-40px;padding-top:24px">
+  <div class="field"><label data-i18n="city"></label><select class="input" name="city" id="hs-city"><option value="" data-i18n="all"></option></select></div>
+  <div class="field"><label data-i18n="check_in"></label><input class="input" type="date" name="date" required></div>
+  <div class="field"><label data-i18n="check_out"></label><input class="input" type="date" name="endDate" required></div>
+  <div class="field"><label data-i18n="rooms"></label><select class="input" name="rooms"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
+  <div class="field"><label data-i18n="guests"></label><select class="input" name="adults"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>8</option><option>10</option></select></div>
+  <button class="btn btn-primary"><span data-i18n="search_hotels"></span></button>
+</form></div>
+<section class="section" style="padding-top:40px"><div class="container"><div class="grid" id="list"></div></div></section>
+<div id="site-footer"></div>
+<script src="/js/app.js"></script>
+<script src="/js/pages/hotels.js"></script>
+</body>
+</html>

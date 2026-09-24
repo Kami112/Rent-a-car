@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flights | Noor Travel Agency</title>
+<meta name="description" content="Search and book domestic and international flights from Saudi Arabia.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+<section class="page-hero"><div class="container">
+  <div class="crumbs"><a href="/" data-i18n="nav_home"></a> / <span data-i18n="flights_title"></span></div>
+  <h1 data-i18n="flights_title"></h1><p data-i18n="flights_sub"></p>
+</div></section>
+<div class="container"><form class="search-card search-grid" id="fs" style="margin-top:-40px;padding-top:24px">
+  <div class="field"><label data-i18n="from"></label><select class="input" name="from" id="fs-from"></select></div>
+  <div class="field"><label data-i18n="to"></label><select class="input" name="to" id="fs-to"></select></div>
+  <div class="field"><label data-i18n="depart"></label><input class="input" type="date" name="date" required></div>
+  <div class="field"><label><span data-i18n="return"></span> <span class="muted">(<span data-i18n="optional"></span>)</span></label><input class="input" type="date" name="returnDate"></div>
+  <div class="field"><label data-i18n="adults"></label><select class="input" name="adults"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option></select></div>
+  <div class="field"><label data-i18n="children"></label><select class="input" name="children"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+  <div class="field"><label data-i18n="infants"></label><select class="input" name="infants"><option>0</option><option>1</option><option>2</option></select></div>
+  <div class="field"><label data-i18n="cabin"></label><select class="input" name="cabin" id="fs-cabin"></select></div>
+  <button class="btn btn-primary"><span data-i18n="search_flights"></span></button>
+</form></div>
+<section class="section" style="padding-top:40px"><div class="container">
+  <div id="f-alert"></div>
+  <h3 id="out-h" class="hidden"></h3><div class="card hidden" id="out-list"></div>
+  <h3 id="in-h" class="hidden mt-3"></h3><div class="card hidden" id="in-list"></div>
+  <div class="card panel mt-3 hidden flex between" id="f-bar"><div><div class="small muted" data-i18n="total"></div><div class="price num" id="f-total"></div></div>
+    <button class="btn btn-primary btn-lg" id="f-go" data-i18n="continue"></button></div>
+</div></section>
+<div id="site-footer"></div>
+<script src="/js/app.js"></script>
+<script src="/js/pages/flights.js"></script>
+</body>
+</html>

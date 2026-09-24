@@ -1,0 +1,20 @@
+{
+  "name": "noor-travel",
+  "version": "1.0.0",
+  "description": "Noor Travel Agency — bilingual booking website and back-office (Riyadh, KSA)",
+  "main": "server.js",
+  "private": true,
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server.js",
+    "dev": "node --disable-warning=ExperimentalWarning --watch server.js",
+    "seed": "node --disable-warning=ExperimentalWarning src/seed.js --reset",
+    "test": "node --disable-warning=ExperimentalWarning --test test/*.test.js"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "express": "^4.22.3"
+  }
+}

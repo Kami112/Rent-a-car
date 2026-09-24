@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package details | Noor Travel Agency</title>
+<meta name="description" content="Package itinerary, inclusions, reviews and online booking.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+<section class="section" style="padding-top:32px"><div class="container">
+  <div class="crumbs" style="color:var(--muted)"><a href="/" data-i18n="nav_home"></a> / <a href="/packages.html" data-i18n="nav_packages"></a> / <span id="crumb"></span></div>
+  <div id="pkg-head"></div>
+  <div class="gallery" id="gallery"></div>
+  <div class="layout-main mt-3">
+    <div>
+      <div class="card panel"><h3 data-i18n="overview"></h3><p id="summary"></p><ul class="ticks" id="includes"></ul></div>
+      <div class="card panel"><h3 data-i18n="itinerary"></h3><ol class="timeline" id="itinerary"></ol></div>
+      <div class="card panel"><h3 data-i18n="guest_reviews"></h3><div id="reviews"></div>
+        <details class="mt-2"><summary class="btn btn-outline btn-sm" data-i18n="write_review"></summary>
+          <form id="review-form" class="form-grid mt-2">
+            <div class="field"><label data-i18n="your_name"></label><input class="input" name="name" required maxlength="80"></div>
+            <div class="field"><label data-i18n="rating"></label><select class="input" name="rating"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></div>
+            <div class="field full"><label data-i18n="comment"></label><textarea class="input" name="comment" required maxlength="1000"></textarea></div>
+            <div><button class="btn btn-primary" data-i18n="submit"></button></div>
+          </form></details>
+      </div>
+    </div>
+    <aside class="card book-box sticky" id="book-box">
+      <div><span class="small muted" data-i18n="from_price"></span><div class="price num" id="bx-price"></div><div class="small muted" data-i18n="vat_incl"></div></div>
+      <div class="field"><label for="bx-date" data-i18n="travel_date"></label><input class="input" type="date" id="bx-date"></div>
+      <div class="field"><span class="label" data-i18n="adults"></span><div id="bx-adults"></div></div>
+      <div class="field"><span class="label" data-i18n="children"></span><div id="bx-children"></div></div>
+      <div class="field"><span class="label" data-i18n="infants"></span><div id="bx-infants"></div></div>
+      <div class="summary-row total"><span data-i18n="total"></span><span class="num" id="bx-total">—</span></div>
+      <div class="bnpl-box" id="bx-bnpl"></div>
+      <div class="alert alert-error hidden" id="bx-err"></div>
+      <button class="btn btn-primary btn-lg btn-block" id="bx-go" data-i18n="continue_booking"></button>
+      <div class="small muted">✓ <span data-i18n="free_cancel"></span></div>
+    </aside>
+  </div>
+</div></section>
+<div id="site-footer"></div>
+<script src="/js/app.js"></script>
+<script src="/js/pages/package.js"></script>
+</body>
+</html>

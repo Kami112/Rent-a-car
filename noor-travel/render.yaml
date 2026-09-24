@@ -1,0 +1,50 @@
+# Render Blueprint for the Noor Travel web app (Node + SQLite on a persistent disk).
+# In Render: New → Blueprint → select this repo and set the blueprint path to noor-travel/render.yaml.
+services:
+  - type: web
+    name: noor-travel
+    runtime: node
+    rootDir: noor-travel
+    plan: starter            # persistent disks require a paid instance
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    disk:
+      name: noor-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      - key: DB_PATH
+        value: /var/data/noor.db
+      - key: PAYMENTS_MODE
+        value: live
+      - key: BASE_URL
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: COMPANY_VAT_NUMBER
+        sync: false
+      - key: COMPANY_CR_NUMBER
+        sync: false
+      - key: COMPANY_TOURISM_LICENSE
+        sync: false
+      - key: MOYASAR_PUBLISHABLE_KEY
+        sync: false
+      - key: MOYASAR_SECRET_KEY
+        sync: false
+      - key: TABBY_PUBLIC_KEY
+        sync: false
+      - key: TABBY_SECRET_KEY
+        sync: false
+      - key: TABBY_MERCHANT_CODE
+        sync: false
+      - key: TAMARA_API_TOKEN
+        sync: false
+      - key: TAMARA_NOTIFICATION_KEY
+        sync: false

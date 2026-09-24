@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact us | Noor Travel Agency</title>
+<meta name="description" content="Contact Noor Travel Agency head office in Riyadh.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+<section class="page-hero"><div class="container">
+  <div class="crumbs"><a href="/" data-i18n="nav_home"></a> / <span data-i18n="contact_title"></span></div>
+  <h1 data-i18n="contact_title"></h1><p data-i18n="contact_sub"></p>
+</div></section>
+<section class="section" style="padding-top:40px"><div class="container layout-main">
+  <div>
+    <form class="card panel" id="inq">
+      <div class="form-grid">
+        <div class="field"><label data-i18n="full_name"></label><input class="input" name="name" required></div>
+        <div class="field"><label data-i18n="email"></label><input class="input" name="email" type="email" required></div>
+        <div class="field"><label data-i18n="mobile"></label><input class="input num" name="phone" type="tel"></div>
+        <div class="field"><label data-i18n="subject"></label><select class="input" name="subject">
+          <option value="Umrah" data-i18n="nav_umrah"></option><option value="Holiday" data-i18n="nav_packages"></option><option value="Flights" data-i18n="nav_flights"></option>
+          <option value="Hotels" data-i18n="nav_hotels"></option><option value="Visa" data-i18n="nav_visas"></option><option value="Corporate">Corporate / Groups</option><option value="Other">Other</option></select></div>
+        <div class="field full"><label data-i18n="message"></label><textarea class="input" name="message" required></textarea></div>
+      </div>
+      <div class="alert hidden mt-2" id="inq-msg"></div>
+      <button class="btn btn-primary mt-3" data-i18n="send"></button>
+    </form>
+    <div class="card panel faq"><h3 data-i18n="faq"></h3><div id="faq"></div></div>
+  </div>
+  <aside class="card panel sticky" id="office"></aside>
+</div></section>
+<div id="site-footer"></div>
+<script src="/js/app.js"></script>
+<script src="/js/pages/contact.js"></script>
+</body>
+</html>
