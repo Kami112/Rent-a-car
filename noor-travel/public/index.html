@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Noor Travel Agency | Umrah, Holidays, Flights & Hotels — Riyadh</title>
+<meta name="description" content="Noor Travel Agency, Riyadh. Book Umrah programmes, holiday packages, flights, hotels and visa services online. Pay with mada, Visa, Mastercard, Apple Pay, STC Pay, Tabby or Tamara.">
+<meta property="og:title" content="Noor Travel Agency — Riyadh">
+<meta property="og:description" content="Umrah, holidays, flights, hotels and visas. Pay now or split with Tabby & Tamara.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<section class="hero">
+  <div class="hero-art" id="hero-art"></div>
+  <div class="container">
+    <span class="eyebrow" data-i18n="hero_eyebrow"></span>
+    <h1 data-i18n-html="hero_title"></h1>
+    <p class="lead" data-i18n="hero_lead"></p>
+    <div class="hero-badges">
+      <span>✓ <span data-i18n="hero_b1"></span></span>
+      <span>✓ <span data-i18n="hero_b2"></span></span>
+      <span>✓ <span data-i18n="hero_b3"></span></span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="search-card" id="search">
+    <div class="tabs" role="tablist">
+      <button class="tab active" role="tab" data-tab="umrah"><span data-icon="moon"></span><span data-i18n="tab_umrah"></span></button>
+      <button class="tab" role="tab" data-tab="packages"><span data-icon="globe"></span><span data-i18n="tab_packages"></span></button>
+      <button class="tab" role="tab" data-tab="flights"><span data-icon="plane"></span><span data-i18n="tab_flights"></span></button>
+      <button class="tab" role="tab" data-tab="hotels"><span data-icon="bed"></span><span data-i18n="tab_hotels"></span></button>
+      <button class="tab" role="tab" data-tab="visas"><span data-icon="doc"></span><span data-i18n="tab_visas"></span></button>
+    </div>
+
+    <form class="search-grid" data-pane="umrah" action="/packages.html">
+      <input type="hidden" name="category" value="umrah">
+      <div class="field"><label data-i18n="travel_date"></label><input class="input" type="date" name="date" id="umrah-date"></div>
+      <div class="field"><label data-i18n="adults"></label><select class="input" name="adults">
+        <option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>
+      <div class="field"><label data-i18n="sort"></label><select class="input" name="sort">
+        <option value="" data-i18n="sort_featured"></option><option value="price_asc" data-i18n="sort_price_asc"></option></select></div>
+      <button class="btn btn-primary"><span data-i18n="search"></span></button>
+    </form>
+
+    <form class="search-grid hidden" data-pane="packages" action="/packages.html">
+      <div class="field" style="grid-column: span 2"><label data-i18n="where_to"></label><input class="input" name="q" data-i18n-ph="any_destination"></div>
+      <div class="field"><label data-i18n="category"></label><select class="input" name="category">
+        <option value="" data-i18n="all"></option><option value="international" data-i18n="cat_international"></option>
+        <option value="domestic" data-i18n="cat_domestic"></option><option value="honeymoon" data-i18n="cat_honeymoon"></option></select></div>
+      <button class="btn btn-primary"><span data-i18n="search"></span></button>
+    </form>
+
+    <form class="search-grid hidden" data-pane="flights" action="/flights.html">
+      <div class="field"><label data-i18n="from"></label><select class="input airport" name="from" data-default="RUH"></select></div>
+      <div class="field"><label data-i18n="to"></label><select class="input airport" name="to" data-default="JED"></select></div>
+      <div class="field"><label data-i18n="depart"></label><input class="input" type="date" name="date" required></div>
+      <div class="field"><label><span data-i18n="return"></span> <span class="muted">(<span data-i18n="optional"></span>)</span></label><input class="input" type="date" name="returnDate"></div>
+      <div class="field"><label data-i18n="adults"></label><select class="input" name="adults"><option selected>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>
+      <div class="field"><label data-i18n="cabin"></label><select class="input" name="cabin" id="cabin-sel"></select></div>
+      <button class="btn btn-primary"><span data-i18n="search_flights"></span></button>
+    </form>
+
+    <form class="search-grid hidden" data-pane="hotels" action="/hotels.html">
+      <div class="field"><label data-i18n="city"></label><select class="input" name="city">
+        <option value="Makkah">Makkah · مكة</option><option value="Madinah">Madinah · المدينة</option><option value="Riyadh">Riyadh · الرياض</option>
+        <option value="Jeddah">Jeddah · جدة</option><option value="Dubai">Dubai · دبي</option><option value="Istanbul">Istanbul · إسطنبول</option>
+        <option value="Cairo">Cairo · القاهرة</option><option value="London">London · لندن</option><option value="Kuala Lumpur">Kuala Lumpur · كوالالمبور</option></select></div>
+      <div class="field"><label data-i18n="check_in"></label><input class="input" type="date" name="date" required></div>
+      <div class="field"><label data-i18n="check_out"></label><input class="input" type="date" name="endDate" required></div>
+      <div class="field"><label data-i18n="rooms"></label><select class="input" name="rooms"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
+      <button class="btn btn-primary"><span data-i18n="search_hotels"></span></button>
+    </form>
+
+    <form class="search-grid hidden" data-pane="visas" action="/visas.html">
+      <p class="muted mb-0" style="grid-column: span 3" data-i18n="visas_sub"></p>
+      <button class="btn btn-primary"><span data-i18n="browse_visas"></span></button>
+    </form>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div><span class="eyebrow" data-i18n="nav_umrah"></span><h2 data-i18n="umrah_title"></h2><p data-i18n="umrah_sub"></p></div>
+      <a class="btn btn-outline" href="/packages.html?category=umrah"><span data-i18n="view_all"></span> →</a>
+    </div>
+    <div class="grid grid-3" id="umrah-grid"></div>
+  </div>
+</section>
+
+<section class="section" style="background:#fff">
+  <div class="container">
+    <div class="section-head">
+      <div><span class="eyebrow">★</span><h2 data-i18n="featured_title"></h2><p data-i18n="featured_sub"></p></div>
+      <a class="btn btn-outline" href="/packages.html"><span data-i18n="view_all"></span> →</a>
+    </div>
+    <div class="grid grid-3" id="featured-grid"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head"><div><h2 data-i18n="why_title"></h2><p data-i18n="why_sub"></p></div></div>
+    <div class="grid grid-4">
+      <div class="card feature"><div class="ico" data-icon="shield"></div><h3 data-i18n="why1_t"></h3><p data-i18n="why1_d"></p></div>
+      <div class="card feature"><div class="ico" data-icon="card"></div><h3 data-i18n="why2_t"></h3><p data-i18n="why2_d"></p></div>
+      <div class="card feature"><div class="ico" data-icon="chat"></div><h3 data-i18n="why3_t"></h3><p data-i18n="why3_d"></p></div>
+      <div class="card feature"><div class="ico" data-icon="tag"></div><h3 data-i18n="why4_t"></h3><p data-i18n="why4_d"></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="section-head"><div><h2 data-i18n="dest_title"></h2><p data-i18n="dest_sub"></p></div></div>
+    <div class="grid grid-4" id="dest-grid"></div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="band">
+      <div><h2 data-i18n="split_title"></h2><p data-i18n="split_sub"></p>
+        <div class="pay-logos"><span class="pay-logo tabby">tabby</span><span class="pay-logo tamara">tamara</span></div></div>
+      <div class="card card-pad" style="color:var(--ink)">
+        <div class="small muted">Istanbul & Bursa · 2 <span data-i18n="adults"></span></div>
+        <div class="price num" id="bnpl-demo-total"></div>
+        <div class="plan" id="bnpl-demo-plan"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:#fff">
+  <div class="container">
+    <div class="stats-strip">
+      <div><strong class="num">48,000+</strong><span data-i18n="stat1"></span></div>
+      <div><strong class="num">12,500+</strong><span data-i18n="stat2"></span></div>
+      <div><strong class="num">60+</strong><span data-i18n="stat3"></span></div>
+      <div><strong class="num">4.9/5</strong><span data-i18n="stat4"></span></div>
+    </div>
+    <div class="section-head mt-4"><div><h2 data-i18n="reviews_title"></h2></div></div>
+    <div class="grid grid-3" id="reviews-grid"></div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+<script src="/js/app.js"></script>
+<script src="/js/pages/home.js"></script>
+</body>
+</html>
