@@ -8,6 +8,16 @@
   let promo = '';
   let quote = null;
 
+  if (!me && type) {
+    // Booking requires an account: send the customer to sign in / sign up and back here.
+    const back = encodeURIComponent(location.pathname + location.search);
+    $('#co').classList.add('hidden');
+    $('#co-error-top').innerHTML = `<div class="card panel" style="max-width:560px;margin:0 auto;text-align:center">
+      <div style="font-size:2.4rem">🔐</div><h2 style="font-size:1.5rem">${esc(t('auth_gate_title'))}</h2><p class="muted">${esc(t('auth_gate_sub'))}</p>
+      <div class="flex" style="justify-content:center"><a class="btn btn-primary" href="/account.html?next=${back}">${esc(t('sign_in'))}</a>
+      <a class="btn btn-outline" href="/account.html?next=${back}#register">${esc(t('create_account'))}</a></div></div>`;
+    return;
+  }
   if (me) {
     $('#c-name').value = me.name || '';
     $('#c-email').value = me.email || '';

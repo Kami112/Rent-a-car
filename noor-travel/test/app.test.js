@@ -12,6 +12,7 @@ const dbm = require('../src/db');
 const { seed } = require('../src/seed');
 const { createApp } = require('../server');
 const zatca = require('../src/zatca');
+const notify = require('../src/notify');
 const { vatFromInclusive } = require('../src/money');
 
 let db; let server; let base;
@@ -27,9 +28,11 @@ before(async () => {
   server = createApp(db).listen(0);
   await new Promise((r) => server.once('listening', r));
   base = `http://127.0.0.1:${server.address().port}`;
+  const reg = await call('/api/account/register', { method: 'POST', body: { name: 'Test Traveller', email: 'traveller@example.com', password: 'password123' } });
+  assert.equal(reg.status, 201);
   globalThis.fetch = async (url, init) => {
     const u = String(url);
-    if (providerMock && /tabby\.ai|tamara\.co|moyasar\.com|duffel\.com/.test(u)) {
+    if (providerMock && /tabby\.ai|tamara\.co|moyasar\.com|duffel\.com|resend\.com/.test(u)) {
       const { status = 200, body = {} } = await providerMock(u, init || {});
       return new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
     }
@@ -59,7 +62,8 @@ function client() {
     return { status: res.status, data, headers: res.headers };
   };
 }
-const call = client();
+const call = client(); // signed-in customer (registered in before())
+const anon = client(); // guest
 
 const PKG = { type: 'package', id: 'istanbul-bursa-6-days', date: future(30), adults: 2, children: 1, infants: 0 };
 const CONTACT = { name: 'Mohammed Alqahtani', email: 'mo@example.com', phone: '0551234567' };
@@ -207,6 +211,13 @@ test('live Duffel: search, seat hold at booking, ticket issued after payment', a
   }
 });
 
+test('guests must sign in or sign up before booking', async () => {
+  const r = await anon('/api/bookings', { method: 'POST', body: { ...PKG, contact: CONTACT, travelers: TRAVELERS, acceptTerms: true } });
+  assert.equal(r.status, 401);
+  const mine = await call('/api/account/bookings');
+  assert.ok(Array.isArray(mine.data));
+});
+
 test('booking requires contact details, traveler names and accepted terms', async () => {
   const r = await call('/api/bookings', { method: 'POST', body: { ...PKG, contact: CONTACT, travelers: TRAVELERS } });
   assert.equal(r.status, 400);
@@ -217,7 +228,7 @@ test('booking requires contact details, traveler names and accepted terms', asyn
 test('sandbox Tabby payment confirms booking, issues invoice, uses promo and seats', async () => {
   const seatsBefore = db.prepare("SELECT seats FROM packages WHERE slug = 'istanbul-bursa-6-days'").get().seats;
   const b = await book({ promo: 'NOOR250' });
-  const view = await call(`/api/bookings/${b.ref}`);
+  const view = await anon(`/api/bookings/${b.ref}`);
   assert.equal(view.status, 404, 'booking is private without its token');
 
   const start = await call(`/api/bookings/${b.ref}/pay`, { method: 'POST', body: { t: b.token, method: 'tabby' } });
@@ -338,7 +349,7 @@ test('live Moyasar card payment is adopted from the callback and verified', asyn
 });
 
 test('staff back-office: auth, walk-in booking, office payment, refund', async () => {
-  const guest = await call('/api/admin/stats');
+  const guest = await anon('/api/admin/stats');
   assert.equal(guest.status, 401);
 
   const cust = client();
@@ -391,4 +402,68 @@ test('Tamara webhook token is verified when a notification key is set', async ()
   assert.equal(tamara.verifyNotificationToken(`${h}.${p}.${sig}`), true);
   assert.equal(tamara.verifyNotificationToken(`${h}.${p}.bad`), false);
   config.tamara.notificationKey = '';
+});
+
+test('emails: confirmation with tax invoice attachment, e-ticket email, delivery status', async () => {
+  config.mail.resendApiKey = 're_test';
+  const sent = [];
+  providerMock = (url, init) => {
+    if (url === 'https://api.resend.com/emails') { sent.push(JSON.parse(init.body)); return { body: { id: `em_${sent.length}` } }; }
+    return { status: 404 };
+  };
+  try {
+    const b = await book();
+    await notify.settle();
+    assert.match(sent.at(-1).subject, /received/);
+    const start = await call(`/api/bookings/${b.ref}/pay`, { method: 'POST', body: { t: b.token, method: 'card' } });
+    const ref = new URL(start.data.url, base).searchParams.get('ref');
+    const sim = await call(`/api/pay/sandbox/${ref}`, { method: 'POST', body: { outcome: 'approve', last4: '1111' } });
+    await call(sim.data.redirect, { redirect: 'manual' });
+    for (let i = 0; i < 40 && !sent.some((m) => /confirmed/.test(m.subject)); i++) await new Promise((r) => setTimeout(r, 25));
+    await notify.settle();
+    const conf = sent.find((m) => /confirmed/.test(m.subject));
+    assert.ok(conf, 'confirmation email sent');
+    assert.deepEqual(conf.to, [CONTACT.email]);
+    assert.match(conf.subject, /INV-\d{4}-\d{6}/);
+    assert.match(conf.html, /Simplified Tax Invoice/);
+    assert.match(conf.html, /invoice-qr\.png/);
+    assert.equal(conf.attachments.length, 1);
+    const file = Buffer.from(conf.attachments[0].content, 'base64').toString('utf8');
+    assert.match(file, /فاتورة ضريبية مبسطة/);
+    assert.match(file, /data:image\/png;base64/);
+    const qr = await realFetch(`${base}/api/bookings/${b.ref}/invoice-qr.png?t=${b.token}`);
+    assert.equal(qr.headers.get('content-type'), 'image/png');
+    const row = db.prepare("SELECT status, provider_id FROM notifications WHERE subject = ?").get(conf.subject);
+    assert.equal(row.status, 'sent');
+
+    // Failed delivery is recorded, not thrown.
+    providerMock = () => ({ status: 422, body: { message: 'domain not verified' } });
+    await notify.send(db, { recipient: 'x@example.com', subject: 'fail test', body: 'x' });
+    assert.equal(db.prepare("SELECT status FROM notifications WHERE subject = 'fail test'").get().status, 'failed');
+  } finally {
+    config.mail.resendApiKey = '';
+  }
+});
+
+test('password reset by email', async () => {
+  config.mail.resendApiKey = 're_test';
+  const sent = [];
+  providerMock = (url, init) => { sent.push(JSON.parse(init.body)); return { body: { id: 'x' } }; };
+  try {
+    const u = client();
+    await u('/api/account/register', { method: 'POST', body: { name: 'Reset User', email: 'reset@example.com', password: 'oldpassword1' } });
+    const unknown = await anon('/api/account/forgot', { method: 'POST', body: { email: 'nobody@example.com' } });
+    assert.equal(unknown.status, 200, 'same answer for unknown emails');
+    await anon('/api/account/forgot', { method: 'POST', body: { email: 'reset@example.com' } });
+    await notify.settle();
+    const mail = sent.find((m) => /Reset your password/.test(m.subject));
+    const token = mail.text.match(/reset=([\w-]+)/)[1];
+    assert.ok(!db.prepare('SELECT body FROM notifications ORDER BY id DESC').get().body.includes(token), 'link not stored in outbox');
+    assert.equal((await anon('/api/account/reset', { method: 'POST', body: { token: 'bad', password: 'newpassword1' } })).status, 400);
+    assert.equal((await anon('/api/account/reset', { method: 'POST', body: { token, password: 'newpassword1' } })).status, 200);
+    assert.equal((await anon('/api/account/reset', { method: 'POST', body: { token, password: 'again12345' } })).status, 400, 'single use');
+    assert.equal((await anon('/api/account/login', { method: 'POST', body: { email: 'reset@example.com', password: 'newpassword1' } })).status, 200);
+  } finally {
+    config.mail.resendApiKey = '';
+  }
 });

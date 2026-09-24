@@ -215,7 +215,7 @@ function markPaid(db, paymentId, { userId = null } = {}) {
   });
   if (confirmedNow) {
     const b = getBooking(db, confirmedNow);
-    notify.bookingConfirmed(db, b);
+    notify.bookingConfirmed(db, b).catch((e) => console.error('[notify]', e));
     if (b.type === 'flight') ticketing.issue(db, b.id, { userId }).catch((e) => console.error('[ticketing]', e));
   }
 }
@@ -258,11 +258,7 @@ async function refund(db, paymentId, amount, { userId, reason = '' } = {}) {
     dbm.logActivity(db, { userId, bookingId: b.id, action: `payment.${p.provider}.refund`, detail: `${amount} halalas ${reason}`.trim() });
   });
   const b = getBooking(db, p.booking_id);
-  notify.send(db, {
-    recipient: b.contact_email, bookingId: b.id, subject: `Refund issued for booking ${b.ref}`,
-    body: `Dear ${b.contact_name},\n\nA refund of SAR ${(amount / 100).toFixed(2)} has been issued for booking ${b.ref}. `
-      + 'Depending on your bank or instalment provider it may take 5–14 working days to appear.\n\nNoor Travel Agency',
-  });
+  notify.refundIssued(db, b, amount);
   return b;
 }
 

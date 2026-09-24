@@ -141,11 +141,11 @@ module.exports = function adminRoutes(db) {
     res.json({ ticketStatus: fresh.ticket_status, pnr: fresh.pnr });
   });
 
-  r.post('/bookings/:ref/resend', (req, res) => {
+  r.post('/bookings/:ref/resend', ah(async (req, res) => {
     const b = byRef(req.params.ref);
-    if (b.payment_status === 'paid') notify.bookingConfirmed(db, b); else notify.bookingCreated(db, b);
+    if (b.payment_status === 'paid') await notify.bookingConfirmed(db, b); else notify.bookingCreated(db, b);
     res.json({ ok: true });
-  });
+  }));
 
   // ---------- Payments ----------
   r.get('/payments', (req, res) => {
@@ -304,7 +304,10 @@ module.exports = function adminRoutes(db) {
     res.json({ ok: true });
   });
 
-  r.get('/notifications', (_req, res) => res.json(db.prepare('SELECT * FROM notifications ORDER BY id DESC LIMIT 200').all()));
+  r.get('/notifications', (_req, res) => res.json({
+    provider: require('../mailer').provider(),
+    rows: db.prepare('SELECT * FROM notifications ORDER BY id DESC LIMIT 200').all(),
+  }));
   r.get('/subscribers', (_req, res) => res.json(db.prepare('SELECT * FROM subscribers ORDER BY created_at DESC').all()));
 
   // ---------- Settings ----------

@@ -56,6 +56,18 @@ const config = {
     merchantCode: env.TABBY_MERCHANT_CODE || '',
     apiUrl: env.TABBY_API_URL || 'https://api.tabby.ai/api/v2',
   },
+  mail: {
+    from: env.MAIL_FROM || 'Noor Travel <no-reply@noortravel.sa>',
+    replyTo: env.MAIL_REPLY_TO || env.COMPANY_EMAIL || 'info@noortravel.sa',
+    agencyInbox: env.AGENCY_NOTIFY_EMAIL || '', // staff copy of every paid booking
+    resendApiKey: env.RESEND_API_KEY || '',
+    smtp: {
+      host: env.SMTP_HOST || '',
+      port: Number(env.SMTP_PORT) || 587,
+      user: env.SMTP_USER || '',
+      pass: env.SMTP_PASS || '',
+    },
+  },
   duffel: {
     accessToken: env.DUFFEL_ACCESS_TOKEN || '',
   },

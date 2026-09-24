@@ -48,3 +48,11 @@ services:
         sync: false
       - key: TAMARA_NOTIFICATION_KEY
         sync: false
+      - key: DUFFEL_ACCESS_TOKEN
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: AGENCY_NOTIFY_EMAIL
+        sync: false
