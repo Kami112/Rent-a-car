@@ -2,29 +2,25 @@
   const { t, L, esc, $, $$, api, art, icons, money, addDays, pkgCard, stars } = Noor;
   const { site } = await Noor.init('nav_home');
 
-  $('#hero-art').innerHTML = art('mosque', 160, 3);
+  $('#hero-art').innerHTML = art('city', 200, 5);
   $$('[data-icon]').forEach((el) => { el.innerHTML = icons[el.dataset.icon] || ''; });
 
-  // Search tabs
-  $$('.tab').forEach((tab) => tab.addEventListener('click', () => {
-    $$('.tab').forEach((x) => x.classList.toggle('active', x === tab));
-    $$('[data-pane]').forEach((p) => p.classList.toggle('hidden', p.dataset.pane !== tab.dataset.tab));
-  }));
+  Noor.flightSearch($('#flight-search'));
+  try {
+    const recent = JSON.parse(localStorage.getItem('noor_recent') || '[]');
+    if (recent.length) {
+      $('#recent').innerHTML = `<span class="muted">${esc(t('recent_searches'))}:</span>` + recent.map((r) => `<a href="/flights.html?${esc(r.q)}">${esc(r.from)} → ${esc(r.to)} · ${Noor.fmtDate(r.date, { day: 'numeric', month: 'short' })}</a>`).join('');
+    }
+  } catch { /* storage unavailable */ }
 
-  // Airports & cabins
-  $$('select.airport').forEach((sel) => {
-    sel.innerHTML = Object.entries(site.airports).map(([code, a]) => `<option value="${code}">${esc(L(a))} (${code})</option>`).join('');
-    sel.value = sel.dataset.default;
-  });
-  $('#cabin-sel').innerHTML = Object.entries(site.cabins).map(([k, c]) => `<option value="${k}">${esc(L(c))}</option>`).join('');
-
-  // Sensible default dates
-  const min = addDays(1);
-  $$('input[type=date]').forEach((i) => { i.min = min; });
-  $('#umrah-date').value = addDays(14);
-  $('[data-pane=flights] [name=date]').value = addDays(10);
-  $('[data-pane=hotels] [name=date]').value = addDays(10);
-  $('[data-pane=hotels] [name=endDate]').value = addDays(14);
+  const routes = [['JED', 'mosque', 45], ['MED', 'mosque', 150], ['DXB', 'city', 260], ['CAI', 'desert', 35], ['IST', 'mosque', 205], ['LHR', 'city', 230], ['KUL', 'city', 20], ['MLE', 'beach', 185], ['GYD', 'city', 265], ['TBS', 'mountain', 130], ['DMM', 'beach', 195], ['AHB', 'mountain', 110]];
+  const when = addDays(14);
+  $('#routes').innerHTML = routes.map(([code, scene, hue], i) => {
+    const a = site.airports[code];
+    return `<a class="route-card" href="/flights.html?from=RUH&to=${code}&date=${when}&adults=1&cabin=economy">
+      <span class="rc-art">${art(scene, hue, i + 1)}</span>
+      <span><small class="muted">${esc(L({ en: site.airports.RUH.en, ar: site.airports.RUH.ar }))} →</small><strong>${esc(L({ en: a.en, ar: a.ar }))}</strong><small class="muted">${esc(L(a.countryName))}</small></span></a>`;
+  }).join('');
 
   // Content
   const [umrah, featured, reviews] = await Promise.all([

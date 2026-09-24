@@ -33,15 +33,15 @@
       <div><span>Customer · العميل</span><strong>${esc(inv.contact.name)}</strong></div>
     </div>
     <div class="table-wrap mt-3"><table class="table">
-      <thead><tr><th>Description · الوصف</th><th class="r">Qty · الكمية</th><th class="r">Unit price · سعر الوحدة</th><th class="r">Total · الإجمالي</th></tr></thead>
-      <tbody>${inv.lines.map((l) => `<tr><td>${esc(l.en)}<div class="small muted" dir="rtl">${esc(l.ar)}</div></td><td class="r num">${l.qty}</td><td class="r num">${sar(l.unit)}</td><td class="r num">${sar(l.amount)}</td></tr>`).join('')}</tbody>
+      <thead><tr><th>Description · الوصف</th><th class="r">Qty · الكمية</th><th class="r">Unit price · سعر الوحدة</th><th class="r">VAT · الضريبة</th><th class="r">Total · الإجمالي</th></tr></thead>
+      <tbody>${inv.lines.map((l) => `<tr><td>${esc(l.en)}<div class="small muted" dir="rtl">${esc(l.ar)}</div></td><td class="r num">${l.qty}</td><td class="r num">${sar(l.unit)}</td><td class="r num">${l.vatRate ?? inv.vatRate}%</td><td class="r num">${sar(l.amount)}</td></tr>`).join('')}</tbody>
     </table></div>
     <div class="flex between mt-3" style="align-items:flex-end">
       <div style="width:150px">${qr}</div>
       <div style="min-width:320px">
         ${inv.discount ? `<div class="summary-row"><span>Discount · الخصم</span><span class="num">−${sar(inv.discount)}</span></div>` : ''}
         <div class="summary-row"><span>Total excl. VAT · الإجمالي غير شامل الضريبة</span><span class="num">${sar(exVat)}</span></div>
-        <div class="summary-row"><span>VAT ${inv.vatRate}% · ضريبة القيمة المضافة</span><span class="num">${sar(inv.vat)}</span></div>
+        <div class="summary-row"><span>VAT · ضريبة القيمة المضافة</span><span class="num">${sar(inv.vat)}</span></div>
         <div class="summary-row total"><span>Total incl. VAT · الإجمالي شامل الضريبة</span><span class="num">${money(inv.total, { decimals: 2 })}</span></div>
       </div>
     </div>

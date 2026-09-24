@@ -18,6 +18,7 @@ let db; let server; let base;
 const realFetch = globalThis.fetch;
 let providerMock = null; // (url, init) => {status, body} for provider hosts
 
+const base_ = () => base;
 const future = (days) => new Date(Date.now() + days * 864e5).toISOString().slice(0, 10);
 
 before(async () => {
@@ -28,7 +29,7 @@ before(async () => {
   base = `http://127.0.0.1:${server.address().port}`;
   globalThis.fetch = async (url, init) => {
     const u = String(url);
-    if (providerMock && /tabby\.ai|tamara\.co|moyasar\.com/.test(u)) {
+    if (providerMock && /tabby\.ai|tamara\.co|moyasar\.com|duffel\.com/.test(u)) {
       const { status = 200, body = {} } = await providerMock(u, init || {});
       return new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
     }
@@ -104,12 +105,106 @@ test('quote rejects invalid input', async () => {
   }
 });
 
-test('flight search returns priced offers and round-trip quotes', async () => {
-  const s = await call(`/api/flights/search?from=RUH&to=IST&date=${future(20)}&returnDate=${future(27)}&cabin=business`);
-  assert.equal(s.status, 200);
-  assert.ok(s.data.outbound.length && s.data.inbound.length);
-  const q = await call('/api/quote', { method: 'POST', body: { type: 'flight', id: s.data.outbound[0].id, returnId: s.data.inbound[0].id, cabin: 'business', adults: 1 } });
-  assert.equal(q.data.total, s.data.outbound[0].fare + s.data.inbound[0].fare);
+test('flight search returns priced offers, fare calendar and zero-rated international VAT', async () => {
+  const s = await call(`/api/flights/search?from=RUH&to=IST&date=${future(20)}&returnDate=${future(27)}&cabin=business&adults=1`);
+  assert.equal(s.status, 200, JSON.stringify(s.data));
+  assert.equal(s.data.provider, 'demo');
+  assert.ok(s.data.offers.length > 0);
+  assert.ok(s.data.calendar.length >= 4);
+  const offer = s.data.offers[0];
+  assert.equal(offer.slices.length, 2);
+  const q = await call('/api/quote', { method: 'POST', body: { type: 'flight', id: offer.id, adults: 1 } });
+  assert.equal(q.status, 200, JSON.stringify(q.data));
+  assert.equal(q.data.total, offer.total + 2500, 'fare + SAR 25 service fee');
+  assert.equal(q.data.vat, vatFromInclusive(2500), 'international fare is zero-rated; only the fee carries VAT');
+  const mismatch = await call('/api/quote', { method: 'POST', body: { type: 'flight', id: offer.id, adults: 2 } });
+  assert.equal(mismatch.status, 400);
+  const ac = await call('/api/airports?q=ista');
+  assert.equal(ac.data[0].code, 'IST');
+});
+
+test('flight booking: passport validation, sandbox payment, manual ticketing by staff', async () => {
+  const s = await call(`/api/flights/search?from=RUH&to=CAI&date=${future(15)}&adults=1`);
+  const offer = s.data.offers[0];
+  const base = { type: 'flight', id: offer.id, adults: 1, contact: CONTACT, acceptTerms: true };
+  const pax = { type: 'adult', title: 'mr', firstName: 'Mohammed', lastName: 'Alqahtani', dob: '1990-05-01', nationality: 'SA', passport: 'A1234567', passportExpiry: future(400) };
+  const noPassport = await call('/api/bookings', { method: 'POST', body: { ...base, travelers: [{ ...pax, passport: '' }] } });
+  assert.equal(noPassport.status, 400);
+  const arabicName = await call('/api/bookings', { method: 'POST', body: { ...base, travelers: [{ ...pax, firstName: 'محمد' }] } });
+  assert.equal(arabicName.status, 400);
+  const b = (await call('/api/bookings', { method: 'POST', body: { ...base, travelers: [pax] } })).data;
+  assert.ok(b.ref);
+  const start = await call(`/api/bookings/${b.ref}/pay`, { method: 'POST', body: { t: b.token, method: 'card' } });
+  const ref = new URL(start.data.url, base_()).searchParams.get('ref');
+  const sim = await call(`/api/pay/sandbox/${ref}`, { method: 'POST', body: { outcome: 'approve', last4: '1111' } });
+  await call(sim.data.redirect, { redirect: 'manual' });
+  await new Promise((r) => setTimeout(r, 50));
+  let v = await call(`/api/bookings/${b.ref}?t=${b.token}`);
+  assert.equal(v.data.paymentStatus, 'paid');
+  assert.equal(v.data.ticketStatus, 'manual', 'demo fares are ticketed by staff');
+
+  const admin = client();
+  await admin('/api/account/login', { method: 'POST', body: { email: 'admin@test.sa', password: 'Admin@12345' } });
+  const bad = await admin(`/api/admin/bookings/${b.ref}/ticket/manual`, { method: 'POST', body: { pnr: '!!', tickets: '' } });
+  assert.equal(bad.status, 400);
+  const ok = await admin(`/api/admin/bookings/${b.ref}/ticket/manual`, { method: 'POST', body: { pnr: 'abc123', tickets: '0651234567890' } });
+  assert.equal(ok.data.ticketStatus, 'issued');
+  v = await call(`/api/bookings/${b.ref}?t=${b.token}`);
+  assert.equal(v.data.pnr, 'ABC123');
+  assert.deepEqual(v.data.tickets, ['0651234567890']);
+});
+
+test('live Duffel: search, seat hold at booking, ticket issued after payment', async () => {
+  config.duffel.accessToken = 'duffel_test_x';
+  const dep = future(30);
+  const duffelOffer = {
+    id: 'off_1', total_amount: '400.00', total_currency: 'USD', tax_amount: '60.00', tax_currency: 'USD',
+    expires_at: new Date(Date.now() + 3600e3).toISOString(),
+    owner: { iata_code: 'SV', name: 'Saudia', logo_symbol_url: null },
+    passengers: [{ id: 'pas_1', type: 'adult' }],
+    conditions: { refund_before_departure: { allowed: true }, change_before_departure: { allowed: true } },
+    payment_requirements: { requires_instant_payment: false },
+    slices: [{ duration: 'PT4H45M', segments: [{
+      marketing_carrier: { iata_code: 'SV', name: 'Saudia' }, operating_carrier: { iata_code: 'SV', name: 'Saudia' }, marketing_carrier_flight_number: '263',
+      origin: { iata_code: 'RUH', city_name: 'Riyadh', iata_country_code: 'SA' }, destination: { iata_code: 'IST', city_name: 'Istanbul', iata_country_code: 'TR' },
+      departing_at: `${dep}T02:40:00`, arriving_at: `${dep}T07:25:00`, duration: 'PT4H45M', aircraft: { name: 'Boeing 787' },
+      passengers: [{ cabin_class: 'economy', baggages: [{ type: 'checked', quantity: 2 }, { type: 'carry_on', quantity: 1 }] }],
+    }] }],
+  };
+  const calls = [];
+  providerMock = (url, init) => {
+    const path = url.replace('https://api.duffel.com', '');
+    calls.push(`${init.method || 'GET'} ${path.split('?')[0]}`);
+    assert.equal(init.headers['Duffel-Version'], 'v2');
+    if (path.startsWith('/air/offer_requests')) return { body: { data: { offers: [duffelOffer] } } };
+    if (path === '/air/offers/off_1') return { body: { data: duffelOffer } };
+    if (path === '/air/orders' && JSON.parse(init.body).data.type === 'hold') return { body: { data: { id: 'ord_1', booking_reference: 'HOLD12', documents: [], payment_status: { awaiting_payment: true } } } };
+    if (path === '/air/orders/ord_1') return { body: { data: { id: 'ord_1', booking_reference: 'HOLD12', total_amount: '400.00', total_currency: 'USD', documents: calls.includes('POST /air/payments') ? [{ type: 'electronic_ticket', unique_identifier: '0651111111111' }] : [] } } };
+    if (path === '/air/payments') return { body: { data: { id: 'pay_1' } } };
+    return { status: 404 };
+  };
+  try {
+    const s = await call(`/api/flights/search?from=RUH&to=IST&date=${dep}&adults=1`);
+    assert.equal(s.data.provider, 'duffel', JSON.stringify(s.data));
+    const o = s.data.offers[0];
+    assert.equal(o.total, 150000, 'USD 400 × 3.75 = SAR 1,500');
+    assert.equal(o.baggage.checked, 2);
+    const pax = { type: 'adult', title: 'ms', firstName: 'Sara', lastName: 'Alharbi', dob: '1992-02-02', nationality: 'SA', passport: 'B7654321', passportExpiry: future(500) };
+    const b = (await call('/api/bookings', { method: 'POST', body: { type: 'flight', id: 'off_1', adults: 1, contact: CONTACT, travelers: [pax], acceptTerms: true } })).data;
+    const row = db.prepare('SELECT ticket_status, pnr FROM bookings WHERE ref = ?').get(b.ref);
+    assert.deepEqual({ ...row }, { ticket_status: 'held', pnr: 'HOLD12' });
+    const start = await call(`/api/bookings/${b.ref}/pay`, { method: 'POST', body: { t: b.token, method: 'tabby' } });
+    const ref = new URL(start.data.url, base_()).searchParams.get('ref');
+    const sim = await call(`/api/pay/sandbox/${ref}`, { method: 'POST', body: { outcome: 'approve' } });
+    await call(sim.data.redirect, { redirect: 'manual' });
+    for (let i = 0; i < 20 && db.prepare('SELECT ticket_status FROM bookings WHERE ref = ?').get(b.ref).ticket_status !== 'issued'; i++) await new Promise((r) => setTimeout(r, 25));
+    const done = await call(`/api/bookings/${b.ref}?t=${b.token}`);
+    assert.equal(done.data.ticketStatus, 'issued');
+    assert.deepEqual(done.data.tickets, ['0651111111111']);
+    assert.ok(calls.includes('POST /air/payments'));
+  } finally {
+    config.duffel.accessToken = '';
+  }
 });
 
 test('booking requires contact details, traveler names and accepted terms', async () => {

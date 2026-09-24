@@ -18,10 +18,10 @@ module.exports = function bookingRoutes(db) {
     return b;
   };
 
-  r.post('/', rateLimit({ max: 30, windowMs: 3600e3 }), (req, res) => {
-    const b = bookings.create(db, req.body || {}, { user: req.user });
+  r.post('/', rateLimit({ max: 30, windowMs: 3600e3 }), ah(async (req, res) => {
+    const b = await bookings.create(db, req.body || {}, { user: req.user });
     res.status(201).json({ ref: b.ref, token: b.access_token, total: b.total, paymentMethods: payments.listMethods(db, b.total) });
-  });
+  }));
 
   // Guest lookup by reference + email (rate-limited against enumeration).
   r.post('/lookup', rateLimit({ max: 10 }), (req, res) => {

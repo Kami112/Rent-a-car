@@ -49,6 +49,13 @@ function createApp(db) {
   app.use((err, req, res, _next) => {
     if (err instanceof AppError) return res.status(err.status).json({ error: err.message, error_ar: err.ar });
     if (err.type === 'entity.parse.failed') return res.status(400).json({ error: 'Invalid JSON body' });
+    if (err.provider === 'duffel') {
+      console.error('[duffel]', err.message);
+      return res.status(502).json({
+        error: 'The airline system did not respond. Please try again in a moment.',
+        error_ar: 'لم يستجب نظام شركة الطيران. يرجى المحاولة بعد قليل.',
+      });
+    }
     if (err.provider) {
       console.error(`[${err.provider}]`, err.message);
       return res.status(502).json({

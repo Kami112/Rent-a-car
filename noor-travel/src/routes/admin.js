@@ -5,6 +5,8 @@ const dbm = require('../db');
 const bookings = require('../bookings');
 const payments = require('../payments');
 const notify = require('../notify');
+const ticketing = require('../ticketing');
+const flights = require('../flights');
 const config = require('../config');
 const { AppError } = require('../errors');
 const { toHalalas } = require('../money');
@@ -53,7 +55,8 @@ module.exports = function adminRoutes(db) {
         WHERE created_at >= datetime('now', ?) GROUP BY type ORDER BY v DESC`).all(since),
       upcoming: db.prepare(`SELECT ref, title, travel_date, contact_name, adults + children + infants pax, status FROM bookings
         WHERE status = 'confirmed' AND travel_date BETWEEN date('now') AND date('now', '+14 days') ORDER BY travel_date LIMIT 10`).all(),
-      recent: db.prepare(`SELECT ref, title, contact_name, total, status, payment_status, payment_method, created_at FROM bookings
+      toTicket: db.prepare("SELECT COUNT(*) v FROM bookings WHERE type = 'flight' AND ticket_status IN ('manual','failed') AND status != 'cancelled'").get().v,
+      recent: db.prepare(`SELECT ref, title, contact_name, total, status, payment_status, payment_method, ticket_status, pnr, created_at FROM bookings
         ORDER BY id DESC LIMIT 8`).all(),
     });
   });
@@ -62,7 +65,7 @@ module.exports = function adminRoutes(db) {
   r.get('/bookings', (req, res) => {
     const where = ['1=1'];
     const args = [];
-    for (const f of ['status', 'payment_status', 'type', 'source']) {
+    for (const f of ['status', 'payment_status', 'type', 'source', 'ticket_status']) {
       if (req.query[f]) { where.push(`${f} = ?`); args.push(String(req.query[f])); }
     }
     if (req.query.q) {
@@ -76,15 +79,15 @@ module.exports = function adminRoutes(db) {
     const size = 25;
     const total = db.prepare(`SELECT COUNT(*) n FROM bookings WHERE ${where.join(' AND ')}`).get(...args).n;
     const rows = db.prepare(`SELECT id, ref, type, title, travel_date, contact_name, contact_email, contact_phone, total, paid_amount,
-      status, payment_status, payment_method, source, created_at FROM bookings WHERE ${where.join(' AND ')}
+      status, payment_status, payment_method, ticket_status, pnr, source, created_at FROM bookings WHERE ${where.join(' AND ')}
       ORDER BY id DESC LIMIT ? OFFSET ?`).all(...args, size, (page - 1) * size);
     res.json({ total, page, pages: Math.ceil(total / size), rows });
   });
 
-  r.post('/bookings', (req, res) => {
-    const b = bookings.create(db, req.body || {}, { source: 'office', createdBy: req.user.id });
+  r.post('/bookings', ah(async (req, res) => {
+    const b = await bookings.create(db, req.body || {}, { source: 'office', createdBy: req.user.id });
     res.status(201).json({ ref: b.ref, paymentLink: notify.link(b) });
-  });
+  }));
 
   const byRef = (ref) => {
     const b = db.prepare('SELECT * FROM bookings WHERE ref = ?').get(String(ref).toUpperCase());
@@ -121,6 +124,21 @@ module.exports = function adminRoutes(db) {
     const { method, amount, reference } = req.body || {};
     const b = payments.recordOffline(db, byRef(req.params.ref), { method, amount: toHalalas(amount), reference, userId: req.user.id });
     res.status(201).json({ paymentStatus: b.payment_status, status: b.status });
+  });
+
+  // Airline ticketing
+  r.post('/bookings/:ref/ticket/issue', ah(async (req, res) => {
+    const b = byRef(req.params.ref);
+    if (b.type !== 'flight' || b.payment_status !== 'paid') throw new AppError('Only fully paid flight bookings can be ticketed.');
+    const fresh = await ticketing.issue(db, b.id, { userId: req.user.id });
+    res.json({ ticketStatus: fresh.ticket_status, pnr: fresh.pnr });
+  }));
+
+  r.post('/bookings/:ref/ticket/manual', (req, res) => {
+    const b = byRef(req.params.ref);
+    if (b.type !== 'flight') throw new AppError('Not a flight booking.');
+    const fresh = ticketing.recordManual(db, b, req.body || {}, req.user.id);
+    res.json({ ticketStatus: fresh.ticket_status, pnr: fresh.pnr });
   });
 
   r.post('/bookings/:ref/resend', (req, res) => {
@@ -214,12 +232,6 @@ module.exports = function adminRoutes(db) {
     res.json({ ok: true });
   });
 
-  r.get('/flights', (_req, res) => res.json(db.prepare('SELECT * FROM flight_schedules ORDER BY origin, destination, depart_time').all()));
-  r.put('/flights/:id', adminOnly, (req, res) => {
-    db.prepare('UPDATE flight_schedules SET base_fare = ?, active = ? WHERE id = ?')
-      .run(toHalalas(req.body?.baseFare), req.body?.active === false ? 0 : 1, Number(req.params.id));
-    res.json({ ok: true });
-  });
 
   // ---------- Promo codes ----------
   r.get('/promos', (_req, res) => res.json(db.prepare('SELECT * FROM promo_codes ORDER BY code').all()));
@@ -304,11 +316,15 @@ module.exports = function adminRoutes(db) {
       providers: { card: status('card'), tabby: status('tabby'), tamara: status('tamara') },
       paymentLimits: dbm.getSetting(db, 'payment_limits', {}),
       bankTransfer: dbm.getSetting(db, 'bank_transfer', {}),
+      flightProvider: flights.provider(),
+      flightFees: dbm.getSetting(db, 'flight_fees', { perPassenger: 0 }),
+      fxRates: config.fxRates,
     });
   });
 
   r.put('/settings', adminOnly, (req, res) => {
-    const { paymentLimits, bankTransfer } = req.body || {};
+    const { paymentLimits, bankTransfer, flightFees } = req.body || {};
+    if (flightFees) dbm.setSetting(db, 'flight_fees', { perPassenger: Math.max(0, toHalalas(flightFees.perPassenger || 0)) });
     if (paymentLimits) {
       const clean = {};
       for (const m of ['tabby', 'tamara']) {

@@ -56,6 +56,15 @@ const config = {
     merchantCode: env.TABBY_MERCHANT_CODE || '',
     apiUrl: env.TABBY_API_URL || 'https://api.tabby.ai/api/v2',
   },
+  duffel: {
+    accessToken: env.DUFFEL_ACCESS_TOKEN || '',
+  },
+  // SAR per 1 unit of foreign currency, for converting airline fares. Override with FX_RATES='{"USD":3.75,...}'.
+  fxRates: {
+    SAR: 1, USD: 3.75, EUR: 4.1, GBP: 4.95, AED: 1.021, QAR: 1.03, BHD: 9.95, KWD: 12.2, OMR: 9.74,
+    EGP: 0.078, TRY: 0.11, JOD: 5.29, INR: 0.045, PKR: 0.0135, MYR: 0.85, CHF: 4.3,
+    ...JSON.parse(env.FX_RATES || '{}'),
+  },
   tamara: {
     apiToken: env.TAMARA_API_TOKEN || '',
     notificationKey: env.TAMARA_NOTIFICATION_KEY || '',

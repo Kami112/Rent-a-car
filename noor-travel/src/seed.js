@@ -139,28 +139,6 @@ const HOTELS = [
 ];
 const HOTEL_AMENITIES = ['wifi', 'breakfast', 'pool', 'gym', 'parking', 'family_rooms', 'prayer_room', 'airport_shuttle'];
 
-// [airline, code, number, from, to, depart, durationMin, baseFareSar, stops]
-const SCHEDULES = [
-  ['Saudia', 'SV', '1020', 'RUH', 'JED', '06:00', 110, 390, 0], ['flynas', 'XY', '021', 'RUH', 'JED', '09:30', 115, 290, 0],
-  ['flyadeal', 'F3', '105', 'RUH', 'JED', '14:15', 110, 260, 0], ['Saudia', 'SV', '1044', 'RUH', 'JED', '20:40', 110, 420, 0],
-  ['Saudia', 'SV', '1021', 'JED', 'RUH', '08:00', 105, 390, 0], ['flynas', 'XY', '022', 'JED', 'RUH', '17:45', 105, 290, 0],
-  ['Saudia', 'SV', '1404', 'RUH', 'MED', '07:20', 95, 360, 0], ['flyadeal', 'F3', '311', 'RUH', 'MED', '16:10', 95, 250, 0],
-  ['Saudia', 'SV', '1405', 'MED', 'RUH', '19:00', 95, 360, 0], ['flynas', 'XY', '071', 'RUH', 'DMM', '10:00', 70, 220, 0],
-  ['Saudia', 'SV', '1631', 'RUH', 'AHB', '11:10', 100, 330, 0], ['Saudia', 'SV', '1567', 'RUH', 'ULH', '08:45', 95, 480, 0],
-  ['Saudia', 'SV', '554', 'RUH', 'DXB', '09:15', 120, 690, 0], ['Emirates', 'EK', '816', 'RUH', 'DXB', '15:35', 115, 820, 0],
-  ['flynas', 'XY', '201', 'RUH', 'DXB', '22:05', 120, 540, 0], ['Emirates', 'EK', '815', 'DXB', 'RUH', '11:00', 115, 820, 0],
-  ['Saudia', 'SV', '555', 'DXB', 'RUH', '13:20', 120, 690, 0], ['Qatar Airways', 'QR', '1163', 'RUH', 'DOH', '12:30', 80, 610, 0],
-  ['Saudia', 'SV', '305', 'RUH', 'CAI', '13:00', 170, 920, 0], ['flynas', 'XY', '581', 'RUH', 'CAI', '02:10', 175, 740, 0],
-  ['Saudia', 'SV', '306', 'CAI', 'RUH', '18:30', 165, 920, 0], ['Saudia', 'SV', '263', 'RUH', 'IST', '02:40', 285, 1450, 0],
-  ['Turkish Airlines', 'TK', '145', 'RUH', 'IST', '04:05', 290, 1620, 0], ['Turkish Airlines', 'TK', '144', 'IST', 'RUH', '19:35', 270, 1620, 0],
-  ['Saudia', 'SV', '264', 'IST', 'RUH', '09:50', 275, 1450, 0], ['flynas', 'XY', '721', 'RUH', 'GYD', '03:25', 225, 1190, 0],
-  ['flynas', 'XY', '722', 'GYD', 'RUH', '09:10', 235, 1190, 0], ['flynas', 'XY', '731', 'RUH', 'TBS', '04:00', 230, 1150, 0],
-  ['Saudia', 'SV', '119', 'RUH', 'LHR', '08:15', 400, 2650, 0], ['Saudia', 'SV', '120', 'LHR', 'RUH', '16:30', 385, 2650, 0],
-  ['Saudia', 'SV', '127', 'RUH', 'CDG', '07:55', 385, 2490, 0], ['Saudia', 'SV', '181', 'RUH', 'ZRH', '09:40', 355, 2390, 0],
-  ['Saudia', 'SV', '832', 'RUH', 'KUL', '12:10', 520, 2190, 0], ['Saudia', 'SV', '833', 'KUL', 'RUH', '23:55', 555, 2190, 0],
-  ['Emirates', 'EK', '816', 'RUH', 'MLE', '15:35', 480, 2890, 1], ['Saudia', 'SV', '758', 'RUH', 'MLE', '21:30', 290, 2750, 0],
-];
-
 const VISAS = [
   ['United Kingdom', 'المملكة المتحدة', 'Standard Visitor (6 months)', 'زيارة قياسية (6 أشهر)', '10–15 working days', 450, '🇬🇧'],
   ['Schengen Area', 'منطقة شنغن', 'Short-stay (Type C)', 'إقامة قصيرة (نوع C)', '10–15 working days', 390, '🇪🇺'],
@@ -184,7 +162,7 @@ const REVIEWS = [
 function seed(db, { reset = false } = {}) {
   if (reset) {
     db.exec(`DELETE FROM reviews; DELETE FROM activity_log; DELETE FROM notifications; DELETE FROM payments; DELETE FROM bookings;
-      DELETE FROM packages; DELETE FROM hotels; DELETE FROM flight_schedules; DELETE FROM visas; DELETE FROM promo_codes; DELETE FROM counters;`);
+      DELETE FROM packages; DELETE FROM hotels; DELETE FROM visas; DELETE FROM promo_codes; DELETE FROM counters;`);
   }
   const has = (table) => db.prepare(`SELECT COUNT(*) AS n FROM ${table}`).get().n > 0;
 
@@ -202,11 +180,6 @@ function seed(db, { reset = false } = {}) {
         VALUES (?,?,?,?,?,?,?,?,?,?)`);
       HOTELS.forEach((h, i) => ins.run(h[0], h[1], h[2], h[3], SAR(h[4]), h[5], h[6],
         J(HOTEL_AMENITIES.filter((_, j) => (i + j) % 3 !== 0 || j < 2)), h[7], h[8]));
-    }
-    if (!has('flight_schedules')) {
-      const ins = db.prepare(`INSERT INTO flight_schedules (airline, airline_code, flight_no, origin, destination, depart_time, duration_min, base_fare, stops)
-        VALUES (?,?,?,?,?,?,?,?,?)`);
-      for (const s of SCHEDULES) ins.run(s[0], s[1], `${s[1]} ${s[2]}`, s[3], s[4], s[5], s[6], SAR(s[7]), s[8]);
     }
     if (!has('visas')) {
       const ins = db.prepare(`INSERT INTO visas (country_en, country_ar, type_en, type_ar, processing_days, price, requirements, flag)
@@ -226,6 +199,9 @@ function seed(db, { reset = false } = {}) {
     if (dbm.getSetting(db, 'payment_limits') == null) {
       // Customer-facing BNPL eligibility caps; the provider still makes the final decision.
       dbm.setSetting(db, 'payment_limits', { tabby: { min: SAR(100), max: SAR(20000) }, tamara: { min: SAR(100), max: SAR(20000) } });
+    }
+    if (dbm.getSetting(db, 'flight_fees') == null) {
+      dbm.setSetting(db, 'flight_fees', { perPassenger: SAR(25) }); // agency service fee per ticket (VAT 15%)
     }
     if (dbm.getSetting(db, 'bank_transfer') == null) {
       dbm.setSetting(db, 'bank_transfer', {

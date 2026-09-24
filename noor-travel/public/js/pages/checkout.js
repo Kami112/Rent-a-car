@@ -3,7 +3,7 @@
   const { me } = await Noor.init();
   const q = qs();
   const type = q.type;
-  const base = { type, id: q.id, returnId: q.returnId, date: q.date, endDate: q.endDate, cabin: q.cabin, rooms: q.rooms };
+  const base = type === 'flight' ? { type, id: q.id } : { type, id: q.id, date: q.date, endDate: q.endDate, rooms: q.rooms };
   const pax = { adults: Number(q.adults) || 1, children: Number(q.children) || 0, infants: Number(q.infants) || 0 };
   let promo = '';
   let quote = null;
@@ -18,8 +18,59 @@
   // ---- Travelers (hotels only need the lead guest) ----
   if (type === 'hotel') $('#travelers-panel').classList.add('hidden');
   const saved = [];
+  function flightTravelers() {
+    $$('.traveler').forEach((el, i) => { saved[i] = Object.fromEntries($$('input,select', el).map((x) => [x.name, x.value])); });
+    const kinds = [...Array(pax.adults).fill('adult'), ...Array(pax.children).fill('child'), ...Array(pax.infants).fill('infant')];
+    const intl = !quote.meta.domestic;
+    const countries = Object.entries(Noor.site.countries).sort((a, b) => (a[0] === 'SA' ? -1 : b[0] === 'SA' ? 1 : L({ en: a[1][0], ar: a[1][1] }).localeCompare(L({ en: b[1][0], ar: b[1][1] }))));
+    const natOpts = (v) => `<option value="">${esc(t('select_country'))}</option>` + countries.map(([code, n]) => `<option value="${code}" ${v === code ? 'selected' : ''}>${esc(L({ en: n[0], ar: n[1] }))}</option>`).join('');
+    $('#travelers').innerHTML = `<p class="small muted mt-0">✎ ${esc(t('name_hint'))}</p>` + kinds.map((k, i) => {
+      const sv = saved[i] || {};
+      const v = (n) => esc(sv[n] || '');
+      return `<div class="traveler" data-kind="${k}"><h4>${esc(t('traveler'))} ${i + 1} · <span class="muted">${esc(t(k))}</span></h4>
+        <div class="form-grid">
+          <div class="field"><label>${esc(t('first_name'))}</label><div class="flex" style="flex-wrap:nowrap">
+            <select class="input" name="title" style="width:96px">${['mr', 'mrs', 'ms'].map((x) => `<option value="${x}" ${sv.title === x ? 'selected' : ''}>${esc(t(`title_${x}`))}</option>`).join('')}</select>
+            <input class="input" name="firstName" required value="${v('firstName')}" autocomplete="off" dir="ltr" pattern="[A-Za-z][A-Za-z '\-]*"></div></div>
+          <div class="field"><label>${esc(t('last_name'))}</label><input class="input" name="lastName" required value="${v('lastName')}" autocomplete="off" dir="ltr" pattern="[A-Za-z][A-Za-z '\-]*"></div>
+          <div class="field"><label>${esc(t('gender'))}</label><select class="input" name="gender"><option value="m" ${sv.gender !== 'f' ? 'selected' : ''}>${esc(t('male'))}</option><option value="f" ${sv.gender === 'f' ? 'selected' : ''}>${esc(t('female'))}</option></select></div>
+          <div class="field"><label>${esc(t('dob'))}</label><input class="input" type="date" name="dob" required value="${v('dob')}" max="${Noor.addDays(0)}"></div>
+          <div class="field"><label>${esc(t('nationality'))}</label><select class="input" name="nationality" ${intl ? 'required' : ''}>${natOpts(sv.nationality || (i === 0 ? 'SA' : ''))}</select></div>
+          ${intl ? `<div class="field"><label>${esc(t('passport_no'))}</label><input class="input num" name="passport" required value="${v('passport')}" style="text-transform:uppercase" dir="ltr"></div>
+          <div class="field"><label>${esc(t('passport_expiry'))}</label><input class="input" type="date" name="passportExpiry" required value="${v('passportExpiry')}" min="${Noor.addDays(1)}"></div>` : ''}
+        </div></div>`;
+    }).join('');
+    $$('#travelers select[name=title]').forEach((sel) => sel.addEventListener('change', () => {
+      const g = sel.closest('.traveler').querySelector('[name=gender]');
+      if (sel.value !== 'mr') g.value = 'f'; else g.value = 'm';
+    }));
+  }
+
+  function renderFlight() {
+    const F = Noor.flightUI;
+    const m = quote.meta;
+    const panel = $('#flight-panel');
+    panel.classList.remove('hidden');
+    panel.innerHTML = `<div class="flex between"><h3 class="mb-0">✈ ${esc(t('flight_summary'))}</h3><span id="fare-timer" class="small muted"></span></div>
+      <div class="fl-box mt-2"><div class="fl-main"><div class="fl-airline">${F.logo(m.owner)}<div><strong>${esc(m.owner.name)}</strong><div class="small muted">${esc(L(Noor.site.cabins[m.cabin] || Noor.site.cabins.economy))}</div></div></div>
+        <div class="fl-slices">${m.slices.map(F.sliceRow).join('')}</div></div>
+        <div class="fl-foot"><div class="perks">${F.perks({ baggage: m.baggage, refundable: m.refundable })}</div><button class="btn btn-ghost btn-sm" type="button" id="fl-more">${esc(t('flight_details'))} ▾</button></div>
+        <div class="fl-details hidden" id="fl-det">${m.slices.map((sl, i) => F.sliceDetails(sl, t(i ? 'inbound' : 'outbound'))).join('')}</div></div>`;
+    $('#fl-more').onclick = () => $('#fl-det').classList.toggle('hidden');
+    if (m.expiresAt) {
+      const tick = () => {
+        const left = Math.max(0, Date.parse(m.expiresAt) - Date.now());
+        $('#fare-timer').textContent = `⏱ ${t('fare_expires')} ${Math.floor(left / 60000)}:${String(Math.floor(left / 1000) % 60).padStart(2, '0')}`;
+        if (!left) { clearInterval(timer); showError(Noor.lang === 'ar' ? 'انتهت صلاحية السعر. يرجى البحث مرة أخرى.' : 'This fare has expired. Please search again.'); $('#pay-btn').disabled = true; }
+      };
+      const timer = setInterval(tick, 1000);
+      tick();
+    }
+  }
+
   function renderTravelers() {
     if (type === 'hotel') return;
+    if (type === 'flight') return flightTravelers();
     $$('.traveler').forEach((el, i) => { saved[i] = Object.fromEntries($$('input,select', el).map((x) => [x.name, x.value])); });
     const kinds = [...Array(pax.adults).fill('adult'), ...Array(pax.children).fill('child'), ...Array(pax.infants).fill('infant')];
     const intl = type !== 'package' || !['domestic', 'umrah'].includes(quote?.meta?.category);
@@ -69,6 +120,7 @@
       if (mine !== seq) return;
       const first = !quote;
       quote = qt;
+      if (first && type === 'flight') renderFlight();
       if (first || travelersChanged) renderTravelers();
       renderSummary();
       renderMethods();

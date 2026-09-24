@@ -2,6 +2,8 @@
 const express = require('express');
 const config = require('../config');
 const flights = require('../flights');
+const airports = require('../airports');
+const duffel = require('../flights-duffel');
 const pricing = require('../pricing');
 const payments = require('../payments');
 const { AppError } = require('../errors');
@@ -29,6 +31,8 @@ function pkgOut(p, full = false) {
 const PKG_SELECT = `SELECT p.*, (SELECT AVG(rating) FROM reviews r WHERE r.package_id = p.id AND r.approved = 1) AS rating,
   (SELECT COUNT(*) FROM reviews r WHERE r.package_id = p.id AND r.approved = 1) AS review_count FROM packages p`;
 
+const ah = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
+
 module.exports = function publicRoutes(db) {
   const r = express.Router();
 
@@ -38,8 +42,10 @@ module.exports = function publicRoutes(db) {
       vatRate: config.vatRate,
       paymentsMode: config.paymentsMode,
       moyasarFormVersion: config.moyasar.formVersion,
-      airports: flights.AIRPORTS,
+      airports: airports.AIRPORTS,
+      countries: airports.COUNTRIES,
       cabins: flights.CABINS,
+      flightProvider: flights.provider(),
     });
   });
 
@@ -100,25 +106,30 @@ module.exports = function publicRoutes(db) {
     })));
   });
 
-  r.get('/flights/search', (req, res) => {
-    const { from, to, date, returnDate, cabin } = req.query;
-    const outbound = flights.searchFlights(db, { from, to, date, cabin });
-    const inbound = returnDate ? flights.searchFlights(db, { from: to, to: from, date: returnDate, cabin }) : [];
-    if (returnDate && returnDate < date) throw new AppError('Return date must be after departure.', { ar: 'يجب أن يكون تاريخ العودة بعد المغادرة.' });
-    res.json({ outbound, inbound });
-  });
+  r.get('/airports', ah(async (req, res) => {
+    const local = airports.search(req.query.q);
+    const extra = local.length < 4 ? await duffel.places(req.query.q).catch(() => []) : [];
+    const seen = new Set(local.map((a) => a.code));
+    res.json([...local, ...extra.filter((a) => !seen.has(a.code))].map((a) => ({
+      code: a.code, city: { en: a.en, ar: a.ar }, name: a.name, country: a.countryName,
+    })));
+  }));
+
+  r.get('/flights/search', ah(async (req, res) => {
+    res.json(await flights.search(db, req.query));
+  }));
 
   r.get('/addons/:type', (req, res) => res.json(pricing.availableAddons(req.params.type)));
 
-  r.post('/quote', (req, res) => {
-    const q = pricing.quote(db, req.body || {});
+  r.post('/quote', ah(async (req, res) => {
+    const q = await pricing.quote(db, req.body || {});
     res.json({ ...q, paymentMethods: payments.listMethods(db, q.total) });
-  });
+  }));
 
-  r.post('/promo/check', (req, res) => {
-    const q = pricing.quote(db, req.body || {});
+  r.post('/promo/check', ah(async (req, res) => {
+    const q = await pricing.quote(db, req.body || {});
     res.json({ promo: q.promo, discount: q.discount, total: q.total });
-  });
+  }));
 
   r.post('/inquiries', rateLimit({ max: 8, windowMs: 3600e3 }), (req, res) => {
     const { name, email, phone, subject, message } = req.body || {};

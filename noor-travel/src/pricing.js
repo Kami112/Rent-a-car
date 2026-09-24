@@ -1,10 +1,18 @@
 'use strict';
 // Server-side quote engine. The browser only ever sends *what* the customer
 // wants; every amount charged is computed here.
+//
+// VAT (KSA): prices are VAT-inclusive. Each line carries its own rate —
+// international air transport is zero-rated, domestic flights and all agency
+// service fees are standard-rated (15%). Confirm treatment of packages with
+// your tax advisor; they are standard-rated here.
 
+const config = require('./config');
+const dbm = require('./db');
 const { AppError } = require('./errors');
 const { vatFromInclusive } = require('./money');
 const flights = require('./flights');
+const { AIRPORTS } = require('./airports');
 
 const CHILD_RATE = 0.75;
 const INFANT_RATE = 0.1;
@@ -13,7 +21,6 @@ const ADDONS = {
   insurance: { en: 'Travel insurance', ar: 'تأمين السفر', per: 'traveler', price: 7500, types: ['package', 'flight', 'hotel'] },
   transfer: { en: 'Airport transfers (return)', ar: 'توصيل من وإلى المطار', per: 'booking', price: 15000, types: ['package', 'flight', 'hotel'] },
   esim: { en: 'Travel eSIM (10 GB)', ar: 'شريحة بيانات إلكترونية (10 جيجا)', per: 'traveler', price: 4900, types: ['package', 'flight', 'hotel'] },
-  baggage: { en: 'Extra baggage (23 kg)', ar: 'أمتعة إضافية (23 كجم)', per: 'traveler', price: 18000, types: ['flight'] },
   express: { en: 'Express visa processing', ar: 'معالجة التأشيرة المستعجلة', per: 'traveler', price: 20000, types: ['visa'] },
 };
 
@@ -40,39 +47,55 @@ function quotePackage(db, input, pax) {
   const pkg = db.prepare('SELECT * FROM packages WHERE (id = ? OR slug = ?) AND active = 1').get(int(input.id, -1), String(input.id));
   if (!pkg) throw new AppError('This package is not available.', { ar: 'هذه الباقة غير متاحة.' });
   flights.assertDate(input.date, 'travel date');
-  const minDate = new Date(Date.parse(flights.todayRiyadh()) + 3 * 864e5).toISOString().slice(0, 10);
+  const minDate = flights.addDays(flights.todayRiyadh(), 3);
   if (input.date < minDate) throw new AppError('Packages must be booked at least 3 days before departure.', { ar: 'يجب حجز الباقات قبل 3 أيام على الأقل من موعد السفر.' });
   if (pax.adults + pax.children > pkg.seats) throw new AppError(`Only ${pkg.seats} seats left on this package.`, { ar: `تبقى ${pkg.seats} مقاعد فقط في هذه الباقة.` });
-  const end = new Date(Date.parse(input.date) + (pkg.duration_days - 1) * 864e5).toISOString().slice(0, 10);
   return {
     itemId: String(pkg.id),
     title: pkg.title_en,
     titleAr: pkg.title_ar,
     date: input.date,
-    endDate: end,
+    endDate: flights.addDays(input.date, pkg.duration_days - 1),
     lines: paxLines(pkg.price, pax, pkg.title_en, pkg.title_ar),
     meta: { slug: pkg.slug, category: pkg.category, durationDays: pkg.duration_days, destination: pkg.destination_en },
   };
 }
 
-function quoteFlight(db, input, pax) {
-  const cabin = flights.CABINS[input.cabin] ? input.cabin : 'economy';
-  const out = flights.getOffer(db, input.id, cabin);
-  const ret = input.returnId ? flights.getOffer(db, input.returnId, cabin) : null;
-  if (ret && (ret.origin !== out.destination || ret.destination !== out.origin || ret.date < out.date)) {
-    throw new AppError('The return flight does not match the outbound flight.', { ar: 'رحلة العودة لا تتوافق مع رحلة الذهاب.' });
+const cityEn = (c) => AIRPORTS[c]?.en || c;
+const cityAr = (c) => AIRPORTS[c]?.ar || c;
+
+async function quoteFlight(db, input, pax) {
+  const offer = await flights.getOffer(db, input.id);
+  const o = offer.pax;
+  if (o.adults !== pax.adults || o.children !== pax.children || o.infants !== pax.infants) {
+    throw new AppError('Passenger numbers changed — please search again.', { ar: 'تغيّر عدد المسافرين — يرجى البحث مرة أخرى.' });
   }
-  const leg = (o) => `${o.airline} ${o.flightNo} ${o.origin}→${o.destination} ${o.date}`;
-  const lines = paxLines(out.fare, pax, leg(out), leg(out));
-  if (ret) lines.push(...paxLines(ret.fare, pax, leg(ret), leg(ret)));
+  const first = offer.slices[0];
+  const ret = offer.slices.length === 2;
+  const codes = offer.slices.flatMap((s) => s.segments.flatMap((g) => [g.origin, g.destination]));
+  const domestic = flights.isDomestic(codes);
+  const cabin = flights.CABINS[offer.cabin] || flights.CABINS.economy;
+  const routeEn = `${cityEn(first.origin)} → ${cityEn(first.destination)}`;
+  const routeAr = `${cityAr(first.origin)} ← ${cityAr(first.destination)}`;
+  const seated = pax.adults + pax.children + pax.infants;
+  const fee = dbm.getSetting(db, 'flight_fees', { perPassenger: 0 }).perPassenger;
+  const lines = [{
+    en: `Air ticket${seated > 1 ? 's' : ''} — ${offer.owner.name}, ${routeEn}${ret ? ' (return)' : ''}`,
+    ar: `تذاكر طيران — ${offer.owner.name}، ${routeAr}${ret ? ' (ذهاب وعودة)' : ''}`,
+    qty: 1, unit: offer.total, vatRate: domestic ? config.vatRate : 0,
+  }];
+  if (fee) lines.push({ en: 'Booking service fee', ar: 'رسوم خدمة الحجز', qty: seated, unit: fee, vatRate: config.vatRate });
   return {
-    itemId: ret ? `${out.id},${ret.id}` : out.id,
-    title: `${out.originCity.en} → ${out.destinationCity.en}${ret ? ' (return)' : ''} · ${out.cabinLabel.en}`,
-    titleAr: `${out.originCity.ar} ← ${out.destinationCity.ar}${ret ? ' (ذهاب وعودة)' : ''} · ${out.cabinLabel.ar}`,
-    date: out.date,
-    endDate: ret ? ret.date : null,
+    itemId: offer.id,
+    title: `${routeEn}${ret ? ' · Return' : ' · One way'} · ${cabin.en}`,
+    titleAr: `${routeAr}${ret ? ' · ذهاب وعودة' : ' · ذهاب فقط'} · ${cabin.ar}`,
+    date: first.departAt.slice(0, 10),
+    endDate: ret ? offer.slices[1].departAt.slice(0, 10) : null,
     lines,
-    meta: { cabin, outbound: out, inbound: ret },
+    meta: {
+      provider: offer.provider, owner: offer.owner, cabin: offer.cabin, slices: offer.slices, baggage: offer.baggage,
+      refundable: offer.refundable, changeable: offer.changeable, expiresAt: offer.expiresAt, domestic, holdable: !!offer.holdable,
+    },
   };
 }
 
@@ -126,18 +149,32 @@ function findPromo(db, code, subtotal) {
   return { code: p.code, discount: Math.min(discount, subtotal) };
 }
 
+/** VAT contained in the lines, per rate, after spreading the discount proportionally. */
+function vatFor(lines, discount) {
+  const byRate = new Map();
+  for (const l of lines) byRate.set(l.vatRate, (byRate.get(l.vatRate) || 0) + l.amount);
+  const subtotal = lines.reduce((s, l) => s + l.amount, 0);
+  const groups = [...byRate.entries()];
+  let left = discount;
+  return groups.reduce((sum, [rate, amount], i) => {
+    const share = i === groups.length - 1 ? left : Math.round((discount * amount) / (subtotal || 1));
+    left -= share;
+    return sum + vatFromInclusive(amount - share, rate);
+  }, 0);
+}
+
 /**
  * Build a full, priced quote.
- * input: { type, id, returnId?, date, endDate?, adults, children, infants, rooms?, cabin?, addons?: string[], promo? }
+ * input: { type, id, date, endDate?, adults, children, infants, rooms?, addons?: string[], promo? }
  */
-function quote(db, input = {}) {
+async function quote(db, input = {}) {
   const type = input.type;
   const pax = type === 'hotel'
     ? { adults: Math.max(1, Math.min(int(input.adults, 1), 20)), children: Math.max(0, Math.min(int(input.children, 0), 10)), infants: 0 }
     : parsePax(input);
   let q;
   if (type === 'package') q = quotePackage(db, input, pax);
-  else if (type === 'flight') q = quoteFlight(db, input, pax);
+  else if (type === 'flight') q = await quoteFlight(db, input, pax);
   else if (type === 'hotel') q = quoteHotel(db, input);
   else if (type === 'visa') q = quoteVisa(db, input, pax);
   else throw new AppError('Unknown booking type.', { ar: 'نوع الحجز غير معروف.' });
@@ -146,10 +183,12 @@ function quote(db, input = {}) {
   const addons = [...new Set(Array.isArray(input.addons) ? input.addons : [])].filter((k) => ADDONS[k]?.types.includes(type));
   for (const key of addons) {
     const a = ADDONS[key];
-    const qty = a.per === 'booking' ? 1 : key === 'baggage' ? pax.adults + pax.children : travelers;
-    q.lines.push({ key, en: a.en, ar: a.ar, qty, unit: a.price, addon: true });
+    q.lines.push({ key, en: a.en, ar: a.ar, qty: a.per === 'booking' ? 1 : travelers, unit: a.price, addon: true });
   }
-  for (const l of q.lines) l.amount = l.qty * l.unit;
+  for (const l of q.lines) {
+    l.amount = l.qty * l.unit;
+    if (l.vatRate == null) l.vatRate = config.vatRate;
+  }
 
   const subtotal = q.lines.reduce((s, l) => s + l.amount, 0);
   const promo = findPromo(db, input.promo, subtotal);
@@ -165,7 +204,7 @@ function quote(db, input = {}) {
     discount,
     promo: promo ? promo.code : null,
     total,
-    vat: vatFromInclusive(total),
+    vat: vatFor(q.lines, discount),
     currency: 'SAR',
   };
 }
