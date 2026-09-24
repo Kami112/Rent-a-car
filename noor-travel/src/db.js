@@ -217,6 +217,16 @@ const COLUMNS = {
     tickets: "TEXT NOT NULL DEFAULT '[]'",
     provider_order_id: 'TEXT',
   },
+  notifications: {
+    status: "TEXT NOT NULL DEFAULT 'logged'", // logged | sent | failed
+    error: 'TEXT',
+    provider_id: 'TEXT',
+    sent_at: 'TEXT',
+  },
+  users: {
+    reset_token_hash: 'TEXT',
+    reset_expires: 'TEXT',
+  },
 };
 function migrate(db) {
   for (const [table, cols] of Object.entries(COLUMNS)) {

@@ -484,10 +484,13 @@
 
   async function messages() {
     setTitle('Messages outbox');
-    const rows = await api('/admin/notifications');
-    view.innerHTML = `<div class="alert alert-info" style="margin-bottom:16px">Every customer email / WhatsApp message is logged here. Connect an email (SMTP) or WhatsApp Business provider in <code>src/notify.js</code> to deliver them.</div>
-      <div class="card table-wrap">${rows.length ? `<table class="table"><thead><tr><th>When</th><th>Channel</th><th>To</th><th>Message</th></tr></thead><tbody>
-      ${rows.map((m) => `<tr><td class="small muted nowrap">${dt(m.created_at)}</td><td>${esc(m.channel)}</td><td class="small">${esc(m.recipient)}</td>
+    const { provider, rows } = await api('/admin/notifications');
+    const st = (m) => (m.status === 'sent' ? '<span class="status s-confirmed">sent</span>' : m.status === 'failed' ? `<span class="status s-failed" title="${esc(m.error || '')}">failed</span>` : '<span class="status">logged</span>');
+    view.innerHTML = `<div class="alert ${provider ? 'alert-success' : 'alert-warn'}" style="margin-bottom:16px">${provider
+      ? `Email delivery is <strong>active</strong> via ${esc(provider === 'resend' ? 'Resend' : 'SMTP')}. WhatsApp messages are logged until a WhatsApp Business provider is connected.`
+      : 'Email delivery is <strong>not configured</strong> — messages are only logged. Set RESEND_API_KEY or SMTP_HOST/SMTP_USER/SMTP_PASS in the environment.'}</div>
+      <div class="card table-wrap">${rows.length ? `<table class="table"><thead><tr><th>When</th><th>Channel</th><th>To</th><th>Status</th><th>Message</th></tr></thead><tbody>
+      ${rows.map((m) => `<tr><td class="small muted nowrap">${dt(m.created_at)}</td><td>${esc(m.channel)}</td><td class="small">${esc(m.recipient)}</td><td>${st(m)}${m.error ? `<div class="small" style="color:var(--danger);max-width:220px">${esc(m.error)}</div>` : ''}</td>
         <td><strong>${esc(m.subject)}</strong><details><summary class="small muted" style="cursor:pointer">Show</summary><pre class="msg">${esc(m.body)}</pre></details></td></tr>`).join('')}</tbody></table>` : '<div class="empty">No messages yet.</div>'}</div>`;
   }
 

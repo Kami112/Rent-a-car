@@ -4,6 +4,8 @@ const auth = require('../auth');
 const bookings = require('../bookings');
 const { AppError } = require('../errors');
 const { EMAIL } = require('./public');
+const notify = require('../notify');
+const config = require('../config');
 
 module.exports = function accountRoutes(db) {
   const r = express.Router();
@@ -23,6 +25,7 @@ module.exports = function accountRoutes(db) {
     // Guest bookings are not auto-attached by email (the address is unverified);
     // they can be claimed with their private link via POST /bookings/claim.
     auth.createSession(db, res, userId);
+    notify.welcome(db, { name: String(name).trim(), email: String(email).trim().toLowerCase() });
     res.status(201).json({ id: userId, name, email, role: 'customer' });
   });
 
@@ -34,6 +37,30 @@ module.exports = function accountRoutes(db) {
     }
     auth.createSession(db, res, u.id);
     res.json({ id: u.id, name: u.name, email: u.email, role: u.role });
+  });
+
+  // Password reset by email. Always answers the same way so it cannot be used to discover accounts.
+  r.post('/forgot', auth.rateLimit({ max: 5, windowMs: 3600e3 }), (req, res) => {
+    const u = db.prepare('SELECT id, name, email FROM users WHERE email = ? AND active = 1').get(String(req.body?.email || '').trim());
+    if (u) {
+      const token = auth.randomToken(24);
+      db.prepare('UPDATE users SET reset_token_hash = ?, reset_expires = ? WHERE id = ?')
+        .run(auth.sha256(token), new Date(Date.now() + 3600e3).toISOString(), u.id);
+      notify.passwordReset(db, u, `${config.baseUrl}/account.html#reset=${token}`);
+    }
+    res.json({ ok: true });
+  });
+
+  r.post('/reset', auth.rateLimit({ max: 10 }), (req, res) => {
+    const { token, password } = req.body || {};
+    if (String(password || '').length < 8) throw new AppError('Password must be at least 8 characters.', { ar: 'يجب ألا تقل كلمة المرور عن 8 أحرف.' });
+    const u = db.prepare('SELECT id FROM users WHERE reset_token_hash = ? AND reset_expires > ? AND active = 1')
+      .get(auth.sha256(String(token || '')), new Date().toISOString());
+    if (!u) throw new AppError('This reset link is invalid or has expired.', { ar: 'رابط إعادة التعيين غير صالح أو منتهي الصلاحية.' });
+    db.prepare('UPDATE users SET password_hash = ?, reset_token_hash = NULL, reset_expires = NULL WHERE id = ?').run(auth.hashPassword(String(password)), u.id);
+    db.prepare('DELETE FROM sessions WHERE user_id = ?').run(u.id);
+    auth.createSession(db, res, u.id);
+    res.json({ ok: true });
   });
 
   r.post('/logout', (req, res) => {

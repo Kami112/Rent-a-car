@@ -20,6 +20,8 @@ hotels and visa services and pay online. Staff run the business from the back-of
   **Tamara** (split in 3 or 4), bank transfer, and cash/POS at the office
 - Booking page with status, retry payment, cancel unpaid booking
 - **ZATCA simplified tax invoice** (bilingual, with Phase-1 TLV QR code) issued automatically when paid
+- Customers sign in / sign up before booking (with password reset by email); bookings are saved to their account
+- Emails: booking received, payment confirmed with the tax invoice (inline + attached), e-ticket/PNR, refunds, status changes
 - Customer accounts, guest "Manage my booking" lookup, contact form, newsletter, WhatsApp button
 
 **Back-office** (`/admin/`)
@@ -39,7 +41,7 @@ cd noor-travel
 npm install
 cp .env.example .env     # optional
 npm start                # http://localhost:3000
-npm test                 # 15 automated tests
+npm test                 # 18 automated tests
 ```
 
 Back-office: <http://localhost:3000/admin/> — default dev login `admin@noortravel.sa` / `Admin@12345`
@@ -63,7 +65,11 @@ Tickets are paid from your Duffel balance in the airline's currency; set `FX_RAT
 and set the agency service fee per passenger in **Back-office → Settings**. VAT: international air fares are
 zero-rated, domestic fares and service fees carry 15%.
 
-## Going live — checklist
+## Going live
+
+**Full step-by-step guide: [docs/LAUNCH.md](docs/LAUNCH.md)** (hosting, domain, email, payments, Sabre/IATA ticketing, compliance).
+
+### Checklist
 
 1. **Moyasar** (cards, mada, Apple Pay, STC Pay): set `MOYASAR_PUBLISHABLE_KEY`, `MOYASAR_SECRET_KEY`;
    register webhook `https://YOUR-DOMAIN/api/pay/webhook/moyasar`; complete Apple Pay domain verification in Moyasar.
@@ -72,7 +78,7 @@ zero-rated, domestic fares and service fees carry 15%.
    notification URL is sent automatically per order.
 4. Set real company details (`COMPANY_*`), `BASE_URL` (https) and a strong `ADMIN_PASSWORD`.
 5. Replace the placeholder bank IBAN in **Back-office → Settings**.
-6. Connect email / WhatsApp delivery in `src/notify.js` (every message is already logged in the outbox).
+6. Email: set `RESEND_API_KEY` (or SMTP) and `MAIL_FROM` — customers then receive confirmations, tax invoices and e-tickets. WhatsApp: connect a provider in `src/notify.js`.
 7. Have the terms/cancellation/privacy wording in `public/js/pages/policies.js` reviewed by your legal advisor.
 8. **Flights:** open a Duffel account (or connect your IATA/consolidator GDS), fund the balance and set `DUFFEL_ACCESS_TOKEN`.
 9. For ZATCA Phase 2 (e-invoice integration), connect a certified EGS solution.

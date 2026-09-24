@@ -18,7 +18,9 @@ module.exports = function bookingRoutes(db) {
     return b;
   };
 
+  // Customers must be signed in to book (the booking is saved to their account).
   r.post('/', rateLimit({ max: 30, windowMs: 3600e3 }), ah(async (req, res) => {
+    if (!req.user) throw new AppError('Please sign in or create an account to complete your booking.', { status: 401, ar: 'يرجى تسجيل الدخول أو إنشاء حساب لإتمام الحجز.' });
     const b = await bookings.create(db, req.body || {}, { user: req.user });
     res.status(201).json({ ref: b.ref, token: b.access_token, total: b.total, paymentMethods: payments.listMethods(db, b.total) });
   }));
@@ -39,6 +41,13 @@ module.exports = function bookingRoutes(db) {
   });
 
   r.get('/:ref/invoice', (req, res) => res.json(bookings.invoice(db, load(req))));
+
+  // ZATCA QR as an image (used inside confirmation emails).
+  r.get('/:ref/invoice-qr.png', ah(async (req, res) => {
+    const inv = bookings.invoice(db, load(req));
+    const png = await require('qrcode').toBuffer(inv.qr, { margin: 1, width: 300 });
+    res.set('Cache-Control', 'private, max-age=86400').type('png').send(png);
+  }));
 
   r.post('/:ref/pay', rateLimit({ max: 20 }), ah(async (req, res) => {
     const b = load(req);

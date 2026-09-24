@@ -107,6 +107,9 @@
       tk_note: 'Your e-ticket will be sent to your email and WhatsApp within minutes after payment.',
       popular_routes: 'Popular flights from Riyadh', recent_searches: 'Your recent searches', flights_hero_title: 'Book flights to 80+ destinations, <em>pay your way</em>',
       flights_hero_lead: 'Compare Saudia, flynas, flyadeal, Emirates, Qatar Airways, Turkish Airlines and more — then pay by mada, Apple Pay or split with Tabby & Tamara.',
+      auth_gate_title: 'Sign in to complete your booking', auth_gate_sub: 'Your booking, tax invoice and e-ticket are saved to your account and emailed to you.',
+      forgot_password: 'Forgot password?', send_reset_link: 'Send reset link', reset_sent: 'If an account exists for this email, a reset link has been sent. Please check your inbox.',
+      new_password: 'New password', set_password: 'Save new password', reset_title: 'Choose a new password', back_to_signin: 'Back to sign in',
       loading: 'Loading…', error_generic: 'Something went wrong. Please try again.', required: 'This field is required',
     },
     ar: {
@@ -203,6 +206,9 @@
       tk_note: 'ستصلك التذكرة الإلكترونية على بريدك وواتساب خلال دقائق بعد الدفع.',
       popular_routes: 'رحلات شائعة من الرياض', recent_searches: 'عمليات البحث الأخيرة', flights_hero_title: 'احجز رحلتك إلى أكثر من 80 وجهة <em>وادفع بطريقتك</em>',
       flights_hero_lead: 'قارن بين السعودية وطيران ناس وطيران أديل والإمارات والقطرية والتركية وغيرها — وادفع بمدى أو Apple Pay أو قسّمها مع تابي وتمارا.',
+      auth_gate_title: 'سجّل الدخول لإتمام حجزك', auth_gate_sub: 'يُحفظ حجزك وفاتورتك الضريبية وتذكرتك في حسابك وتُرسل إلى بريدك الإلكتروني.',
+      forgot_password: 'نسيت كلمة المرور؟', send_reset_link: 'إرسال رابط إعادة التعيين', reset_sent: 'إذا كان هناك حساب بهذا البريد فقد أرسلنا رابط إعادة التعيين. يرجى مراجعة بريدك.',
+      new_password: 'كلمة المرور الجديدة', set_password: 'حفظ كلمة المرور', reset_title: 'اختر كلمة مرور جديدة', back_to_signin: 'العودة لتسجيل الدخول',
       loading: 'جارٍ التحميل…', error_generic: 'حدث خطأ ما. يرجى المحاولة مرة أخرى.', required: 'هذا الحقل مطلوب',
     },
   };

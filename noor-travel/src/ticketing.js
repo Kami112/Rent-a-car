@@ -56,7 +56,7 @@ async function issue(db, bookingId, { userId = null } = {}) {
     }
     save(db, b.id, { ticket_status: 'issued', pnr: order.pnr, tickets: order.tickets, provider_order_id: order.orderId });
     dbm.logActivity(db, { userId, bookingId: b.id, action: 'ticket.issued', detail: `PNR ${order.pnr} ${order.tickets.join(', ')}` });
-    ticketsIssued(db, get(db, b.id));
+    notify.ticketsIssued(db, get(db, b.id));
   } catch (err) {
     save(db, b.id, { ticket_status: 'failed' });
     dbm.logActivity(db, { userId, bookingId: b.id, action: 'ticket.failed', detail: err.message });
@@ -73,22 +73,8 @@ function recordManual(db, b, { pnr, tickets }, userId) {
   save(db, b.id, { ticket_status: 'issued', pnr: cleanPnr, tickets: list });
   dbm.logActivity(db, { userId, bookingId: b.id, action: 'ticket.recorded', detail: `PNR ${cleanPnr} ${list.join(', ')}` });
   const fresh = get(db, b.id);
-  ticketsIssued(db, fresh);
+  notify.ticketsIssued(db, fresh);
   return fresh;
-}
-
-function ticketsIssued(db, b) {
-  const tickets = JSON.parse(b.tickets || '[]');
-  notify.send(db, {
-    recipient: b.contact_email, bookingId: b.id, subject: `Your e-ticket — booking ${b.ref} (PNR ${b.pnr})`,
-    body: `Dear ${b.contact_name},\n\nYour flight is ticketed.\nAirline booking reference (PNR): ${b.pnr}\n`
-      + `${tickets.length ? `E-ticket number(s): ${tickets.join(', ')}\n` : ''}\nManage your booking: ${notify.link(b)}\n\n`
-      + 'Please arrive at the airport at least 3 hours before international departures.\nNoor Travel Agency',
-  });
-  notify.send(db, {
-    channel: 'whatsapp', recipient: b.contact_phone, bookingId: b.id, subject: `E-ticket ${b.pnr}`,
-    body: `Noor Travel ✈️ Your flight is ticketed. PNR: ${b.pnr}${tickets.length ? ` · Tickets: ${tickets.join(', ')}` : ''}. ${notify.link(b)}`,
-  });
 }
 
 module.exports = { onCreated, issue, recordManual };
