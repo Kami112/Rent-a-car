@@ -62,7 +62,10 @@ h1 span{background:var(--tape);color:var(--tape-ink);padding:0 .15em}
 .appbar h2{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:.02em;text-transform:uppercase;margin:0;flex:1}
 .icon-btn{all:unset;cursor:pointer;width:34px;height:34px;display:grid;place-items:center;border-radius:50%;font-size:20px;color:var(--ink)}
 .icon-btn:focus-visible{outline:2px solid var(--tape)}
-.view{flex:1;overflow-y:auto;padding:4px 16px 16px;display:flex;flex-direction:column;gap:14px}
+/* each screen fills the phone and scrolls inside it */
+.scr{flex:1;min-height:0;display:flex;flex-direction:column}
+[hidden]{display:none!important}
+.view{flex:1;min-height:0;overflow-y:auto;padding:4px 16px 16px;display:flex;flex-direction:column;gap:14px}
 .muted{color:var(--muted)}
 .small{font-size:13px}
 .kinds{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -79,6 +82,8 @@ h1 span{background:var(--tape);color:var(--tape-ink);padding:0 .15em}
 .btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
 .btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .btn-row{display:grid;gap:10px;margin-top:auto}
+.btn-row.sticky{position:sticky;bottom:-16px;background:var(--screen);padding-block:10px 16px;margin-bottom:-16px;box-shadow:0 -8px 12px -10px rgba(0,0,0,.25)}
+.btn-row.sticky .btn{padding:12px}
 .tips{margin:0;padding-left:18px;font-size:13.5px;display:grid;gap:6px}
 .viewfinder{border-radius:14px;overflow:hidden;background:#0d1110;aspect-ratio:3/4;display:grid;place-items:center;position:relative;max-width:100%}
 .viewfinder svg{width:70%;opacity:.9}
@@ -90,7 +95,7 @@ h1 span{background:var(--tape);color:var(--tape-ink);padding:0 .15em}
 /* the whole photo always fits on screen: tall photos shrink to the height limit */
 #cv{display:block;max-width:100%;max-height:420px;width:auto;height:auto;touch-action:none;cursor:grab}
 @media (max-width:420px){#cv{max-height:380px}}
-.readout{display:flex;flex-wrap:wrap;gap:4px 14px;justify-content:space-between;font-family:var(--mono);font-size:13px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-variant-numeric:tabular-nums}
+.readout{display:flex;flex-wrap:wrap;gap:4px 14px;justify-content:space-between;font-family:var(--mono);font-size:15px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-variant-numeric:tabular-nums}
 .big{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .big .card{padding:14px 14px 12px}
 .big .v{font-family:var(--display);font-weight:700;font-size:44px;line-height:1;font-variant-numeric:tabular-nums}
@@ -117,7 +122,6 @@ h1 span{background:var(--tape);color:var(--tape-ink);padding:0 .15em}
 .toast[hidden]{display:none!important}
 .demo-flag{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:var(--tape);color:var(--tape-ink);padding:2px 6px;border-radius:3px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-
 /* on a real phone: the app fills the screen, no phone frame */
 @media (max-width:560px){
   body{padding:0}
@@ -207,6 +211,8 @@ h1 span{background:var(--tape);color:var(--tape-ink);padding:0 .15em}
             <div class="auto" id="auto" hidden></div>
             <div class="hint small" id="hint">Drag the <b>yellow dots</b> to the 4 inside corners of the door or window.</div>
             <div class="canvas-box"><canvas id="cv"></canvas></div>
+            <div class="seg units" style="grid-template-columns:repeat(4,1fr)"><button data-u="mm" aria-pressed="false">mm</button><button data-u="cm" aria-pressed="true">cm</button><button data-u="m" aria-pressed="false">m</button><button data-u="in" aria-pressed="false">in</button></div>
+            <div class="readout"><span>Width <b id="rw">–</b></span><span>Height <b id="rh">–</b></span></div>
             <div class="nudge" id="nudge">
               <canvas id="lp" width="160" height="160" hidden></canvas>
               <span class="small" id="selName">Tap a dot to select it, then use the arrows for exact placement.</span>
@@ -218,7 +224,6 @@ h1 span{background:var(--tape);color:var(--tape-ink);padding:0 .15em}
               </div>
             </div>
             <div class="warn" id="warn" hidden></div>
-            <div class="readout"><span>W <b id="rw">–</b></span><span>H <b id="rh">–</b></span><span id="rscale" class="muted">–</span></div>
             <div class="btn-row"><button class="btn ghost" id="redetect">Find corners automatically</button><button class="btn" data-go="result">Calculate size</button></div>
           </div>
         </div>
@@ -228,7 +233,7 @@ h1 span{background:var(--tape);color:var(--tape-ink);padding:0 .15em}
           <div class="appbar"><button class="icon-btn" data-go="mark" aria-label="Back">‹</button><h2 id="resTitle">Door size</h2>
           </div>
           <div class="view">
-            <div class="seg" id="units" style="grid-template-columns:repeat(4,1fr)"><button data-u="mm" aria-pressed="false">mm</button><button data-u="cm" aria-pressed="true">cm</button><button data-u="m" aria-pressed="false">m</button><button data-u="in" aria-pressed="false">in</button></div>
+            <div class="seg units" style="grid-template-columns:repeat(4,1fr)"><button data-u="mm" aria-pressed="false">mm</button><button data-u="cm" aria-pressed="true">cm</button><button data-u="m" aria-pressed="false">m</button><button data-u="in" aria-pressed="false">in</button></div>
             <div class="big">
               <div class="card"><h3>Width</h3><span class="v" id="vw">–</span><span class="u" data-unit>cm</span></div>
               <div class="card"><h3>Height</h3><span class="v" id="vh">–</span><span class="u" data-unit>cm</span></div>
@@ -575,9 +580,8 @@ window.OpenSizeDetect = (function(){
     if(!forThumb && drag!==null) loupe(c, state[state.layer][drag], k);
     if(!forThumb) sideLoupe();
     if(!forThumb){
-      document.getElementById('rw').textContent = fmt(m.w,'cm')+' cm · '+fmt(m.w,'mm')+' mm';
-      document.getElementById('rh').textContent = fmt(m.h,'cm')+' cm · '+fmt(m.h,'mm')+' mm';
-      document.getElementById('rscale').textContent = m.mmPerPx.toFixed(2)+' mm/px';
+      document.getElementById('rw').textContent = fmt(m.w,state.unit)+' '+state.unit;
+      document.getElementById('rh').textContent = fmt(m.h,state.unit)+' '+state.unit;
       const pr=problem(), w=document.getElementById('warn'); w.textContent=pr; w.hidden=!pr;
     }
   }
@@ -707,10 +711,12 @@ window.OpenSizeDetect = (function(){
     document.getElementById('lastDims').textContent=`${(m.w/10).toFixed(0)} × ${(m.h/10).toFixed(0)} cm`;
     document.getElementById('lastKind').textContent=state.kind+(state.sample?' · sample':'');
   }
-  document.querySelectorAll('#units button').forEach(b=>b.onclick=()=>{
+  // the unit switch appears on the corners screen and the result screen; both stay in sync
+  document.querySelectorAll('.units button').forEach(b=>b.onclick=()=>{
     state.unit=b.dataset.u;
-    document.querySelectorAll('#units button').forEach(x=>x.setAttribute('aria-pressed',x===b));
-    renderResult();
+    document.querySelectorAll('.units button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.u===state.unit));
+    if(state.img) draw();
+    if(!document.querySelector('[data-screen="result"]').hidden) renderResult();
   });
 
   // ---------- navigation ----------
