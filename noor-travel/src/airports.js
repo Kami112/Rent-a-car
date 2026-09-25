@@ -100,9 +100,24 @@ const COUNTRIES = {
   ZA: ['South Africa', 'جنوب أفريقيا'], BN: ['Brunei', 'بروناي'],
 };
 
+// Curated airports (with Arabic names) are "major": ranked first in search and sent to the browser.
 const AIRPORTS = Object.fromEntries(RAW.map(([code, en, ar, name, country, lat, lon, tz]) => [code, {
-  code, en, ar, name, country, countryName: { en: COUNTRIES[country]?.[0] || country, ar: COUNTRIES[country]?.[1] || country }, lat, lon, tz,
+  code, en, ar, name, country, countryName: { en: COUNTRIES[country]?.[0] || country, ar: COUNTRIES[country]?.[1] || country }, lat, lon, tz, major: true,
 }]));
+
+// Every other passenger airport worldwide (OpenFlights.org, ODbL) — see src/data/airports.json.
+const COUNTRY_BY_NAME = Object.fromEntries(Object.entries(COUNTRIES).map(([iso, [en]]) => [en.toLowerCase(), iso]));
+Object.assign(COUNTRY_BY_NAME, { turkey: 'TR', 'united states': 'US', 'south korea': 'KR', 'bosnia and herzegovina': 'BA', 'burma': 'MM' });
+for (const [code, city, name, countryEn, lat, lon, tz] of require('./data/airports.json').rows) {
+  if (AIRPORTS[code]) continue;
+  const iso = COUNTRY_BY_NAME[countryEn.toLowerCase()] || countryEn;
+  AIRPORTS[code] = {
+    code, en: city, ar: city, name, country: iso,
+    countryName: { en: COUNTRIES[iso]?.[0] || countryEn, ar: COUNTRIES[iso]?.[1] || countryEn }, lat, lon, tz, major: false,
+  };
+}
+const MAJOR = Object.fromEntries(Object.entries(AIRPORTS).filter(([, a]) => a.major));
+const ALL = Object.values(AIRPORTS);
 
 function distanceKm(a, b) {
   const A = AIRPORTS[a]; const B = AIRPORTS[b];
@@ -120,19 +135,34 @@ function tzOffsetMin(tz, date = new Date()) {
   return Math.round((asUtc - Math.floor(date.getTime() / 60000) * 60000) / 60000);
 }
 
-function search(q, lang = 'en') {
-  const s = String(q || '').trim().toLowerCase();
-  const all = Object.values(AIRPORTS);
-  if (!s) return all.filter((a) => ['RUH', 'JED', 'MED', 'DMM', 'DXB', 'CAI', 'IST', 'LHR', 'KUL', 'MLE'].includes(a.code));
+const POPULAR = ['RUH', 'JED', 'MED', 'DMM', 'DXB', 'CAI', 'IST', 'LHR', 'KUL', 'MLE', 'DOH', 'AMM'];
+
+/** Airport autocomplete: code, city (EN/AR), airport name or country. Major airports rank first. */
+function search(q, limit = 10) {
+  const raw = String(q || '').trim();
+  const s = raw.toLowerCase();
+  if (!s) return POPULAR.map((c) => AIRPORTS[c]);
   const score = (a) => {
     if (a.code.toLowerCase() === s) return 0;
-    if (a.en.toLowerCase().startsWith(s) || a.ar.startsWith(q.trim())) return 1;
-    if (a.countryName.en.toLowerCase().startsWith(s) || a.countryName.ar.startsWith(q.trim())) return 2;
-    if (a.name.toLowerCase().includes(s) || a.en.toLowerCase().includes(s) || a.ar.includes(q.trim())) return 3;
+    if (a.en.toLowerCase() === s || a.ar === raw) return 1;
+    if (a.en.toLowerCase().startsWith(s) || a.ar.startsWith(raw)) return 2;
+    if (a.countryName.en.toLowerCase().startsWith(s) || a.countryName.ar.startsWith(raw)) return 3;
+    if (a.name.toLowerCase().includes(s) || a.en.toLowerCase().includes(s) || a.ar.includes(raw)) return 4;
     return 9;
   };
-  void lang;
-  return all.map((a) => [score(a), a]).filter(([n]) => n < 9).sort((x, y) => x[0] - y[0]).slice(0, 8).map(([, a]) => a);
+  const hits = [];
+  for (const a of ALL) { const n = score(a); if (n < 9) hits.push([n + (a.major ? 0 : 0.5), a]); }
+  return hits.sort((x, y) => x[0] - y[0] || x[1].en.localeCompare(y[1].en)).slice(0, limit).map(([, a]) => a);
 }
 
-module.exports = { AIRPORTS, COUNTRIES, distanceKm, tzOffsetMin, search };
+/** Names for the given codes, for labelling flights in the browser. */
+function describe(codes) {
+  const out = {};
+  for (const c of codes) {
+    const a = AIRPORTS[c];
+    if (a) out[c] = { en: a.en, ar: a.ar, name: a.name, countryName: a.countryName };
+  }
+  return out;
+}
+
+module.exports = { AIRPORTS, MAJOR, COUNTRIES, distanceKm, tzOffsetMin, search, describe };

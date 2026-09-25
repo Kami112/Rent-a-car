@@ -12,7 +12,7 @@
   ];
   $('#root').innerHTML = `<div class="layout-main">
     <div class="card panel"><h2>${esc(L(blocks[0]))}</h2><p>${esc(L(blocks[1]))}</p><h2 class="mt-3">${esc(L(blocks[2]))}</h2><p>${esc(L(blocks[3]))}</p>
-      <div class="stats-strip mt-3"><div><strong class="num">8</strong>${esc(t('stat1'))}</div><div><strong class="num">80+</strong>${esc(t('stat2'))}</div>
+      <div class="stats-strip mt-3"><div><strong class="num">8</strong>${esc(t('stat1'))}</div><div><strong class="num">5,000+</strong>${esc(t('stat2'))}</div>
       <div><strong class="num">6</strong>${esc(t('stat3'))}</div><div><strong class="num">5</strong>${esc(t('stat4'))}</div></div>
       <h2 class="mt-3">${esc(L({ en: 'Our offices in Riyadh', ar: 'مكاتبنا في الرياض' }))}</h2>
       <div class="chips">${[{ en: 'Head office — As Suwaidi', ar: 'المكتب الرئيسي — السويدي' }, ...c.branches].map((b) => `<span class="chip">${esc(L(b))}</span>`).join('')}</div></div>

@@ -16,5 +16,6 @@
       en: 'We process your personal data in line with the Saudi Personal Data Protection Law (PDPL) only to deliver your booking, meet legal obligations and — with your consent — send offers. Card details are handled by our payment providers and never stored by Ezhar Travel.',
       ar: 'نعالج بياناتك الشخصية وفق نظام حماية البيانات الشخصية السعودي فقط لتنفيذ حجزك والوفاء بالالتزامات النظامية، ولإرسال العروض بموافقتك. تتم معالجة بيانات البطاقات لدى مزودي الدفع ولا تحتفظ بها إزهار للسفر والسياحة.' }],
   ];
-  $('#root').innerHTML = sections.map(([h, p]) => `<h2 style="font-size:1.35rem" class="mt-3">${esc(L(h))}</h2><p class="muted">${esc(L(p))}</p>`).join('');
+  $('#root').innerHTML = sections.map(([h, p]) => `<h2 style="font-size:1.35rem" class="mt-3">${esc(L(h))}</h2><p class="muted">${esc(L(p))}</p>`).join('')
+    + '<p class="small muted mt-3">Airport data © <a href="https://openflights.org/data" target="_blank" rel="noopener">OpenFlights.org</a>, available under the Open Database License (ODbL).</p>';
 })();
