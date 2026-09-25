@@ -9,6 +9,12 @@ services:
       - path: /*
         name: Cache-Control
         value: public, max-age=3600
+      - path: /admin.html
+        name: X-Robots-Tag
+        value: noindex
+      - path: /business-kit/*
+        name: X-Robots-Tag
+        value: noindex
     routes:
       - type: rewrite
         source: /

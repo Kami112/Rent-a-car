@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Lead Tracker</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/admin.css">
+<style>
+  .tracker { max-width: 1320px; margin: 0 auto; padding: 28px 24px 60px; }
+  .tracker-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+  .tracker-head h1 { font-size: 1.6rem; font-weight: 800; color: var(--color-dark); }
+  .tracker-head p { color: var(--color-text-light); font-size: 0.9rem; max-width: 640px; }
+  .tracker-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .kpi-grid.six { grid-template-columns: repeat(6, 1fr); }
+  .settings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .settings label { font-size: 0.8rem; font-weight: 700; color: var(--color-text-light); display: block; margin-bottom: 6px; }
+  .settings input, .settings select, .panel-head.toolbar input, .panel-head.toolbar select, .lead-note, .lead-date {
+    border: 1.5px solid var(--color-border); border-radius: var(--radius-sm); padding: 9px 12px; font-size: 0.9rem; width: 100%; background: #fff;
+  }
+  .panel-head.toolbar select { width: auto; }
+  .panel-head.toolbar input[type="checkbox"] { width: auto; }
+  .panel-head.toolbar label { white-space: nowrap; }
+  .lead-note { min-width: 180px; padding: 6px 10px; }
+  .lead-date { width: 140px; padding: 6px 8px; }
+  .prio { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; }
+  .prio-hot { background: #fdecec; color: #c23b3b; }
+  .prio-warm { background: #fff4e5; color: #b86200; }
+  .prio-normal { background: #eef0f4; color: #4a5263; }
+  .status-new { background: #eef0f4; color: #4a5263; }
+  .status-contacted { background: #e8efff; color: var(--color-primary-dark); }
+  .status-replied { background: #f1ecff; color: #5a45c9; }
+  .status-meeting { background: #fff4e5; color: #b86200; }
+  .status-won { background: #e6f7ef; color: #17945c; }
+  .status-lost { background: #fdecec; color: #c23b3b; }
+  .row-due td { background: #fffaf0; }
+  .actions-cell { display: flex; gap: 6px; }
+  .admin-table td { white-space: normal; }
+  .admin-table td.nowrap { white-space: nowrap; }
+  .lead-name strong { display: block; }
+  .lead-name small a { color: var(--color-primary); }
+  #add-form .form-row { margin-bottom: 0; }
+  .help { font-size: 0.85rem; color: var(--color-text-light); line-height: 1.7; }
+  .help code { background: var(--color-bg-alt); padding: 2px 6px; border-radius: 4px; }
+  @media (max-width: 1080px) { .kpi-grid.six { grid-template-columns: repeat(3, 1fr); } .settings { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) { .kpi-grid.six { grid-template-columns: repeat(2, 1fr); } .tracker { padding: 20px 16px 50px; } }
+</style>
+</head>
+<body style="background:var(--color-bg-alt);">
+<div class="tracker">
+
+  <div class="tracker-head">
+    <div>
+      <h1>🎯 Lead Tracker</h1>
+      <p>Import leads from <code>lead_finder.py</code> or add them by hand, send a ready-made WhatsApp message, and track every business from first contact to signed client. Data stays in this browser. Export a CSV regularly as a backup.</p>
+    </div>
+    <div class="tracker-actions">
+      <label class="btn btn-outline btn-sm" for="import-file" style="cursor:pointer;">Import CSV</label>
+      <input type="file" id="import-file" accept=".csv,text/csv" hidden>
+      <button type="button" class="btn btn-outline btn-sm" id="export">Export CSV</button>
+      <button type="button" class="btn btn-primary btn-sm" id="add-toggle">+ Add lead</button>
+    </div>
+  </div>
+
+  <div class="kpi-grid six" id="stats"></div>
+
+  <div class="panel" id="add-panel" hidden>
+    <div class="panel-head"><h2>Add a lead</h2></div>
+    <form id="add-form">
+      <div class="form-row">
+        <div class="form-group"><label for="f-name">Business name</label><input id="f-name" required></div>
+        <div class="form-group"><label for="f-phone">Phone / WhatsApp</label><input id="f-phone" type="tel" placeholder="+966 5X XXX XXXX"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label for="f-niche">Niche</label>
+          <select id="f-niche"><option>car rental</option><option>travel agency</option><option>umrah company</option><option>tourism company</option><option>restaurant</option><option>clinic</option><option>other</option></select>
+        </div>
+        <div class="form-group"><label for="f-city">City</label><input id="f-city" placeholder="Riyadh" required></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label for="f-website">Website (leave empty if none)</label><input id="f-website" placeholder="https://"></div>
+        <div class="form-group"><label for="f-source">Found on</label>
+          <select id="f-source"><option>Google Maps</option><option>Instagram</option><option>Snapchat</option><option>LinkedIn</option><option>Haraj / Dubizzle</option><option>Referral</option><option>Other</option></select>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm">Save lead</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h2>Your details (used in messages)</h2></div>
+    <div class="settings">
+      <div><label for="s-name">Your name</label><input id="s-name" placeholder="Muhammad"></div>
+      <div><label for="s-demo">Demo link to show clients</label><input id="s-demo" placeholder="https://your-demo.onrender.com"></div>
+      <div><label for="s-lang">Message language</label>
+        <select id="s-lang"><option value="ar">العربية (Arabic)</option><option value="en">English</option></select>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head toolbar">
+      <input type="search" id="q" placeholder="Search name, city, phone, notes">
+      <select id="f-status-filter"><option value="">All statuses</option></select>
+      <select id="f-prio-filter">
+        <option value="">All priorities</option><option value="hot">Hot (no website)</option><option value="warm">Warm</option><option value="normal">Normal</option>
+      </select>
+      <label style="display:flex;gap:6px;align-items:center;font-size:0.85rem;font-weight:600;"><input type="checkbox" id="due-only"> Follow-ups due</label>
+    </div>
+    <div class="table-wrap"><table class="admin-table" id="leads"></table></div>
+  </div>
+
+  <div class="panel help">
+    <strong>How to get leads into this page</strong><br>
+    1. Run <code>python3 lead_finder.py --niche "car rental" --city Riyadh</code> (needs a Google Places API key, see <code>README.md</code>), then click <em>Import CSV</em>.<br>
+    2. Or search Google Maps, Instagram, Snapchat and Haraj/Dubizzle yourself and click <em>+ Add lead</em>.<br>
+    3. Click 💬 to open WhatsApp with a personalised message. <strong>You press send yourself.</strong> Contact at most 20–30 new businesses a day and stop if someone isn't interested, so your number is not reported as spam.
+  </div>
+</div>
+
+<script>
+(function () {
+  var KEY = 'lead_tracker_v1', SKEY = 'lead_tracker_settings';
+  var STATUSES = ['New', 'Contacted', 'Replied', 'Meeting', 'Won', 'Lost'];
+  var FOLLOW_UP_DAYS = { Contacted: 3, Replied: 2, Meeting: 1 };
+
+  var TEMPLATES = {
+    ar: {
+      'car rental': 'السلام عليكم {name} 👋\nأنا {me}، أصمم مواقع وأنظمة حجز لشركات تأجير السيارات في {city}.\nجهزت نموذج لموقع تأجير بالعربي والإنجليزي مع حجز عبر واتساب ولوحة تحكم لإدارة السيارات والحجوزات:\n{demo}\nهل يناسبك أعرض عليك تصور مجاني لموقع {name}؟',
+      'travel agency': 'السلام عليكم {name} 👋\nأنا {me}، أصمم مواقع لوكالات السفر والسياحة في {city}: عرض الباقات، حجز عبر واتساب، ولوحة تحكم لإدارة الحجوزات والعملاء.\nهذا مثال من أعمالي: {demo}\nهل يناسبك أرسل لك تصور مجاني لموقع {name}؟',
+      'umrah company': 'السلام عليكم {name} 👋\nأنا {me}، أصمم مواقع لشركات العمرة: باقات العمرة بالأسعار، حجز مباشر عبر واتساب، ولوحة تحكم للحجوزات.\nمثال من أعمالي: {demo}\nهل تحب أجهز لك تصور مجاني لموقع {name}؟',
+      'default': 'السلام عليكم {name} 👋\nأنا {me}، أقدم خدمات تصميم المواقع وأنظمة الإدارة والتسويق عبر البريد والسوشال ميديا للشركات في {city}.\nمثال من أعمالي: {demo}\nهل يناسبك نتكلم 10 دقائق هذا الأسبوع؟'
+    },
+    en: {
+      'car rental': 'Hi {name} 👋\nI\'m {me}. I build websites and booking systems for car rental companies in {city}.\nHere is a demo: Arabic & English, WhatsApp booking, and an admin dashboard for cars and bookings:\n{demo}\nCould I show you a free mockup for {name}?',
+      'travel agency': 'Hi {name} 👋\nI\'m {me}. I build websites for travel and tourism agencies in {city}: package listings, WhatsApp booking and a dashboard for bookings and customers.\nExample of my work: {demo}\nWould you like a free mockup for {name}?',
+      'umrah company': 'Hi {name} 👋\nI\'m {me}. I build websites for Umrah companies: priced packages, direct WhatsApp booking and a bookings dashboard.\nExample of my work: {demo}\nShall I prepare a free mockup for {name}?',
+      'default': 'Hi {name} 👋\nI\'m {me}. I help businesses in {city} with websites, management dashboards, email marketing and social media.\nExample of my work: {demo}\nDo you have 10 minutes for a quick call this week?'
+    }
+  };
+
+  function load(k, d) { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  var leads = load(KEY, []);
+  var settings = load(SKEY, { me: '', demo: '', lang: 'ar' });
+
+  function today() { return new Date().toISOString().slice(0, 10); }
+  function addDays(n) { var d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); }
+  function persist() { save(KEY, leads); render(); }
+  function el(tag, attrs, kids) {
+    var n = document.createElement(tag);
+    for (var k in attrs || {}) { if (k === 'text') n.textContent = attrs[k]; else if (k === 'class') n.className = attrs[k]; else n.setAttribute(k, attrs[k]); }
+    (kids || []).forEach(function (c) { if (c != null) n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return n;
+  }
+  function digits(p) {
+    var d = String(p || '').replace(/\D/g, '');
+    if (d.indexOf('00') === 0) d = d.slice(2);
+    if (d.indexOf('05') === 0 && d.length === 10) d = '966' + d.slice(1); // Saudi mobile written locally
+    return d;
+  }
+  function message(lead) {
+    var set = TEMPLATES[settings.lang] || TEMPLATES.ar;
+    var tpl = set[lead.niche] || set['default'];
+    var demo = settings.demo || (location.protocol.indexOf('http') === 0 ? location.origin + '/' : '');
+    return tpl.replace(/\{name\}/g, lead.name).replace(/\{city\}/g, lead.city || '')
+      .replace(/\{me\}/g, settings.me || (settings.lang === 'en' ? 'a web developer' : 'مطور مواقع'))
+      .replace(/\{demo\}/g, demo);
+  }
+  function isDue(l) { return l.followUp && l.followUp <= today() && l.status !== 'Won' && l.status !== 'Lost'; }
+
+  /* ---------- CSV ---------- */
+  function parseCsv(text) {
+    var rows = [], row = [], cell = '', q = false;
+    text = text.replace(/^﻿/, '');
+    for (var i = 0; i < text.length; i++) {
+      var c = text[i];
+      if (q) {
+        if (c === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+        else if (c === '"') q = false;
+        else cell += c;
+      } else if (c === '"') q = true;
+      else if (c === ',') { row.push(cell); cell = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && text[i + 1] === '\n') i++;
+        row.push(cell); rows.push(row); row = []; cell = '';
+      } else cell += c;
+    }
+    if (cell || row.length) { row.push(cell); rows.push(row); }
+    var head = (rows.shift() || []).map(function (h) { return h.trim().toLowerCase(); });
+    return rows.filter(function (r) { return r.some(Boolean); }).map(function (r) {
+      var o = {}; head.forEach(function (h, i) { o[h] = (r[i] || '').trim(); }); return o;
+    });
+  }
+  var EXPORT_COLS = ['name', 'niche', 'city', 'phone', 'website', 'rating', 'reviews', 'priority', 'status', 'followUp', 'notes', 'source', 'address', 'maps_url', 'place_id', 'added'];
+  function exportCsv() {
+    var lines = [EXPORT_COLS.join(',')].concat(leads.map(function (l) {
+      return EXPORT_COLS.map(function (c) { return '"' + String(l[c] == null ? '' : l[c]).replace(/"/g, '""') + '"'; }).join(',');
+    }));
+    var a = el('a', { href: URL.createObjectURL(new Blob(['﻿' + lines.join('\n')], { type: 'text/csv;charset=utf-8' })), download: 'leads-' + today() + '.csv' });
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+  function importCsv(file) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      var rows = parseCsv(String(reader.result)), added = 0;
+      var known = {};
+      leads.forEach(function (l) { known[l.place_id || (l.name + '|' + digits(l.phone))] = true; });
+      rows.forEach(function (r) {
+        if (!r.name) return;
+        var key = r.place_id || (r.name + '|' + digits(r.phone));
+        if (known[key]) return;
+        known[key] = true;
+        leads.push({
+          id: 'L' + Date.now() + '-' + added, name: r.name, niche: r.niche || 'other', city: r.city || '', phone: r.phone || '',
+          website: r.website || '', rating: r.rating || '', reviews: r.reviews || '', priority: r.priority || (r.website ? 'normal' : 'hot'),
+          status: STATUSES.indexOf(r.status) >= 0 ? r.status : 'New', followUp: r.followup || '', notes: r.notes || '',
+          source: r.source || 'Google Maps', address: r.address || '', maps_url: r.maps_url || '', place_id: r.place_id || '', added: r.added || today()
+        });
+        added++;
+      });
+      persist();
+      alert(added + ' new leads imported (' + (rows.length - added) + ' duplicates or empty rows skipped).');
+    };
+    reader.readAsText(file, 'utf-8');
+  }
+
+  /* ---------- Render ---------- */
+  function renderStats() {
+    var box = document.getElementById('stats'); box.innerHTML = '';
+    var count = function (f) { return leads.filter(f).length; };
+    [
+      ['Total leads', leads.length, ''],
+      ['Hot (no website)', count(function (l) { return l.priority === 'hot'; }), ''],
+      ['Contacted', count(function (l) { return l.status !== 'New'; }), ''],
+      ['Replied / meeting', count(function (l) { return l.status === 'Replied' || l.status === 'Meeting'; }), ''],
+      ['Won', count(function (l) { return l.status === 'Won'; }), ''],
+      ['Follow-ups due', count(isDue), 'Today or overdue']
+    ].forEach(function (s) {
+      box.appendChild(el('div', { class: 'kpi-card' }, [el('span', { text: s[0] }), el('strong', { text: String(s[1]) }), s[2] ? el('small', { text: s[2] }) : null]));
+    });
+  }
+
+  function render() {
+    renderStats();
+    var q = document.getElementById('q').value.trim().toLowerCase();
+    var st = document.getElementById('f-status-filter').value;
+    var pr = document.getElementById('f-prio-filter').value;
+    var dueOnly = document.getElementById('due-only').checked;
+    var order = { hot: 0, warm: 1, normal: 2 };
+    var list = leads.filter(function (l) {
+      if (st && l.status !== st) return false;
+      if (pr && l.priority !== pr) return false;
+      if (dueOnly && !isDue(l)) return false;
+      return !q || [l.name, l.city, l.phone, l.notes, l.niche].join(' ').toLowerCase().indexOf(q) !== -1;
+    }).sort(function (a, b) {
+      return (isDue(b) - isDue(a)) || (order[a.priority] - order[b.priority]) || a.name.localeCompare(b.name);
+    });
+
+    var tbl = document.getElementById('leads'); tbl.innerHTML = '';
+    tbl.appendChild(el('thead', {}, [el('tr', {}, ['Business', 'City', 'Priority', 'Phone', 'Status', 'Follow up', 'Notes', ''].map(function (h) { return el('th', { text: h }); }))]));
+    var body = el('tbody');
+    if (!list.length) body.appendChild(el('tr', {}, [el('td', { colspan: 8, class: 'empty', text: leads.length ? 'No leads match these filters.' : 'No leads yet. Import a CSV or add one.' })]));
+
+    list.forEach(function (l) {
+      var status = el('select', { class: 'status-select status-' + l.status.toLowerCase(), 'aria-label': 'Status' },
+        STATUSES.map(function (s) { var o = el('option', { value: s, text: s }); if (s === l.status) o.selected = true; return o; }));
+      status.addEventListener('change', function () {
+        l.status = status.value;
+        if (FOLLOW_UP_DAYS[l.status]) l.followUp = addDays(FOLLOW_UP_DAYS[l.status]);
+        else if (l.status === 'Won' || l.status === 'Lost') l.followUp = '';
+        persist();
+      });
+      var date = el('input', { type: 'date', class: 'lead-date', value: l.followUp || '', 'aria-label': 'Follow-up date' });
+      date.addEventListener('change', function () { l.followUp = date.value; persist(); });
+      var notes = el('input', { class: 'lead-note', value: l.notes || '', placeholder: 'Notes…', 'aria-label': 'Notes' });
+      notes.addEventListener('change', function () { l.notes = notes.value; save(KEY, leads); });
+
+      var actions = el('div', { class: 'actions-cell' });
+      if (l.phone) {
+        var wa = el('a', { class: 'icon-btn wa', href: '#', title: 'WhatsApp with message', 'aria-label': 'WhatsApp', text: '💬' });
+        wa.addEventListener('click', function (e) {
+          e.preventDefault();
+          window.open('https://wa.me/' + digits(l.phone) + '?text=' + encodeURIComponent(message(l)), '_blank', 'noopener');
+          if (l.status === 'New') { l.status = 'Contacted'; l.followUp = addDays(FOLLOW_UP_DAYS.Contacted); persist(); }
+        });
+        actions.appendChild(wa);
+        actions.appendChild(el('a', { class: 'icon-btn', href: 'tel:+' + digits(l.phone), title: 'Call', 'aria-label': 'Call', text: '📞' }));
+      }
+      var copy = el('button', { type: 'button', class: 'icon-btn', title: 'Copy message', 'aria-label': 'Copy message', text: '📋' });
+      copy.addEventListener('click', function () {
+        var m = message(l);
+        if (navigator.clipboard) navigator.clipboard.writeText(m).then(function () { copy.textContent = '✓'; setTimeout(function () { copy.textContent = '📋'; }, 1200); });
+        else prompt('Copy this message:', m);
+      });
+      actions.appendChild(copy);
+      if (l.maps_url) actions.appendChild(el('a', { class: 'icon-btn', href: l.maps_url, target: '_blank', rel: 'noopener', title: 'Open in Google Maps', 'aria-label': 'Map', text: '📍' }));
+      var del = el('button', { type: 'button', class: 'icon-btn', title: 'Delete', 'aria-label': 'Delete', text: '✕' });
+      del.addEventListener('click', function () { if (confirm('Delete ' + l.name + '?')) { leads = leads.filter(function (x) { return x !== l; }); persist(); } });
+      actions.appendChild(del);
+
+      var site = l.website ? el('a', { href: l.website, target: '_blank', rel: 'noopener', text: 'website ↗' }) : el('span', { text: 'no website' });
+      body.appendChild(el('tr', { class: isDue(l) ? 'row-due' : '' }, [
+        el('td', { class: 'lead-name' }, [el('strong', { text: l.name }), el('small', {}, [l.niche + ' · ', site, l.rating ? ' · ★ ' + l.rating + ' (' + (l.reviews || 0) + ')' : ''])]),
+        el('td', { class: 'nowrap', text: l.city || '–' }),
+        el('td', {}, [el('span', { class: 'prio prio-' + (l.priority || 'normal'), text: l.priority || 'normal' })]),
+        el('td', { class: 'nowrap', dir: 'ltr', text: l.phone || '–' }),
+        el('td', {}, [status]), el('td', {}, [date]), el('td', {}, [notes]), el('td', {}, [actions])
+      ]));
+    });
+    tbl.appendChild(body);
+  }
+
+  /* ---------- Wiring ---------- */
+  var statusFilter = document.getElementById('f-status-filter');
+  STATUSES.forEach(function (s) { statusFilter.appendChild(el('option', { value: s, text: s })); });
+  ['q', 'f-status-filter', 'f-prio-filter', 'due-only'].forEach(function (id) {
+    document.getElementById(id).addEventListener(id === 'q' ? 'input' : 'change', render);
+  });
+
+  var sName = document.getElementById('s-name'), sDemo = document.getElementById('s-demo'), sLang = document.getElementById('s-lang');
+  sName.value = settings.me || ''; sDemo.value = settings.demo || ''; sLang.value = settings.lang || 'ar';
+  [sName, sDemo, sLang].forEach(function (inp) {
+    inp.addEventListener('change', function () { settings = { me: sName.value.trim(), demo: sDemo.value.trim(), lang: sLang.value }; save(SKEY, settings); });
+  });
+
+  document.getElementById('import-file').addEventListener('change', function (e) { if (e.target.files[0]) importCsv(e.target.files[0]); e.target.value = ''; });
+  document.getElementById('export').addEventListener('click', exportCsv);
+  document.getElementById('add-toggle').addEventListener('click', function () {
+    var p = document.getElementById('add-panel'); p.hidden = !p.hidden; if (!p.hidden) document.getElementById('f-name').focus();
+  });
+  document.getElementById('add-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var website = document.getElementById('f-website').value.trim();
+    leads.push({
+      id: 'L' + Date.now(), name: document.getElementById('f-name').value.trim(), niche: document.getElementById('f-niche').value,
+      city: document.getElementById('f-city').value.trim(), phone: document.getElementById('f-phone').value.trim(), website: website,
+      rating: '', reviews: '', priority: website ? 'normal' : 'hot', status: 'New', followUp: '', notes: '',
+      source: document.getElementById('f-source').value, address: '', maps_url: '', place_id: '', added: today()
+    });
+    e.target.reset();
+    persist();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
