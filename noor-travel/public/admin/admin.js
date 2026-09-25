@@ -1,4 +1,4 @@
-/* Noor Travel back-office (single page, hash routed). */
+/* Ezhar Travel back-office (single page, hash routed). */
 (async function () {
   'use strict';
   const { esc, $, $$, api, money, fmtDate, toast, busy, addDays } = Noor;
@@ -14,7 +14,7 @@
     const box = $('#login');
     box.classList.remove('hidden');
     box.innerHTML = `<div class="login-wrap"><form class="card panel" id="lf" style="width:min(420px,100%)">
-      <div class="logo"><span class="logo-mark"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 2.5l2.3 5.2 5.7.6-4.3 3.8 1.2 5.6L12 14.9l-4.9 2.8 1.2-5.6L4 8.3l5.7-.6z" fill="#c9a24a"/></svg></span><span>Noor Travel<small>Back-office</small></span></div>
+      <div class="logo"><img class="logo-img" src="/img/logo.svg" alt=""><span>Ezhar Travel<small>Back-office</small></span></div>
       <h2 class="mt-3" style="font-size:1.4rem">Staff sign in</h2>
       ${me ? '<div class="alert alert-warn">Your account does not have back-office access.</div>' : ''}
       <div class="field mt-2"><label>Email</label><input class="input" name="email" type="email" required autocomplete="username"></div>
@@ -48,7 +48,7 @@
 
   const view = $('#view');
   let lastPage = 'dashboard';
-  const setTitle = (t, actions = '') => { $('#page-title').textContent = t; $('#bar-actions').innerHTML = actions; document.title = `${t} | Noor back-office`; };
+  const setTitle = (t, actions = '') => { $('#page-title').textContent = t; $('#bar-actions').innerHTML = actions; document.title = `${t} | Ezhar back-office`; };
 
   function modal(html) {
     $('#modal-body').innerHTML = html;

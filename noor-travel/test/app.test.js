@@ -227,7 +227,7 @@ test('booking requires contact details, traveler names and accepted terms', asyn
 
 test('sandbox Tabby payment confirms booking, issues invoice, uses promo and seats', async () => {
   const seatsBefore = db.prepare("SELECT seats FROM packages WHERE slug = 'istanbul-bursa-6-days'").get().seats;
-  const b = await book({ promo: 'NOOR250' });
+  const b = await book({ promo: 'EZHAR250' });
   const view = await anon(`/api/bookings/${b.ref}`);
   assert.equal(view.status, 404, 'booking is private without its token');
 
@@ -244,7 +244,7 @@ test('sandbox Tabby payment confirms booking, issues invoice, uses promo and sea
   assert.equal(after.data.paymentStatus, 'paid');
   assert.equal(after.data.paid, after.data.total);
   assert.match(after.data.invoiceNo, /^INV-\d{4}-\d{6}$/);
-  assert.equal(db.prepare("SELECT used FROM promo_codes WHERE code = 'NOOR250'").get().used, 1);
+  assert.equal(db.prepare("SELECT used FROM promo_codes WHERE code = 'EZHAR250'").get().used, 1);
   assert.equal(db.prepare("SELECT seats FROM packages WHERE slug = 'istanbul-bursa-6-days'").get().seats, seatsBefore - 3);
 
   // Replaying the return URL is idempotent.

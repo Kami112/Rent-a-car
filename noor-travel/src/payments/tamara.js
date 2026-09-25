@@ -54,7 +54,7 @@ async function createCheckout(booking, amount, { lang, instalments = 4 }) {
       cancel: `${returnUrl}&result=cancel`,
       notification: `${config.baseUrl}/api/pay/webhook/tamara`,
     },
-    platform: 'Noor Travel Web',
+    platform: 'Ezhar Travel Web',
     is_mobile: false,
   };
   const res = await request('tamara', `${cfg().apiUrl}/checkout`, { method: 'POST', headers: auth(), body });
@@ -101,7 +101,7 @@ async function capture(orderId, amount) {
 
 async function refund(orderId, amount) {
   return request('tamara', `${cfg().apiUrl}/payments/simplified-refund/${encodeURIComponent(orderId)}`, {
-    method: 'POST', headers: auth(), body: { total_amount: money(amount), comment: 'Refund issued by Noor Travel' },
+    method: 'POST', headers: auth(), body: { total_amount: money(amount), comment: 'Refund issued by Ezhar Travel' },
   });
 }
 

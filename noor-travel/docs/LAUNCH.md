@@ -1,4 +1,4 @@
-# Noor Travel — Go-Live Guide
+# Ezhar Travel — Go-Live Guide
 
 This is the step-by-step path from the current demo (https://noor-travel.onrender.com) to a live
 business taking real bookings and payments. Items marked **(you)** need the agency's documents or
@@ -21,12 +21,12 @@ inside the Kingdom (PDPL / government clients), the same app runs unchanged on a
 (e.g. Google Cloud Dammam, Oracle Cloud Jeddah, STC Cloud): install Node 22, `npm ci`, run
 `npm start` behind Nginx with HTTPS, and back up the `DB_PATH` file daily.
 
-## 2. Your domain (e.g. `noortravel.sa`) (you)
+## 2. Your domain (e.g. `ezhartravels.com`) (you)
 
 1. Buy the domain (`.sa` domains are registered through SaudiNIC-accredited registrars).
-2. Render → **Settings → Custom domains → Add** `noortravel.sa` and `www.noortravel.sa`.
+2. Render → **Settings → Custom domains → Add** `ezhartravels.com` and `www.ezhartravels.com`.
 3. At your DNS provider add the records Render shows (CNAME for `www`, A/ALIAS for the root). HTTPS is issued automatically.
-4. Environment: `BASE_URL=https://noortravel.sa` (used in email links, payment callbacks and invoice QR links).
+4. Environment: `BASE_URL=https://ezhartravels.com` (used in email links, payment callbacks and invoice QR links).
 
 ## 3. Email — confirmations, tax invoices, e-tickets, password resets
 
@@ -35,14 +35,14 @@ and attached), *e-ticket (PNR)*, status changes, refunds, password reset, and a 
 paid booking. Every message and its delivery status appears in **Back-office → Messages outbox**.
 
 **Recommended: Resend** (HTTPS API — works on every Render plan):
-1. Create an account at resend.com → **Domains → Add** `noortravel.sa`.
+1. Create an account at resend.com → **Domains → Add** `ezhartravels.com`.
 2. Add the SPF/DKIM DNS records it shows; wait for "Verified".
 3. **API Keys → Create** → set in Render Environment:
    ```
    RESEND_API_KEY=re_xxxxxxxx
-   MAIL_FROM=Noor Travel <bookings@noortravel.sa>
-   MAIL_REPLY_TO=info@noortravel.sa
-   AGENCY_NOTIFY_EMAIL=bookings@noortravel.sa     # staff copy of paid bookings
+   MAIL_FROM=Ezhar Travel <bookings@ezhartravels.com>
+   MAIL_REPLY_TO=info@ezhartravels.com
+   AGENCY_NOTIFY_EMAIL=bookings@ezhartravels.com     # staff copy of paid bookings
    ```
 
 **Alternative: your existing mailbox via SMTP** (Google Workspace, Microsoft 365, Zoho) — requires a
@@ -50,9 +50,9 @@ paid booking. Every message and its delivery status appears in **Back-office →
 ```
 SMTP_HOST=smtp.gmail.com   # or smtp.office365.com / smtp.zoho.sa
 SMTP_PORT=587
-SMTP_USER=bookings@noortravel.sa
+SMTP_USER=bookings@ezhartravels.com
 SMTP_PASS=<app password>
-MAIL_FROM=Noor Travel <bookings@noortravel.sa>
+MAIL_FROM=Ezhar Travel <bookings@ezhartravels.com>
 ```
 Test: sign up on the site with your own email — you should receive the welcome email within seconds.
 
@@ -77,7 +77,7 @@ COMPANY_TOURISM_LICENSE=xxxxxxxx
 COMPANY_ADDRESS=..., Riyadh, Saudi Arabia
 COMPANY_PHONE=+966 11 xxx xxxx
 COMPANY_WHATSAPP=9665xxxxxxxx
-COMPANY_EMAIL=info@noortravel.sa
+COMPANY_EMAIL=info@ezhartravels.com
 ```
 Then in **Back-office → Settings**: bank transfer IBAN and the flight service fee.
 

@@ -4,14 +4,15 @@
   const c = site.company;
 
   $('#office').innerHTML = `<h3>${esc(t('head_office'))}</h3>
-    <p>${esc(c.address)}</p>
+    <p>${esc(Noor.lang === 'ar' && c.addressAr ? c.addressAr : c.address)}</p>
     <iframe title="Map" style="width:100%;height:220px;border:0;border-radius:12px" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-      src="https://www.google.com/maps?q=King+Fahd+Road+Olaya+Riyadh&output=embed"></iframe>
+      src="https://www.google.com/maps?q=${encodeURIComponent('Ezhar Travel and Tourism, Al Zahrah, As Suwaidi, Riyadh')}&output=embed"></iframe>
     <div class="mt-2" style="display:grid;gap:8px">
-      <a class="btn btn-outline" href="tel:${esc(c.phone.replace(/\s/g, ''))}">☎ <span class="num">${esc(c.phone)}</span></a>
+      ${[c.phone, c.phone2].filter(Boolean).map((n) => `<a class="btn btn-outline" href="tel:${esc(n.replace(/\s/g, ''))}">☎ <span class="num">${esc(n)}</span></a>`).join('')}
       <a class="btn btn-outline" href="mailto:${esc(c.email)}">✉ ${esc(c.email)}</a>
       <a class="btn btn-primary" style="background:#25d366" target="_blank" rel="noopener" href="https://wa.me/${esc(c.whatsapp)}">WhatsApp</a>
     </div>
+    <h4 class="mt-3">${esc(L({ en: 'Our branches', ar: 'فروعنا' }))}</h4><div class="chips">${c.branches.map((b) => `<span class="chip">${esc(L(b))}</span>`).join('')}</div>
     <h4 class="mt-3">${esc(t('working_hours'))}</h4><p class="muted">${esc(t('open_hours'))}</p>`;
 
   const faq = [

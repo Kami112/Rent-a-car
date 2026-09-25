@@ -74,7 +74,7 @@ if (require.main === module) {
   const db = dbm.open();
   seed(db);
   createApp(db).listen(config.port, () => {
-    console.log(`Noor Travel running on ${config.baseUrl} (payments: ${config.paymentsMode})`);
+    console.log(`Ezhar Travel running on ${config.baseUrl} (payments: ${config.paymentsMode})`);
   });
 }
 

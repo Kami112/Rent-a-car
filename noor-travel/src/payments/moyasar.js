@@ -17,7 +17,7 @@ function formConfig(booking, amount, lang) {
     publishable_api_key: cfg().publishableKey,
     amount, // halalas
     currency: 'SAR',
-    description: `Noor Travel booking ${booking.ref}`,
+    description: `Ezhar Travel booking ${booking.ref}`,
     callback_url: `${config.baseUrl}/api/pay/return/card`,
     methods: ['creditcard', 'applepay', 'stcpay'],
     supported_networks: ['mada', 'visa', 'mastercard'],

@@ -19,23 +19,32 @@ const config = {
   isProd,
   port: Number(env.PORT) || 3000,
   baseUrl: (env.BASE_URL || `http://localhost:${Number(env.PORT) || 3000}`).replace(/\/$/, ''),
-  dbPath: env.DB_PATH || path.join(__dirname, '..', 'data', 'noor.db'),
+  dbPath: env.DB_PATH || path.join(__dirname, '..', 'data', 'noor.db'), // file name kept for existing installs
 
   admin: {
-    email: env.ADMIN_EMAIL || 'admin@noortravel.sa',
+    email: env.ADMIN_EMAIL || 'admin@ezhartravels.com',
     password: env.ADMIN_PASSWORD || (isProd ? '' : 'Admin@12345'),
   },
 
   company: {
-    nameEn: 'Noor Travel Agency',
-    nameAr: 'وكالة نور للسفر والسياحة',
-    vatNumber: env.COMPANY_VAT_NUMBER || '300000000000003',
-    crNumber: env.COMPANY_CR_NUMBER || '1010000000',
-    tourismLicense: env.COMPANY_TOURISM_LICENSE || '73100000',
-    address: env.COMPANY_ADDRESS || 'King Fahd Road, Al Olaya District, Riyadh 12211, Saudi Arabia',
-    phone: env.COMPANY_PHONE || '+966 11 000 0000',
-    whatsapp: env.COMPANY_WHATSAPP || '966500000000',
-    email: env.COMPANY_EMAIL || 'info@noortravel.sa',
+    nameEn: env.COMPANY_NAME_EN || 'Ezhar Travel and Tourism',
+    nameAr: env.COMPANY_NAME_AR || 'إزهار للسفر والسياحة',
+    website: env.COMPANY_WEBSITE || 'https://ezhartravels.com',
+    // Legal numbers: left empty until provided — the site hides empty values.
+    vatNumber: env.COMPANY_VAT_NUMBER || '',
+    crNumber: env.COMPANY_CR_NUMBER || '',
+    tourismLicense: env.COMPANY_TOURISM_LICENSE || '',
+    address: env.COMPANY_ADDRESS || 'Badi Al Zaman Al Hamdhani, Al Zahrah District, As Suwaidi, Riyadh 12986, Saudi Arabia',
+    addressAr: env.COMPANY_ADDRESS_AR || 'شارع بديع الزمان الهمذاني، حي الزهرة، السويدي، الرياض 12986، المملكة العربية السعودية',
+    phone: env.COMPANY_PHONE || '+966 59 365 8904',
+    phone2: env.COMPANY_PHONE_2 || '+966 59 353 5610',
+    whatsapp: env.COMPANY_WHATSAPP || '966593658904',
+    email: env.COMPANY_EMAIL || 'info@ezhartravels.com',
+    logo: env.COMPANY_LOGO || '/img/logo.svg',
+    branches: [
+      { en: 'Al Aziziyah', ar: 'العزيزية' }, { en: 'Al Mansourah', ar: 'المنصورة' }, { en: 'Al Nadwa', ar: 'الندوة' },
+      { en: 'Al Naheel', ar: 'النخيل' }, { en: 'Exit 25', ar: 'مخرج 25' }, { en: 'Al Shumaisi', ar: 'الشميسي' }, { en: 'Exit 29', ar: 'مخرج 29' },
+    ],
   },
 
   vatRate: 15, // KSA standard VAT rate (%)
@@ -57,8 +66,8 @@ const config = {
     apiUrl: env.TABBY_API_URL || 'https://api.tabby.ai/api/v2',
   },
   mail: {
-    from: env.MAIL_FROM || 'Noor Travel <no-reply@noortravel.sa>',
-    replyTo: env.MAIL_REPLY_TO || env.COMPANY_EMAIL || 'info@noortravel.sa',
+    from: env.MAIL_FROM || 'Ezhar Travel <no-reply@ezhartravels.com>',
+    replyTo: env.MAIL_REPLY_TO || env.COMPANY_EMAIL || 'info@ezhartravels.com',
     agencyInbox: env.AGENCY_NOTIFY_EMAIL || '', // staff copy of every paid booking
     resendApiKey: env.RESEND_API_KEY || '',
     smtp: {

@@ -1,7 +1,7 @@
-# Noor Travel Agency — Website & Back-office
+# Ezhar Travel and Tourism — Website & Back-office
 
 Bilingual (Arabic / English) online booking website and agency management software for
-**Noor Travel Agency, Riyadh**. Customers book Umrah programmes, holiday packages, flights,
+**Ezhar Travel and Tourism, Riyadh**. Customers book Umrah programmes, holiday packages, flights,
 hotels and visa services and pay online. Staff run the business from the back-office.
 
 ## Features
@@ -44,7 +44,7 @@ npm start                # http://localhost:3000
 npm test                 # 18 automated tests
 ```
 
-Back-office: <http://localhost:3000/admin/> — default dev login `admin@noortravel.sa` / `Admin@12345`
+Back-office: <http://localhost:3000/admin/> — default dev login `admin@ezhartravels.com` / `Admin@12345`
 (set `ADMIN_EMAIL` / `ADMIN_PASSWORD` for production).
 
 ### Sandbox payments

@@ -1,4 +1,4 @@
-# Render Blueprint for the Noor Travel web app (Node + SQLite on a persistent disk).
+# Render Blueprint for the Ezhar Travel web app (Node + SQLite on a persistent disk).
 # In Render: New → Blueprint → select this repo and set the blueprint path to noor-travel/render.yaml.
 services:
   - type: web

@@ -46,6 +46,7 @@
   $('#bnpl-demo-total').textContent = money(demoTotal);
   $('#bnpl-demo-plan').innerHTML = [0, 1, 2, 3].map((i) => `<div><strong class="num">${money(demoTotal / 4)}</strong>${i === 0 ? esc(t('today')) : esc(t('in_months', { n: i }))}</div>`).join('');
 
+  $('#reviews-head').classList.toggle('hidden', !reviews.length);
   $('#reviews-grid').innerHTML = reviews.slice(0, 3).map((r) => `<div class="card review-card">
     <div class="stars" aria-label="${r.rating}/5">${stars(r.rating)}</div>
     <blockquote>“${esc(r.comment)}”</blockquote>
