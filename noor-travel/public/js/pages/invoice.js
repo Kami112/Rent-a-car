@@ -19,8 +19,8 @@
 
   $('#root').innerHTML = `<div class="card" style="padding:36px">
     <div class="flex between" style="align-items:flex-start">
-      <div><div class="logo">${Noor.logoMark()}
-        <span>${esc(s.nameEn)}<small>${esc(s.nameAr)}</small></span></div>
+      <div><div class="logo">${Noor.logoMark()}</div>
+        <div class="small" style="font-weight:700;margin-top:6px">${esc(s.nameEn)} · <span dir="rtl">${esc(s.nameAr)}</span></div>
         <p class="small muted mt-1 mb-0">${esc(s.address)}<br>${esc(s.phone)} · ${esc(s.email)}</p></div>
       <div style="text-align:end"><h2 class="mb-0" style="font-size:1.4rem">Simplified Tax Invoice</h2><div dir="rtl" style="font-weight:800;font-size:1.2rem">فاتورة ضريبية مبسطة</div></div>
     </div>

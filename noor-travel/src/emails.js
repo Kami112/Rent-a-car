@@ -6,20 +6,20 @@ const config = require('./config');
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const sar = (h) => (h / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const BRAND = '#0b5d52';
-const GOLD = '#c9a24a';
+const BRAND = '#16399a';
+const GOLD = '#00cc99';
 
 function layout({ preheader = '', body }) {
   const c = config.company;
   return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>
-<body style="margin:0;padding:0;background:#f1f4f3;font-family:Tahoma,Arial,sans-serif;color:#0f1f1c">
+<body style="margin:0;padding:0;background:#f1f4f3;font-family:Tahoma,Arial,sans-serif;color:#0f1a3a">
 <span style="display:none;max-height:0;overflow:hidden">${esc(preheader)}</span>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f1f4f3;padding:24px 12px"><tr><td align="center">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;background:#ffffff;border-radius:14px;overflow:hidden">
-  <tr><td style="background:${BRAND};padding:22px 28px;color:#fff">
+  <tr><td style="background:#ffffff;padding:20px 28px;border-bottom:4px solid ${GOLD}">
     <table role="presentation" width="100%"><tr>
-      <td style="font-size:20px;font-weight:bold"><span style="color:${GOLD}">✿</span> ${esc(c.nameEn)}</td>
-      <td align="right" dir="rtl" style="font-size:16px;font-weight:bold">${esc(c.nameAr)}</td></tr></table>
+      <td><img src="${esc(config.baseUrl)}/img/logo.png" width="170" height="54" alt="${esc(c.nameEn)}" style="display:block;border:0;height:auto"></td>
+      <td align="right" dir="rtl" style="font-size:15px;font-weight:bold;color:${BRAND}">${esc(c.nameAr)}</td></tr></table>
   </td></tr>
   <tr><td style="padding:28px">${body}</td></tr>
   <tr><td style="background:#f7f9f8;padding:18px 28px;font-size:12px;color:#6b7b77;line-height:1.6">
@@ -55,7 +55,7 @@ function flightBlock(b) {
   const d = JSON.parse(b.details || '{}').meta || {};
   if (!d.slices) return '';
   const tickets = JSON.parse(b.tickets || '[]');
-  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#e8f4f1;border-radius:10px;margin:14px 0"><tr><td style="padding:14px 16px">
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eaf0fb;border-radius:10px;margin:14px 0"><tr><td style="padding:14px 16px">
     <div style="font-weight:bold;margin-bottom:6px">✈ ${esc(d.owner?.name || '')}</div>
     ${d.slices.map((s) => `<div style="font-size:14px;margin:4px 0">${esc(s.origin)} ${esc(s.departAt.replace('T', ' '))} → ${esc(s.destination)} ${esc(s.arriveAt.slice(11))} · ${s.segments.map((g) => esc(g.flightNo)).join(', ')}${s.stops ? ` · ${s.stops} stop(s)` : ''}</div>`).join('')}
     ${b.pnr ? `<div style="margin-top:10px">PNR: <strong style="font-family:monospace;font-size:18px;letter-spacing:2px">${esc(b.pnr)}</strong></div>` : ''}
@@ -84,7 +84,7 @@ function invoiceHtml(inv, { qrSrc, standalone = false } = {}) {
   </table>`;
   if (!standalone) return table;
   return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(inv.invoiceNo)}</title></head>
-    <body style="font-family:Tahoma,Arial,sans-serif;max-width:720px;margin:24px auto;color:#0f1f1c">${table}
+    <body style="font-family:Tahoma,Arial,sans-serif;max-width:720px;margin:24px auto;color:#0f1a3a">${table}
     <p style="font-size:12px;color:#6b7b77">${esc(s.address)} · ${esc(s.phone)} · ${esc(s.email)}</p></body></html>`;
 }
 
