@@ -59,6 +59,7 @@
   function renderFlight() {
     const F = Noor.flightUI;
     const m = quote.meta;
+    Noor.addPlaces(m.places);
     const panel = $('#flight-panel');
     panel.classList.remove('hidden');
     panel.innerHTML = `<div class="flex between"><h3 class="mb-0">✈ ${esc(t('flight_summary'))}</h3><span id="fare-timer" class="small muted"></span></div>

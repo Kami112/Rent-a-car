@@ -10,7 +10,7 @@ hotels and visa services and pay online. Staff run the business from the back-of
 - Arabic (RTL) and English, switchable on every page; mobile-first design
 - Umrah & holiday packages with itinerary, inclusions, reviews and live pricing
 - Flight search (one-way / return, cabins, adults/children/infants)
-- **Flights (Almatar-style):** round-trip / one-way search, airport autocomplete (80+ airports, Arabic & English),
+- **Flights (Almatar-style):** round-trip / one-way search, airport autocomplete (5,300+ airports worldwide; major ones in Arabic & English — airport data © OpenFlights.org, ODbL),
   travellers & cabin picker, fare calendar, cheapest / recommended / fastest sorting, filters (stops, price,
   departure time, airlines, baggage, refundable), expandable itineraries with layovers, airline-grade passenger
   forms (English names, gender, DOB, passport & expiry, 6-month validity check), PNR & e-ticket display

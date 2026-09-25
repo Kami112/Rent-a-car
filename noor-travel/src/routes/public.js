@@ -42,7 +42,7 @@ module.exports = function publicRoutes(db) {
       vatRate: config.vatRate,
       paymentsMode: config.paymentsMode,
       moyasarFormVersion: config.moyasar.formVersion,
-      airports: airports.AIRPORTS,
+      airports: airports.MAJOR,
       countries: airports.COUNTRIES,
       cabins: flights.CABINS,
       flightProvider: flights.provider(),
@@ -116,7 +116,10 @@ module.exports = function publicRoutes(db) {
   }));
 
   r.get('/flights/search', ah(async (req, res) => {
-    res.json(await flights.search(db, req.query));
+    const result = await flights.search(db, req.query);
+    const codes = new Set(result.offers.flatMap((o) => o.slices.flatMap((sl) => sl.segments.flatMap((g) => [g.origin, g.destination]))));
+    codes.add(String(req.query.from || '').toUpperCase()); codes.add(String(req.query.to || '').toUpperCase());
+    res.json({ ...result, places: airports.describe(codes) });
   }));
 
   r.get('/addons/:type', (req, res) => res.json(pricing.availableAddons(req.params.type)));

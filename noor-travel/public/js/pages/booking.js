@@ -63,6 +63,7 @@
   if (b.type === 'flight' && b.meta?.slices) {
     const F = Noor.flightUI;
     const m = b.meta;
+    Noor.addPlaces(m.places);
     const tk = b.ticketStatus || 'pending';
     const ticket = b.pnr && tk === 'issued'
       ? `<div class="ticket-box"><div><div class="small muted">${esc(t('pnr'))}</div><div class="pnr">${esc(b.pnr)}</div></div>

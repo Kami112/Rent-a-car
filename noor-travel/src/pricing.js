@@ -12,7 +12,7 @@ const dbm = require('./db');
 const { AppError } = require('./errors');
 const { vatFromInclusive } = require('./money');
 const flights = require('./flights');
-const { AIRPORTS } = require('./airports');
+const { AIRPORTS, describe } = require('./airports');
 
 const CHILD_RATE = 0.75;
 const INFANT_RATE = 0.1;
@@ -95,6 +95,7 @@ async function quoteFlight(db, input, pax) {
     meta: {
       provider: offer.provider, owner: offer.owner, cabin: offer.cabin, slices: offer.slices, baggage: offer.baggage,
       refundable: offer.refundable, changeable: offer.changeable, expiresAt: offer.expiresAt, domestic, holdable: !!offer.holdable,
+      places: describe(codes),
     },
   };
 }

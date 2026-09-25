@@ -9,11 +9,13 @@
   const nPax = pax.adults + pax.children + pax.infants;
 
   // ---- summary bar
-  $('#fl-summary').innerHTML = has ? `<div class="fl-route"><strong>${esc(F.city(q.from))} <span class="num muted">${esc(q.from)}</span> ${q.returnDate ? '⇄' : '→'} ${esc(F.city(q.to))} <span class="num muted">${esc(q.to)}</span></strong>
+  const renderSummary = () => { $('#fl-summary').innerHTML = has ? `<div class="fl-route"><strong>${esc(F.city(q.from))} <span class="num muted">${esc(q.from)}</span> ${q.returnDate ? '⇄' : '→'} ${esc(F.city(q.to))} <span class="num muted">${esc(q.to)}</span></strong>
       <span class="small">${fmtDate(q.date, { weekday: 'short', day: 'numeric', month: 'short' })}${q.returnDate ? ` – ${fmtDate(q.returnDate, { weekday: 'short', day: 'numeric', month: 'short' })}` : ''} · ${nPax} ${esc(t(nPax === 1 ? 'traveller' : 'travellers_n'))} · ${esc(L(Noor.site.cabins[q.cabin] || Noor.site.cabins.economy))}</span></div>
       <button class="btn btn-gold btn-sm" id="modify" type="button">${esc(t('modify_search'))}</button>` : '';
+    $('#modify')?.addEventListener('click', () => $('#fl-search').classList.toggle('hidden'));
+  };
+  renderSummary();
   if (!has) $('#fl-search').classList.remove('hidden');
-  $('#modify')?.addEventListener('click', () => $('#fl-search').classList.toggle('hidden'));
 
   if (!has) {
     $('#fl-list').innerHTML = `<div class="card empty">${esc(t('flights_sub'))}</div>`;
@@ -27,6 +29,8 @@
   $('#fl-list').innerHTML = `<div class="fl-loading card"><div class="plane">✈</div><p>${esc(t('searching'))}</p></div>` + '<div class="skeleton" style="height:150px;margin-top:14px"></div>'.repeat(3);
   try {
     data = await api(`/flights/search?${new URLSearchParams(q)}`);
+    Noor.addPlaces(data.places);
+    renderSummary();
   } catch (err) {
     $('#fl-list').innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
     return;

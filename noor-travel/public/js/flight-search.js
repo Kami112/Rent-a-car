@@ -66,6 +66,14 @@
     };
     setAirport('from', s.from);
     setAirport('to', s.to);
+    for (const k of ['from', 'to']) {
+      if (!Noor.site.airports[s[k]]) {
+        api(`/airports?q=${encodeURIComponent(s[k])}`).then((list) => {
+          const a = list.find((x) => x.code === s[k]);
+          if (a) { Noor.site.airports[a.code] = { en: a.city.en, ar: a.city.ar, name: a.name }; setAirport(k, a.code); }
+        }).catch(() => {});
+      }
+    }
     $('.fsw-swap').addEventListener('click', () => { const f = s.from; setAirport('from', s.to); setAirport('to', f); });
 
     root.querySelectorAll('.ac').forEach((field) => {
@@ -78,9 +86,9 @@
         list.innerHTML = items.map((a, i) => `<button type="button" class="ac-item ${i === active ? 'active' : ''}" data-i="${i}">
           <span class="ac-code">${esc(a.code)}</span><span><strong>${esc(L(a.city))}</strong><small>${esc(a.name)} · ${esc(L(a.country))}</small></span></button>`).join('');
       };
-      const load = async () => {
+      const load = async (query = input.value.trim()) => {
         const mine = ++seq;
-        const res = await api(`/airports?q=${encodeURIComponent(input.value.trim())}`).catch(() => []);
+        const res = await api(`/airports?q=${encodeURIComponent(query)}`).catch(() => []);
         if (mine !== seq) return;
         items = res; active = 0; render();
       };
@@ -90,8 +98,8 @@
         if (k === 'from') root.querySelector('[data-k=to] input').focus();
         else form.date.focus();
       };
-      input.addEventListener('focus', () => { input.select(); load(); });
-      input.addEventListener('input', load);
+      input.addEventListener('focus', () => { input.select(); load(''); });
+      input.addEventListener('input', () => load());
       input.addEventListener('keydown', (e) => {
         if (list.hidden) return;
         if (e.key === 'ArrowDown') { active = Math.min(items.length - 1, active + 1); render(); e.preventDefault(); }
@@ -194,6 +202,12 @@
 
   Noor.flightUI = { logo, sliceRow, sliceDetails, perks, dur, hm, city };
 
+  /** Add airport names (from search results or quotes) to the shared lookup. */
+  function addPlaces(places) {
+    for (const [code, p] of Object.entries(places || {})) if (!Noor.site.airports[code]) Noor.site.airports[code] = p;
+  }
+
   Noor.flightSearch = mount;
+  Noor.addPlaces = addPlaces;
   Noor.airportLabel = airportLabel;
 })();

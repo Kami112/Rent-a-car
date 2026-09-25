@@ -481,3 +481,16 @@ test('pages and scripts are revalidated so updates reach visitors immediately', 
   }
   assert.match((await realFetch(`${base}/img/logo.png`)).headers.get('cache-control'), /max-age=86400/);
 });
+
+test('airport search covers worldwide airports and lists every airport in a city', async () => {
+  const q = async (s) => (await call(`/api/airports?q=${encodeURIComponent(s)}`)).data.map((a) => a.code);
+  assert.ok((await q('')).length >= 10, 'empty query shows popular airports');
+  const london = await q('london');
+  for (const c of ['LHR', 'LGW', 'STN', 'LTN', 'LCY']) assert.ok(london.includes(c), `London includes ${c}`);
+  assert.equal(london[0], 'LHR', 'major airport ranked first');
+  assert.deepEqual(await q('multan'), ['MUX']);
+  assert.equal((await q('الرياض'))[0], 'RUH');
+  const s = await call(`/api/flights/search?from=RUH&to=MUX&date=${future(20)}&adults=1`);
+  assert.ok(s.data.offers.length > 0, 'flights to a non-curated airport');
+  assert.equal(s.data.places.MUX.en, 'Multan');
+});
