@@ -886,3 +886,65 @@ input, select, textarea { font-family: inherit; font-size: 1rem; }
   box-shadow: var(--shadow-md);
   gap: 18px;
 }
+
+/* ===================== Language switch ===================== */
+.lang-switch {
+  border: 1.5px solid var(--color-border);
+  background: #fff;
+  color: var(--color-dark);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 9px 14px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
+}
+.lang-switch:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.lang-switch[lang="ar"] { font-family: 'Tajawal', sans-serif; }
+
+/* ===================== WhatsApp ===================== */
+.btn-whatsapp { background: #25d366; color: #fff; }
+.btn-whatsapp:hover { background: #1ebe5b; transform: translateY(-2px); }
+.whatsapp-float {
+  position: fixed;
+  bottom: 28px; left: 28px;
+  width: 58px; height: 58px;
+  border-radius: 50%;
+  background: #25d366;
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 24px rgba(37, 211, 102, 0.4);
+  z-index: 450;
+  transition: transform var(--transition);
+}
+.whatsapp-float:hover { transform: scale(1.08); }
+.footer-admin-link { color: #b7bfd4; text-decoration: underline; }
+
+/* ===================== Right-to-left (Arabic) ===================== */
+[dir="rtl"] body { font-family: 'Tajawal', 'Inter', -apple-system, 'Segoe UI', Tahoma, sans-serif; line-height: 1.75; }
+[dir="rtl"] .eyebrow, [dir="rtl"] .field label, [dir="rtl"] .car-cat { letter-spacing: 0; }
+[dir="rtl"] .lang-switch { font-family: 'Inter', sans-serif; }
+[dir="rtl"] .section-head.left { text-align: right; }
+[dir="rtl"] .faq-question { text-align: right; }
+[dir="rtl"] .car-badge { left: auto; right: 14px; }
+[dir="rtl"] .car-fav { right: auto; left: 12px; }
+[dir="rtl"] .location-label { left: auto; right: 18px; }
+[dir="rtl"] .about-media .badge-card { right: auto; left: -24px; }
+[dir="rtl"] .hero-road { right: auto; left: -60px; transform: scaleX(-1); }
+[dir="rtl"] .back-to-top { right: auto; left: 28px; }
+[dir="rtl"] .whatsapp-float { left: auto; right: 28px; }
+[dir="rtl"] .topbar-contacts a, [dir="rtl"] .header-phone strong, [dir="rtl"] input[type="tel"], [dir="rtl"] input[type="email"] { direction: ltr; unicode-bidi: embed; }
+[dir="rtl"] input[type="tel"], [dir="rtl"] input[type="email"] { text-align: right; }
+@media (max-width: 640px) {
+  [dir="rtl"] .about-media .badge-card { left: auto; }
+  .whatsapp-float { bottom: 20px; left: 20px; width: 52px; height: 52px; }
+  [dir="rtl"] .whatsapp-float { left: auto; right: 20px; }
+}
+@media (max-width: 640px) {
+  .site-header .container { gap: 12px; }
+  .header-actions { gap: 10px; }
+  .header-actions > .btn-primary { display: none; }
+  .lang-switch { padding: 7px 10px; font-size: 0.85rem; }
+}
+.car-detail-grid > * { min-width: 0; }
+.detail-tabs { overflow-x: auto; }
+.detail-tabs button { flex-shrink: 0; }
