@@ -13,8 +13,8 @@
       en: 'Travellers are responsible for valid passports (6+ months), visas and health requirements. Names must match passports exactly; name changes may incur airline fees.',
       ar: 'يتحمل المسافرون مسؤولية صلاحية جوازات السفر (6 أشهر على الأقل) والتأشيرات والمتطلبات الصحية. يجب أن تطابق الأسماء جواز السفر تماماً، وقد يترتب على تعديل الأسماء رسوم من شركة الطيران.' }],
     [{ en: 'Privacy', ar: 'الخصوصية' }, {
-      en: 'We process your personal data in line with the Saudi Personal Data Protection Law (PDPL) only to deliver your booking, meet legal obligations and — with your consent — send offers. Card details are handled by our payment providers and never stored by Noor Travel.',
-      ar: 'نعالج بياناتك الشخصية وفق نظام حماية البيانات الشخصية السعودي فقط لتنفيذ حجزك والوفاء بالالتزامات النظامية، ولإرسال العروض بموافقتك. تتم معالجة بيانات البطاقات لدى مزودي الدفع ولا تحتفظ بها نور للسفر.' }],
+      en: 'We process your personal data in line with the Saudi Personal Data Protection Law (PDPL) only to deliver your booking, meet legal obligations and — with your consent — send offers. Card details are handled by our payment providers and never stored by Ezhar Travel.',
+      ar: 'نعالج بياناتك الشخصية وفق نظام حماية البيانات الشخصية السعودي فقط لتنفيذ حجزك والوفاء بالالتزامات النظامية، ولإرسال العروض بموافقتك. تتم معالجة بيانات البطاقات لدى مزودي الدفع ولا تحتفظ بها إزهار للسفر والسياحة.' }],
   ];
   $('#root').innerHTML = sections.map(([h, p]) => `<h2 style="font-size:1.35rem" class="mt-3">${esc(L(h))}</h2><p class="muted">${esc(L(p))}</p>`).join('');
 })();

@@ -55,7 +55,7 @@ async function bookingConfirmed(db, b) {
   }
   send(db, {
     channel: 'whatsapp', recipient: b.contact_phone, bookingId: b.id, subject: `Booking ${b.ref} confirmed`,
-    body: `Noor Travel: booking ${b.ref} confirmed ✅ Total ${format(b.total)}. Details & invoice: ${link(b)}`,
+    body: `Ezhar Travel: booking ${b.ref} confirmed ✅ Total ${format(b.total)}. Details & invoice: ${link(b)}`,
   });
   if (config.mail.agencyInbox) {
     const tpl = emails.staffNewPaidBooking(b);
@@ -68,7 +68,7 @@ function ticketsIssued(db, b) {
   const tickets = JSON.parse(b.tickets || '[]');
   send(db, {
     channel: 'whatsapp', recipient: b.contact_phone, bookingId: b.id, subject: `E-ticket ${b.pnr}`,
-    body: `Noor Travel ✈️ Your flight is ticketed. PNR: ${b.pnr}${tickets.length ? ` · Tickets: ${tickets.join(', ')}` : ''}. ${link(b)}`,
+    body: `Ezhar Travel ✈️ Your flight is ticketed. PNR: ${b.pnr}${tickets.length ? ` · Tickets: ${tickets.join(', ')}` : ''}. ${link(b)}`,
   });
 }
 

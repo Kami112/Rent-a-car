@@ -1,20 +1,20 @@
-/* Noor Travel — shared browser runtime (no framework). */
+/* Ezhar Travel — shared browser runtime (no framework). */
 (function () {
   'use strict';
 
   // ------------------------------------------------------------------ i18n
   const DICT = {
     en: {
-      brand: 'Noor Travel', brandSub: 'Travel & Tourism · Riyadh',
+      brand: 'Ezhar Travel', brandSub: 'Travel & Tourism · Riyadh',
       nav_home: 'Home', nav_umrah: 'Umrah', nav_packages: 'Holidays', nav_flights: 'Flights', nav_hotels: 'Hotels',
       nav_visas: 'Visas', nav_manage: 'My Booking', nav_contact: 'Contact', nav_about: 'About',
       sign_in: 'Sign in', my_account: 'My account', book_now: 'Book now', lang_switch: 'عربي',
-      licensed: 'Licensed by the Ministry of Tourism', call_us: 'Call us', open_hours: 'Sun–Thu 9am–10pm · Sat 4pm–10pm',
+      licensed: 'Licensed travel & tourism agency', call_us: 'Call us', open_hours: 'Please call or WhatsApp us for branch opening hours',
       // home
-      hero_eyebrow: 'Riyadh’s trusted travel partner since 2009',
+      hero_eyebrow: 'Flights · Hotels · Tours · Cargo · Visas',
       hero_title: 'Journeys of faith and discovery, <em>beautifully arranged</em>',
       hero_lead: 'Umrah programmes, holidays, flights, hotels and visas — book online in minutes and pay by mada, card, Apple Pay, or split it with Tabby and Tamara.',
-      hero_b1: 'Best price guarantee', hero_b2: '24/7 Arabic & English support', hero_b3: 'Secure payments',
+      hero_b1: '8 offices across Riyadh', hero_b2: 'Arabic & English support', hero_b3: 'Secure payments',
       tab_packages: 'Holidays', tab_umrah: 'Umrah', tab_flights: 'Flights', tab_hotels: 'Hotels', tab_visas: 'Visas',
       where_to: 'Where to?', any_destination: 'Search destination or package', category: 'Category', all: 'All',
       from: 'From', to: 'To', depart: 'Departure', return: 'Return', optional: 'optional', travelers: 'Travelers',
@@ -22,15 +22,15 @@
       search: 'Search', search_flights: 'Search flights', search_hotels: 'Search hotels', browse_visas: 'Browse visa services',
       featured_title: 'Featured journeys', featured_sub: 'Hand-picked programmes our travellers love — updated every season.',
       view_all: 'View all', umrah_title: 'Umrah programmes', umrah_sub: 'Economy to VIP, fully organised from Riyadh with licensed religious guides.',
-      why_title: 'Why travel with Noor', why_sub: 'Fifteen years of arranging journeys for families, pilgrims and companies across the Kingdom.',
-      why1_t: 'Licensed & trusted', why1_d: 'Licensed by the Ministry of Tourism with a registered VAT number and ZATCA-compliant invoices.',
+      why_title: 'Why travel with Ezhar', why_sub: 'Tailored travel solutions that blend comfort, convenience and cultural immersion — aligned with Saudi Vision 2030.',
+      why1_t: 'Honest & transparent', why1_d: 'Clear VAT-inclusive prices and ZATCA-compliant tax invoices for every booking.',
       why2_t: 'Pay your way', why2_d: 'mada, Visa, Mastercard, Apple Pay, STC Pay, bank transfer — or split into 4 interest-free payments.',
-      why3_t: 'Real people, 24/7', why3_d: 'A dedicated travel consultant on WhatsApp before, during and after your trip.',
-      why4_t: 'Best price guarantee', why4_d: 'Found it cheaper within 24 hours? We refund the difference.',
+      why3_t: 'Real people, real offices', why3_d: 'Visit any of our Riyadh branches or reach a travel consultant on WhatsApp — before, during and after your trip.',
+      why4_t: 'Flights, hotels, tours, cargo & visas', why4_d: 'Everything for your journey in one place — from your ticket to your visa and shipping your cargo.',
       dest_title: 'Popular destinations', dest_sub: 'From the Two Holy Mosques to the Alps.',
       split_title: 'Travel now, pay later — with zero interest',
       split_sub: 'Split any booking into 4 monthly payments with Tabby or 3–4 payments with Tamara. No fees, no hidden charges, Sharia-compliant.',
-      reviews_title: 'What our travellers say', stat1: 'Happy travellers', stat2: 'Umrah trips organised', stat3: 'Destinations', stat4: 'Average rating',
+      reviews_title: 'What our travellers say', stat1: 'Offices in Riyadh', stat2: 'Flight destinations', stat3: 'Ways to pay', stat4: 'Travel services',
       newsletter_title: 'Get exclusive offers', newsletter_sub: 'Seasonal deals and Umrah departures, straight to your inbox.', subscribe: 'Subscribe', your_email: 'Your email',
       // listing
       packages_title: 'Holiday & Umrah packages', packages_sub: 'Complete programmes with flights, hotels, transfers and guides.',
@@ -80,13 +80,13 @@
       m_card: 'Card', m_tabby: 'Tabby', m_tamara: 'Tamara', m_bank_transfer: 'Bank transfer', m_cash: 'Cash', m_pos: 'POS',
       manage_title: 'Manage your booking', manage_sub: 'Enter your booking reference and email to view, pay or download your invoice.', find_booking: 'Find booking',
       // account
-      login_title: 'Welcome back', register_title: 'Create your account', password: 'Password', no_account: 'New to Noor Travel?', have_account: 'Already have an account?',
+      login_title: 'Welcome back', register_title: 'Create your account', password: 'Password', no_account: 'New to Ezhar Travel?', have_account: 'Already have an account?',
       create_account: 'Create account', sign_out: 'Sign out', my_bookings: 'My bookings', no_bookings: 'You have no bookings yet.', open: 'Open',
       // contact
       contact_title: 'Contact us', contact_sub: 'Visit our head office in Riyadh or reach us any time on WhatsApp.', subject: 'Subject', message: 'Message', send: 'Send message',
       inquiry_thanks: 'Thank you! A travel consultant will contact you shortly.', head_office: 'Head office', working_hours: 'Working hours', faq: 'Frequently asked questions',
       // footer
-      footer_about: 'Noor Travel Agency is a Riyadh-based travel and tourism company offering Umrah programmes, holidays, flights, hotels and visa services across the Kingdom.',
+      footer_about: 'Ezhar Travel and Tourism is a Riyadh-based travel company offering flights, hotels, tours, Umrah programmes, cargo and visa services, with 8 offices across Riyadh.',
       quick_links: 'Explore', support: 'Support', policies: 'Terms & policies', privacy: 'Privacy', rights: 'All rights reserved.',
       cr: 'CR', vat_no: 'VAT No.', license: 'Tourism licence', we_accept: 'We accept',
       round_trip: 'Round trip', one_way: 'One way', swap: 'Swap', travellers_class: 'Travellers & class', adults_12: 'Adults (12+)', done: 'Done',
@@ -113,15 +113,15 @@
       loading: 'Loading…', error_generic: 'Something went wrong. Please try again.', required: 'This field is required',
     },
     ar: {
-      brand: 'نور للسفر', brandSub: 'للسفر والسياحة · الرياض',
+      brand: 'إزهار للسفر', brandSub: 'للسفر والسياحة · الرياض',
       nav_home: 'الرئيسية', nav_umrah: 'العمرة', nav_packages: 'العطلات', nav_flights: 'الطيران', nav_hotels: 'الفنادق',
       nav_visas: 'التأشيرات', nav_manage: 'حجزي', nav_contact: 'تواصل معنا', nav_about: 'من نحن',
       sign_in: 'تسجيل الدخول', my_account: 'حسابي', book_now: 'احجز الآن', lang_switch: 'EN',
-      licensed: 'مرخصة من وزارة السياحة', call_us: 'اتصل بنا', open_hours: 'الأحد–الخميس 9ص–10م · السبت 4م–10م',
-      hero_eyebrow: 'شريك السفر الموثوق في الرياض منذ 2009',
+      licensed: 'وكالة سفر وسياحة مرخصة', call_us: 'اتصل بنا', open_hours: 'تواصل معنا هاتفياً أو عبر واتساب لمعرفة أوقات عمل الفروع',
+      hero_eyebrow: 'طيران · فنادق · جولات · شحن · تأشيرات',
       hero_title: 'رحلات إيمانية واستكشافية <em>بتنظيم يليق بك</em>',
       hero_lead: 'برامج العمرة والعطلات والطيران والفنادق والتأشيرات — احجز أونلاين خلال دقائق وادفع بمدى أو البطاقة أو Apple Pay، أو قسّمها مع تابي وتمارا.',
-      hero_b1: 'ضمان أفضل سعر', hero_b2: 'دعم 24/7 بالعربية والإنجليزية', hero_b3: 'مدفوعات آمنة',
+      hero_b1: '8 مكاتب في الرياض', hero_b2: 'دعم بالعربية والإنجليزية', hero_b3: 'مدفوعات آمنة',
       tab_packages: 'العطلات', tab_umrah: 'العمرة', tab_flights: 'الطيران', tab_hotels: 'الفنادق', tab_visas: 'التأشيرات',
       where_to: 'إلى أين؟', any_destination: 'ابحث عن وجهة أو باقة', category: 'الفئة', all: 'الكل',
       from: 'من', to: 'إلى', depart: 'المغادرة', return: 'العودة', optional: 'اختياري', travelers: 'المسافرون',
@@ -129,15 +129,15 @@
       search: 'بحث', search_flights: 'ابحث عن رحلات', search_hotels: 'ابحث عن فنادق', browse_visas: 'تصفح خدمات التأشيرات',
       featured_title: 'رحلات مميزة', featured_sub: 'برامج مختارة بعناية يحبها مسافرونا — تُحدَّث كل موسم.',
       view_all: 'عرض الكل', umrah_title: 'برامج العمرة', umrah_sub: 'من الاقتصادية إلى VIP، بتنظيم كامل من الرياض مع مرشدين دينيين معتمدين.',
-      why_title: 'لماذا تسافر مع نور', why_sub: 'خمسة عشر عاماً في تنظيم الرحلات للعائلات والمعتمرين والشركات في أنحاء المملكة.',
-      why1_t: 'مرخصون وموثوقون', why1_d: 'مرخصون من وزارة السياحة برقم ضريبي مسجل وفواتير متوافقة مع هيئة الزكاة والضريبة والجمارك.',
+      why_title: 'لماذا تسافر مع إزهار', why_sub: 'حلول سفر مصممة لك تجمع بين الراحة والسهولة والتجربة الثقافية — بما يتماشى مع رؤية 2030.',
+      why1_t: 'أمانة وشفافية', why1_d: 'أسعار واضحة شاملة الضريبة وفواتير ضريبية متوافقة مع هيئة الزكاة والضريبة والجمارك لكل حجز.',
       why2_t: 'ادفع بطريقتك', why2_d: 'مدى وفيزا وماستركارد وApple Pay وSTC Pay والتحويل البنكي — أو قسّمها على 4 دفعات بدون فوائد.',
-      why3_t: 'فريق حقيقي على مدار الساعة', why3_d: 'مستشار سفر مخصص عبر واتساب قبل رحلتك وأثناءها وبعدها.',
-      why4_t: 'ضمان أفضل سعر', why4_d: 'وجدت سعراً أقل خلال 24 ساعة؟ نعيد لك الفرق.',
+      why3_t: 'فريق حقيقي ومكاتب قريبة منك', why3_d: 'زر أحد فروعنا في الرياض أو تواصل مع مستشار السفر عبر واتساب قبل رحلتك وأثناءها وبعدها.',
+      why4_t: 'طيران وفنادق وجولات وشحن وتأشيرات', why4_d: 'كل ما تحتاجه لرحلتك في مكان واحد — من التذكرة إلى التأشيرة وشحن أمتعتك.',
       dest_title: 'وجهات شائعة', dest_sub: 'من الحرمين الشريفين إلى جبال الألب.',
       split_title: 'سافر الآن وادفع لاحقاً — بدون فوائد',
       split_sub: 'قسّم أي حجز على 4 دفعات شهرية مع تابي أو 3–4 دفعات مع تمارا. بدون رسوم أو تكاليف خفية ومتوافق مع الشريعة.',
-      reviews_title: 'ماذا يقول مسافرونا', stat1: 'مسافر سعيد', stat2: 'رحلة عمرة منظمة', stat3: 'وجهة', stat4: 'متوسط التقييم',
+      reviews_title: 'ماذا يقول مسافرونا', stat1: 'مكاتب في الرياض', stat2: 'وجهة طيران', stat3: 'طرق دفع', stat4: 'خدمات سفر',
       newsletter_title: 'احصل على عروض حصرية', newsletter_sub: 'عروض موسمية ومواعيد رحلات العمرة مباشرة إلى بريدك.', subscribe: 'اشترك', your_email: 'بريدك الإلكتروني',
       packages_title: 'باقات العطلات والعمرة', packages_sub: 'برامج متكاملة تشمل الطيران والفنادق والتنقلات والمرشدين.',
       cat_umrah: 'العمرة', cat_international: 'دولية', cat_domestic: 'داخل المملكة', cat_honeymoon: 'شهر العسل',
@@ -181,11 +181,11 @@
       ps_unpaid: 'غير مدفوع', ps_pending: 'قيد الانتظار', ps_paid: 'مدفوع', ps_failed: 'فشل', ps_refunded: 'مسترد', ps_partially_refunded: 'مسترد جزئياً',
       m_card: 'بطاقة', m_tabby: 'تابي', m_tamara: 'تمارا', m_bank_transfer: 'تحويل بنكي', m_cash: 'نقداً', m_pos: 'نقاط البيع',
       manage_title: 'إدارة حجزك', manage_sub: 'أدخل رقم الحجز والبريد الإلكتروني لعرض الحجز أو الدفع أو تنزيل الفاتورة.', find_booking: 'ابحث عن الحجز',
-      login_title: 'مرحباً بعودتك', register_title: 'أنشئ حسابك', password: 'كلمة المرور', no_account: 'جديد في نور للسفر؟', have_account: 'لديك حساب بالفعل؟',
+      login_title: 'مرحباً بعودتك', register_title: 'أنشئ حسابك', password: 'كلمة المرور', no_account: 'جديد في إزهار للسفر؟', have_account: 'لديك حساب بالفعل؟',
       create_account: 'إنشاء حساب', sign_out: 'تسجيل الخروج', my_bookings: 'حجوزاتي', no_bookings: 'لا توجد لديك حجوزات بعد.', open: 'فتح',
       contact_title: 'تواصل معنا', contact_sub: 'زر مكتبنا الرئيسي في الرياض أو تواصل معنا في أي وقت عبر واتساب.', subject: 'الموضوع', message: 'الرسالة', send: 'إرسال الرسالة',
       inquiry_thanks: 'شكراً لك! سيتواصل معك مستشار السفر قريباً.', head_office: 'المكتب الرئيسي', working_hours: 'ساعات العمل', faq: 'الأسئلة الشائعة',
-      footer_about: 'وكالة نور للسفر والسياحة شركة مقرها الرياض، تقدم برامج العمرة والعطلات والطيران والفنادق وخدمات التأشيرات في جميع أنحاء المملكة.',
+      footer_about: 'إزهار للسفر والسياحة شركة مقرها الرياض تقدم خدمات الطيران والفنادق والجولات وبرامج العمرة والشحن والتأشيرات، ولديها 8 مكاتب في الرياض.',
       quick_links: 'استكشف', support: 'الدعم', policies: 'الشروط والسياسات', privacy: 'الخصوصية', rights: 'جميع الحقوق محفوظة.',
       cr: 'السجل التجاري', vat_no: 'الرقم الضريبي', license: 'ترخيص السياحة', we_accept: 'نقبل',
       round_trip: 'ذهاب وعودة', one_way: 'ذهاب فقط', swap: 'تبديل', travellers_class: 'المسافرون والدرجة', adults_12: 'البالغون (12+)', done: 'تم',
@@ -371,17 +371,23 @@
   let site = null;
   let me = null;
 
+  // Company logo (public/img/logo.*). Hidden if the file is missing; the name is always shown beside it.
+  function logoMark() {
+    return site.company.logo ? `<img class="logo-img" src="${esc(site.company.logo)}" alt="" onerror="this.remove()">` : '';
+  }
+
   function header(active) {
     const nav = [['/', 'nav_home'], ['/packages.html?category=umrah', 'nav_umrah'], ['/packages.html', 'nav_packages'],
       ['/flights.html', 'nav_flights'], ['/hotels.html', 'nav_hotels'], ['/visas.html', 'nav_visas'], ['/manage.html', 'nav_manage'], ['/contact.html', 'nav_contact']];
     const c = site.company;
+    const tel = (n) => `<a href="tel:${esc(n.replace(/\s/g, ''))}" class="num">☎ ${esc(n)}</a>`;
     return `<div class="topbar"><div class="container">
-        <div class="flex"><a href="tel:${esc(c.phone.replace(/\s/g, ''))}" class="num">☎ ${esc(c.phone)}</a><a href="mailto:${esc(c.email)}" class="hide-sm">✉ ${esc(c.email)}</a></div>
-        <div class="flex"><span class="hide-sm">✓ ${esc(t('licensed'))} · ${esc(t('license'))} <span class="num">${esc(c.tourismLicense)}</span></span></div>
+        <div class="flex">${tel(c.phone)}${c.phone2 ? `<span class="hide-sm">${tel(c.phone2)}</span>` : ''}<a href="mailto:${esc(c.email)}" class="hide-sm">✉ ${esc(c.email)}</a></div>
+        <div class="flex"><span class="hide-sm">✓ ${esc(t('licensed'))}${c.tourismLicense ? ` · ${esc(t('license'))} <span class="num">${esc(c.tourismLicense)}</span>` : ''}</span></div>
       </div></div>
       <header class="site-header"><div class="container">
         <a href="/" class="logo" aria-label="${esc(t('brand'))}">
-          <span class="logo-mark"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2.5l2.3 5.2 5.7.6-4.3 3.8 1.2 5.6L12 14.9l-4.9 2.8 1.2-5.6L4 8.3l5.7-.6z" fill="#c9a24a"/><circle cx="12" cy="11" r="2.2" fill="#fff"/></svg></span>
+          ${logoMark()}
           <span>${esc(t('brand'))}<small>${esc(t('brandSub'))}</small></span>
         </a>
         <nav class="main-nav" id="main-nav">${nav.map(([h, k]) => `<a href="${h}" class="${active === k ? 'active' : ''}">${esc(t(k))}</a>`).join('')}</nav>
@@ -398,7 +404,7 @@
     const c = site.company;
     return `<footer class="site-footer"><div class="container">
       <div class="footer-grid">
-        <div><a href="/" class="logo" style="color:#fff"><span class="logo-mark"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 2.5l2.3 5.2 5.7.6-4.3 3.8 1.2 5.6L12 14.9l-4.9 2.8 1.2-5.6L4 8.3l5.7-.6z" fill="#c9a24a"/></svg></span>${esc(t('brand'))}</a>
+        <div><a href="/" class="logo" style="color:#fff">${logoMark()}${esc(t('brand'))}</a>
           <p class="mt-2">${esc(t('footer_about'))}</p>${payLogos()}</div>
         <div><h4>${esc(t('quick_links'))}</h4><ul>
           <li><a href="/packages.html?category=umrah">${esc(t('nav_umrah'))}</a></li><li><a href="/packages.html">${esc(t('nav_packages'))}</a></li>
@@ -406,12 +412,12 @@
         <div><h4>${esc(t('support'))}</h4><ul>
           <li><a href="/manage.html">${esc(t('nav_manage'))}</a></li><li><a href="/account.html">${esc(t('my_account'))}</a></li>
           <li><a href="/contact.html">${esc(t('nav_contact'))}</a></li><li><a href="/about.html">${esc(t('nav_about'))}</a></li><li><a href="/policies.html">${esc(t('policies'))}</a></li></ul></div>
-        <div><h4>${esc(t('head_office'))}</h4><p>${esc(c.address)}</p>
-          <p><a href="tel:${esc(c.phone.replace(/\s/g, ''))}" class="num">${esc(c.phone)}</a><br><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></p>
+        <div><h4>${esc(t('head_office'))}</h4><p>${esc(lang === 'ar' && c.addressAr ? c.addressAr : c.address)}</p>
+          <p>${[c.phone, c.phone2].filter(Boolean).map((n) => `<a href="tel:${esc(n.replace(/\s/g, ''))}" class="num">${esc(n)}</a>`).join('<br>')}<br><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></p>
           <form class="newsletter" id="nl-form"><label class="sr-only" for="nl-email">${esc(t('your_email'))}</label><input class="input" id="nl-email" type="email" required placeholder="${esc(t('your_email'))}"><button class="btn btn-gold">${esc(t('subscribe'))}</button></form></div>
       </div>
       <div class="footer-bottom"><span>© ${new Date().getFullYear()} ${esc(lang === 'ar' ? c.nameAr : c.nameEn)}. ${esc(t('rights'))}</span>
-        <span class="footer-legal"><span>${esc(t('cr'))}: <span class="num">${esc(c.crNumber)}</span></span><span>${esc(t('vat_no'))}: <span class="num">${esc(c.vatNumber)}</span></span><span>${esc(t('license'))}: <span class="num">${esc(c.tourismLicense)}</span></span></span></div>
+        <span class="footer-legal">${[['cr', c.crNumber], ['vat_no', c.vatNumber], ['license', c.tourismLicense]].filter(([, v]) => v).map(([k, v]) => `<span>${esc(t(k))}: <span class="num">${esc(v)}</span></span>`).join('')}</span></div>
     </div></footer>
     <a class="wa-float" href="https://wa.me/${esc(c.whatsapp)}" target="_blank" rel="noopener" aria-label="WhatsApp">${icons.wa}</a>`;
   }
@@ -496,5 +502,5 @@
 
   const statusBadge = (kind, v) => `<span class="status s-${esc(v)}">${esc(t(`${kind}_${v}`))}</span>`;
 
-  window.Noor = { pkgCard, statusBadge, startPayment, lang, t, L, esc, $, $$, qs, money, fmtDate, addDays, api, toast, busy, stars, art, icons, payLogos, init, applyI18n, stepper, get site() { return site; }, get me() { return me; } };
+  window.Noor = { logoMark, pkgCard, statusBadge, startPayment, lang, t, L, esc, $, $$, qs, money, fmtDate, addDays, api, toast, busy, stars, art, icons, payLogos, init, applyI18n, stepper, get site() { return site; }, get me() { return me; } };
 })();

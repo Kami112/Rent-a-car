@@ -4,19 +4,20 @@
   const c = site.company;
   const blocks = [
     { en: 'Our story', ar: 'قصتنا' },
-    { en: 'Noor Travel Agency was founded in Riyadh to make travel simple, trustworthy and beautifully organised — from the first Umrah of a young family to corporate delegations and once-in-a-lifetime honeymoons. Our head office on King Fahd Road serves travellers across the Kingdom, online and in person.',
-      ar: 'تأسست وكالة نور للسفر والسياحة في الرياض لتجعل السفر سهلاً وموثوقاً ومنظماً بإتقان — من أول عمرة لعائلة شابة إلى الوفود الرسمية ورحلات شهر العسل. يخدم مكتبنا الرئيسي على طريق الملك فهد المسافرين في جميع أنحاء المملكة، إلكترونياً وحضورياً.' },
-    { en: 'Our promise', ar: 'وعدنا' },
-    { en: 'Transparent VAT-inclusive prices, licensed partners only, and a real consultant who answers on WhatsApp — before, during and after your journey.',
-      ar: 'أسعار واضحة شاملة الضريبة، وشركاء مرخصون فقط، ومستشار حقيقي يرد عليك عبر واتساب قبل رحلتك وأثناءها وبعدها.' },
+    { en: 'Ezhar Travel and Tourism crafts journeys built on trust, comfort and excellence. From our head office in As Suwaidi and our branches across Riyadh we arrange flights, hotels, tours, Umrah programmes, cargo and visas — tailored travel solutions that blend comfort, convenience and cultural immersion, proudly aligned with Saudi Vision 2030.',
+      ar: 'تصمم إزهار للسفر والسياحة رحلات قائمة على الثقة والراحة والتميز. من مكتبنا الرئيسي في السويدي وفروعنا في أنحاء الرياض نرتب الطيران والفنادق والجولات وبرامج العمرة والشحن والتأشيرات — حلول سفر مصممة لك تجمع بين الراحة والسهولة والتجربة الثقافية، بما يتماشى مع رؤية المملكة 2030.' },
+    { en: 'Our mission', ar: 'رسالتنا' },
+    { en: 'To deliver world-class travel solutions with honesty, efficiency and care — from your first inquiry to your safe return.',
+      ar: 'تقديم حلول سفر عالمية المستوى بأمانة وكفاءة واهتمام — من أول استفسار حتى عودتك بسلام.' },
   ];
   $('#root').innerHTML = `<div class="layout-main">
     <div class="card panel"><h2>${esc(L(blocks[0]))}</h2><p>${esc(L(blocks[1]))}</p><h2 class="mt-3">${esc(L(blocks[2]))}</h2><p>${esc(L(blocks[3]))}</p>
-      <div class="stats-strip mt-3"><div><strong class="num">15+</strong>${esc(L({ en: 'Years', ar: 'عاماً' }))}</div><div><strong class="num">48k+</strong>${esc(t('stat1'))}</div>
-      <div><strong class="num">60+</strong>${esc(t('stat3'))}</div><div><strong class="num">4.9</strong>${esc(t('stat4'))}</div></div></div>
+      <div class="stats-strip mt-3"><div><strong class="num">8</strong>${esc(t('stat1'))}</div><div><strong class="num">80+</strong>${esc(t('stat2'))}</div>
+      <div><strong class="num">6</strong>${esc(t('stat3'))}</div><div><strong class="num">5</strong>${esc(t('stat4'))}</div></div>
+      <h2 class="mt-3">${esc(L({ en: 'Our offices in Riyadh', ar: 'مكاتبنا في الرياض' }))}</h2>
+      <div class="chips">${[{ en: 'Head office — As Suwaidi', ar: 'المكتب الرئيسي — السويدي' }, ...c.branches].map((b) => `<span class="chip">${esc(L(b))}</span>`).join('')}</div></div>
     <aside class="card" style="overflow:hidden"><div style="aspect-ratio:4/3">${art('city', 220, 7)}</div><div class="panel">
-      <div class="kv"><div><span>${esc(t('cr'))}</span><strong class="num">${esc(c.crNumber)}</strong></div><div><span>${esc(t('vat_no'))}</span><strong class="num">${esc(c.vatNumber)}</strong></div>
-      <div><span>${esc(t('license'))}</span><strong class="num">${esc(c.tourismLicense)}</strong></div></div>
-      <p class="mt-2 muted small">${esc(c.address)}</p><a class="btn btn-primary" href="/contact.html">${esc(t('nav_contact'))}</a></div></aside>
+      <div class="kv">${[['cr', c.crNumber], ['vat_no', c.vatNumber], ['license', c.tourismLicense]].filter(([, v]) => v).map(([k, v]) => `<div><span>${esc(t(k))}</span><strong class="num">${esc(v)}</strong></div>`).join('')}</div>
+      <p class="mt-2 muted small">${esc(Noor.lang === 'ar' && c.addressAr ? c.addressAr : c.address)}</p><a class="btn btn-primary" href="/contact.html">${esc(t('nav_contact'))}</a></div></aside>
   </div>`;
 })();

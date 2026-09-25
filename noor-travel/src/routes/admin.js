@@ -357,7 +357,7 @@ module.exports = function adminRoutes(db) {
     const cols = rows.length ? Object.keys(rows[0]) : ['ref'];
     const body = [cols.join(','), ...rows.map((row) => cols.map((c) => csvCell(money.has(c) ? (row[c] / 100).toFixed(2) : row[c])).join(','))].join('\r\n');
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename="noor-bookings-${from}-to-${to}.csv"`);
+    res.setHeader('Content-Disposition', `attachment; filename="ezhar-bookings-${from}-to-${to}.csv"`);
     res.send(`﻿${body}`);
   });
 

@@ -126,7 +126,7 @@ const PACKAGES = [
 ];
 
 const HOTELS = [
-  ['Noor Haram View Hotel', 'Makkah', 'مكة المكرمة', 5, 1450, '150 m from Masjid al-Haram', '150 م من المسجد الحرام', 'mosque', 42],
+  ['Haram View Hotel', 'Makkah', 'مكة المكرمة', 5, 1450, '150 m from Masjid al-Haram', '150 م من المسجد الحرام', 'mosque', 42],
   ['Ajyad Pilgrim Suites', 'Makkah', 'مكة المكرمة', 3, 420, '700 m from Masjid al-Haram', '700 م من المسجد الحرام', 'mosque', 150],
   ['Madinah Gardens Hotel', 'Madinah', 'المدينة المنورة', 4, 690, '250 m from Masjid an-Nabawi', '250 م من المسجد النبوي', 'mosque', 160],
   ['Olaya Business Tower Hotel', 'Riyadh', 'الرياض', 5, 980, 'King Fahd Road, Olaya', 'طريق الملك فهد، العليا', 'city', 220],
@@ -151,13 +151,8 @@ const VISAS = [
 ];
 const VISA_REQS = [t('Passport valid 6+ months', 'جواز سفر ساري لمدة 6 أشهر على الأقل'), t('Personal photo (white background)', 'صورة شخصية بخلفية بيضاء'), t('Bank statement (3 months)', 'كشف حساب بنكي (3 أشهر)'), t('Employment letter / Iqama copy', 'خطاب تعريف بالراتب / صورة الإقامة')];
 
-const REVIEWS = [
-  ['umrah-economy-7-nights', 'Abdullah A.', 5, 'Excellent organisation from start to finish. The guide was knowledgeable and the hotels were clean and close to the Haram.'],
-  ['umrah-vip-5-star', 'Fatimah S.', 5, 'خدمة راقية جداً، والفندق مطل على الحرم مباشرة. شكراً لفريق نور.'],
-  ['istanbul-bursa-6-days', 'Khalid M.', 4, 'Great family trip, kids loved Uludağ. Paid with Tabby in 4 instalments — very easy.'],
-  ['maldives-honeymoon-5-days', 'Sara & Omar', 5, 'A dream honeymoon! Everything was arranged perfectly.'],
-  ['alula-heritage-3-days', 'Noura K.', 5, 'رحلة رائعة إلى العلا، التنظيم ممتاز والعشاء تحت النجوم لا يُنسى.'],
-];
+// Reviews come from real customers (submitted on package pages, approved in the back-office).
+const REVIEWS = [];
 
 function seed(db, { reset = false } = {}) {
   if (reset) {
@@ -189,7 +184,7 @@ function seed(db, { reset = false } = {}) {
     if (!has('promo_codes')) {
       const ins = db.prepare('INSERT INTO promo_codes (code, kind, value, min_amount, max_discount, max_uses, expires_at) VALUES (?,?,?,?,?,?,?)');
       ins.run('WELCOME10', 'percent', 10, SAR(1000), SAR(500), null, null);
-      ins.run('NOOR250', 'fixed', SAR(250), SAR(3000), null, 500, null);
+      ins.run('EZHAR250', 'fixed', SAR(250), SAR(3000), null, 500, null);
       ins.run('YOMWATANI96', 'percent', 15, SAR(2000), SAR(1000), 1000, '2026-10-15');
     }
     if (!has('reviews')) {
@@ -204,17 +199,15 @@ function seed(db, { reset = false } = {}) {
       dbm.setSetting(db, 'flight_fees', { perPassenger: SAR(25) }); // agency service fee per ticket (VAT 15%)
     }
     if (dbm.getSetting(db, 'bank_transfer') == null) {
-      dbm.setSetting(db, 'bank_transfer', {
-        enabled: true, bank: 'Saudi National Bank (SNB)', accountName: config.company.nameEn,
-        iban: 'SA00 1000 0000 0000 0000 0000',
-      });
+      // Offered at checkout once real bank details are entered in Back-office → Settings.
+      dbm.setSetting(db, 'bank_transfer', { enabled: false, bank: '', accountName: config.company.nameEn, iban: '' });
     }
   });
 
   const { email, password } = config.admin;
   if (password && !db.prepare('SELECT 1 FROM users WHERE email = ?').get(email)) {
     db.prepare("INSERT INTO users (name, email, phone, password_hash, role) VALUES (?, ?, ?, ?, 'admin')")
-      .run('Noor Admin', email, config.company.phone, hashPassword(password));
+      .run('Ezhar Admin', email, config.company.phone, hashPassword(password));
     console.log(`[seed] Admin account created: ${email}`);
   }
 }

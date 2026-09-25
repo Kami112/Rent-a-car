@@ -19,7 +19,7 @@
 
   $('#root').innerHTML = `<div class="card" style="padding:36px">
     <div class="flex between" style="align-items:flex-start">
-      <div><div class="logo"><span class="logo-mark"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 2.5l2.3 5.2 5.7.6-4.3 3.8 1.2 5.6L12 14.9l-4.9 2.8 1.2-5.6L4 8.3l5.7-.6z" fill="#c9a24a"/></svg></span>
+      <div><div class="logo">${Noor.logoMark()}
         <span>${esc(s.nameEn)}<small>${esc(s.nameAr)}</small></span></div>
         <p class="small muted mt-1 mb-0">${esc(s.address)}<br>${esc(s.phone)} · ${esc(s.email)}</p></div>
       <div style="text-align:end"><h2 class="mb-0" style="font-size:1.4rem">Simplified Tax Invoice</h2><div dir="rtl" style="font-weight:800;font-size:1.2rem">فاتورة ضريبية مبسطة</div></div>
@@ -45,7 +45,7 @@
         <div class="summary-row total"><span>Total incl. VAT · الإجمالي شامل الضريبة</span><span class="num">${money(inv.total, { decimals: 2 })}</span></div>
       </div>
     </div>
-    <p class="small muted mt-3 mb-0">Paid via ${esc(inv.paymentMethod || '—')} · Thank you for travelling with Noor · شكراً لسفركم مع نور</p>
+    <p class="small muted mt-3 mb-0">Paid via ${esc(inv.paymentMethod || '—')} · Thank you for travelling with Ezhar · شكراً لسفركم مع إزهار</p>
     <div class="flex mt-3 no-print"><button class="btn btn-primary" onclick="print()">Print / Save PDF · طباعة</button>
       <a class="btn btn-outline" href="/booking.html?ref=${esc(inv.ref)}&t=${esc(q.t)}">←</a></div>
   </div>`;

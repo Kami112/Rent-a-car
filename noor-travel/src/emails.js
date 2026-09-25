@@ -18,13 +18,13 @@ function layout({ preheader = '', body }) {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;background:#ffffff;border-radius:14px;overflow:hidden">
   <tr><td style="background:${BRAND};padding:22px 28px;color:#fff">
     <table role="presentation" width="100%"><tr>
-      <td style="font-size:20px;font-weight:bold"><span style="color:${GOLD}">★</span> ${esc(c.nameEn)}</td>
+      <td style="font-size:20px;font-weight:bold"><span style="color:${GOLD}">✿</span> ${esc(c.nameEn)}</td>
       <td align="right" dir="rtl" style="font-size:16px;font-weight:bold">${esc(c.nameAr)}</td></tr></table>
   </td></tr>
   <tr><td style="padding:28px">${body}</td></tr>
   <tr><td style="background:#f7f9f8;padding:18px 28px;font-size:12px;color:#6b7b77;line-height:1.6">
-    ${esc(c.address)}<br>☎ ${esc(c.phone)} · WhatsApp +${esc(c.whatsapp)} · ${esc(c.email)}<br>
-    VAT ${esc(c.vatNumber)} · CR ${esc(c.crNumber)} · Tourism licence ${esc(c.tourismLicense)}
+    ${esc(c.address)}<br>☎ ${[c.phone, c.phone2].filter(Boolean).map(esc).join(' · ')} · WhatsApp +${esc(c.whatsapp)} · ${esc(c.email)}
+    ${[['VAT', c.vatNumber], ['CR', c.crNumber], ['Tourism licence', c.tourismLicense]].filter(([, v]) => v).map(([k, v]) => `${k} ${esc(v)}`).join(' · ') ? `<br>${[['VAT', c.vatNumber], ['CR', c.crNumber], ['Tourism licence', c.tourismLicense]].filter(([, v]) => v).map(([k, v]) => `${k} ${esc(v)}`).join(' · ')}` : ''}
   </td></tr>
 </table></td></tr></table></body></html>`;
 }
@@ -94,8 +94,8 @@ function bookingReceived(b) {
     subject: `Booking ${b.ref} received — complete your payment | تم استلام حجزك`,
     html: layout({
       preheader: `Your booking ${b.ref} is reserved — complete payment to confirm.`,
-      body: both(`Dear ${esc(b.contact_name)},<br>Thank you for booking with Noor Travel. Your booking is reserved and awaiting payment.`,
-        `عزيزنا ${esc(b.contact_name)}،<br>شكراً لحجزك مع نور للسفر. تم حجز طلبك وهو بانتظار الدفع.`)
+      body: both(`Dear ${esc(b.contact_name)},<br>Thank you for booking with Ezhar Travel. Your booking is reserved and awaiting payment.`,
+        `عزيزنا ${esc(b.contact_name)}،<br>شكراً لحجزك مع إزهار للسفر والسياحة. تم حجز طلبك وهو بانتظار الدفع.`)
         + summaryTable(b) + flightBlock(b) + button(bookingLink(b), 'Complete payment · أكمل الدفع'),
     }),
     text: `Booking ${b.ref} received. Total SAR ${sar(b.total)}. Complete payment: ${bookingLink(b)}`,
@@ -157,10 +157,10 @@ function refundIssued(b, amount) {
 
 function welcome(user) {
   return {
-    subject: 'Welcome to Noor Travel | أهلاً بك في نور للسفر',
-    html: layout({ body: both(`Welcome ${esc(user.name)}!<br>Your Noor Travel account is ready. Book flights, Umrah programmes, holidays, hotels and visas — and manage every trip in one place.`,
-      `أهلاً ${esc(user.name)}!<br>حسابك في نور للسفر جاهز. احجز الطيران وبرامج العمرة والعطلات والفنادق والتأشيرات وأدر جميع رحلاتك في مكان واحد.`) + button(`${config.baseUrl}/`, 'Start booking · ابدأ الحجز') }),
-    text: `Welcome to Noor Travel, ${user.name}! ${config.baseUrl}/`,
+    subject: 'Welcome to Ezhar Travel | أهلاً بك في إزهار للسفر والسياحة',
+    html: layout({ body: both(`Welcome ${esc(user.name)}!<br>Your Ezhar Travel account is ready. Book flights, Umrah programmes, holidays, hotels and visas — and manage every trip in one place.`,
+      `أهلاً ${esc(user.name)}!<br>حسابك في إزهار للسفر والسياحة جاهز. احجز الطيران وبرامج العمرة والعطلات والفنادق والتأشيرات وأدر جميع رحلاتك في مكان واحد.`) + button(`${config.baseUrl}/`, 'Start booking · ابدأ الحجز') }),
+    text: `Welcome to Ezhar Travel, ${user.name}! ${config.baseUrl}/`,
   };
 }
 

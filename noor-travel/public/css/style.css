@@ -562,3 +562,12 @@ body.no-scroll { overflow: hidden; }
 
 .fsw-input[type="date"] { font-size: .98rem; }
 @media (max-width: 960px) { .fl-bar { flex-direction: column; } .fl-filter-btn { align-self: flex-start; } }
+.logo-img { width: 44px; height: 44px; object-fit: contain; border-radius: 10px; flex-shrink: 0; }
+.site-footer .logo-img { background: #fff; padding: 2px; }
+.fsw-pop[hidden], .ac-list[hidden] { display: none; }
+@media (max-width: 560px) {
+  .site-header .logo { font-size: 1.05rem; gap: 8px; min-width: 0; }
+  .logo-img { width: 36px; height: 36px; }
+  .header-actions .btn-sm { padding-inline: 10px; }
+}
+@media (max-width: 380px) { .site-header .logo > span:last-child { display: none; } }
