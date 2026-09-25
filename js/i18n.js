@@ -207,6 +207,7 @@
     lang: lang,
     t: tr,
     translate: function (el) { if (lang === 'ar') translateTree(el); },
+    extend: function (dict) { for (var k in dict) AR[k] = dict[k]; },
     days: function (n) {
       if (lang !== 'ar') return n + ' ' + (n === 1 ? 'day' : 'days');
       if (n === 1) return 'يوم واحد';

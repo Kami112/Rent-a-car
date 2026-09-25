@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Admin Dashboard | DriveNow Rentals</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚗</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/admin.css">
+<script src="js/i18n.js"></script>
+<script src="js/admin.js"></script>
+</head>
+<body class="admin-body">
+
+<aside class="admin-sidebar" id="admin-sidebar">
+  <a href="index.html" class="logo">
+    <span class="logo-mark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14M5 17a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm14 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM5 17l1.5-6.5A2 2 0 0 1 8.4 9h7.2a2 2 0 0 1 1.9 1.5L19 17M3 13h18"/></svg>
+    </span>
+    Drive<span>Now</span>
+  </a>
+  <nav class="admin-nav">
+    <button type="button" class="active" data-view="overview">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+      Overview
+    </button>
+    <button type="button" data-view="bookings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      Bookings
+    </button>
+    <button type="button" data-view="fleet">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14M5 17a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm14 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM5 17l1.5-6.5A2 2 0 0 1 8.4 9h7.2a2 2 0 0 1 1.9 1.5L19 17M3 13h18"/></svg>
+      Fleet
+    </button>
+    <button type="button" data-view="customers">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Customers
+    </button>
+  </nav>
+  <div class="admin-sidebar-foot">
+    <a href="index.html">← Back to website</a>
+  </div>
+</aside>
+
+<div class="admin-main">
+  <header class="admin-topbar">
+    <button type="button" class="admin-menu" id="admin-menu" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    <div>
+      <h1 id="admin-title">Overview</h1>
+      <p class="admin-demo-note">Demo data is stored in this browser only.</p>
+    </div>
+    <div class="admin-topbar-actions header-actions">
+      <button type="button" class="btn btn-outline btn-sm" id="reset-demo">Reset demo data</button>
+    </div>
+  </header>
+
+  <!-- ===================== Overview ===================== -->
+  <section class="admin-view active" id="view-overview">
+    <div class="kpi-grid">
+      <div class="kpi-card"><span>Revenue this month</span><strong id="kpi-revenue">–</strong><small id="kpi-revenue-delta"></small></div>
+      <div class="kpi-card"><span>Active rentals</span><strong id="kpi-active">–</strong><small>Cars on the road now</small></div>
+      <div class="kpi-card"><span>Pending requests</span><strong id="kpi-pending">–</strong><small>Waiting for confirmation</small></div>
+      <div class="kpi-card"><span>Fleet utilization</span><strong id="kpi-util">–</strong><small id="kpi-util-note"></small></div>
+    </div>
+
+    <div class="admin-grid-2">
+      <div class="panel">
+        <div class="panel-head"><h2>Revenue, last 6 months</h2></div>
+        <div id="revenue-chart" class="bar-chart"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Bookings by city</h2></div>
+        <div id="city-list" class="city-list"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Latest bookings</h2>
+        <button type="button" class="link-btn" data-goto="bookings">View all →</button>
+      </div>
+      <div class="table-wrap"><table class="admin-table" id="recent-table"></table></div>
+    </div>
+  </section>
+
+  <!-- ===================== Bookings ===================== -->
+  <section class="admin-view" id="view-bookings">
+    <div class="panel">
+      <div class="panel-head toolbar">
+        <input type="search" id="booking-search" placeholder="Search customer, car or booking ID">
+        <select id="booking-status-filter">
+          <option value="">All statuses</option>
+          <option value="Pending">Pending</option>
+          <option value="Confirmed">Confirmed</option>
+          <option value="Active">Active</option>
+          <option value="Completed">Completed</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+        <button type="button" class="btn btn-outline btn-sm" id="export-csv">Export CSV</button>
+        <button type="button" class="btn btn-primary btn-sm" id="new-booking">+ New booking</button>
+      </div>
+      <div class="table-wrap"><table class="admin-table" id="bookings-table"></table></div>
+    </div>
+  </section>
+
+  <!-- ===================== Fleet ===================== -->
+  <section class="admin-view" id="view-fleet">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Vehicles</h2>
+        <button type="button" class="btn btn-primary btn-sm" id="new-car">+ Add vehicle</button>
+      </div>
+      <div class="table-wrap"><table class="admin-table" id="fleet-table"></table></div>
+    </div>
+  </section>
+
+  <!-- ===================== Customers ===================== -->
+  <section class="admin-view" id="view-customers">
+    <div class="panel">
+      <div class="panel-head"><h2>Customers</h2></div>
+      <div class="table-wrap"><table class="admin-table" id="customers-table"></table></div>
+    </div>
+  </section>
+</div>
+
+<!-- ===================== Dialogs ===================== -->
+<dialog class="admin-dialog" id="booking-dialog">
+  <form method="dialog" id="booking-dialog-form">
+    <h2>New booking</h2>
+    <div class="form-row">
+      <div class="form-group"><label for="nb-customer">Full Name</label><input id="nb-customer" required></div>
+      <div class="form-group"><label for="nb-phone">Phone Number</label><input id="nb-phone" type="tel" placeholder="+966 5X XXX XXXX" required></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label for="nb-car">Car</label><select id="nb-car" required></select></div>
+      <div class="form-group"><label for="nb-city">City</label>
+        <select id="nb-city"><option>Riyadh</option><option>Jeddah</option><option>Dammam</option><option>Dubai</option><option>Abu Dhabi</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label for="nb-pickup">Pick-up Date</label><input id="nb-pickup" type="date" required></div>
+      <div class="form-group"><label for="nb-dropoff">Return Date</label><input id="nb-dropoff" type="date" required></div>
+    </div>
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-outline btn-sm" data-close>Cancel</button>
+      <button type="submit" class="btn btn-primary btn-sm">Save booking</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="admin-dialog" id="car-dialog">
+  <form method="dialog" id="car-dialog-form">
+    <h2>Add vehicle</h2>
+    <div class="form-row">
+      <div class="form-group"><label for="nc-name">Car</label><input id="nc-name" placeholder="Hyundai Tucson" required></div>
+      <div class="form-group"><label for="nc-cat">Category</label>
+        <select id="nc-cat"><option>Economy</option><option>SUV</option><option>Luxury</option><option>Van</option><option>Convertible</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label for="nc-plate">Plate number</label><input id="nc-plate" placeholder="ABC 1234" required></div>
+      <div class="form-group"><label for="nc-rate">Daily Rate</label><input id="nc-rate" type="number" min="1" placeholder="200" required></div>
+    </div>
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-outline btn-sm" data-close>Cancel</button>
+      <button type="submit" class="btn btn-primary btn-sm">Save vehicle</button>
+    </div>
+  </form>
+</dialog>
+
+</body>
+</html>

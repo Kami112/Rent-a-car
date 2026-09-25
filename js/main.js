@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
       car: form.getAttribute('data-car') || '',
       customer: (document.getElementById('booking-name') || {}).value || '',
       phone: (document.getElementById('booking-phone') || {}).value || '',
-      city: loc ? (loc.selectedIndex > 0 ? loc.options[loc.selectedIndex].text : '') : '',
+      city: loc && loc.selectedIndex > 0 ? ['Riyadh', 'Jeddah', 'Dammam', 'Dubai', 'Abu Dhabi'][loc.selectedIndex - 1] : '',
       pickup: pickupDate ? pickupDate.value : '',
       dropoff: returnDate ? returnDate.value : '',
       days: calc.days,
@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
       var lines = ar ? [
         'مرحباً، أرغب في حجز سيارة:',
         'السيارة: ' + b.car,
-        b.city && 'المدينة: ' + b.city,
+        b.city && 'المدينة: ' + I18N.t(b.city),
         b.pickup && 'من: ' + b.pickup + ' إلى: ' + b.dropoff,
         'المدة: ' + I18N.days(b.days) + ' — الإجمالي: ' + I18N.money(b.total),
         b.customer && 'الاسم: ' + b.customer
