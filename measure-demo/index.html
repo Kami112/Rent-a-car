@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#141917">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="OpenSize">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23F2B705'/%3E%3Crect x='20' y='10' width='24' height='44' fill='none' stroke='%232A2200' stroke-width='5'/%3E%3C/svg%3E">
+<title>OpenSize Measure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{
+  --ground:#E9ECE6; --panel:#F7F8F4; --ink:#1B2220; --muted:#5B6661; --line:#CDD3CB;
+  --tape:#F2B705; --tape-ink:#2A2200; --ref:#1F7A72; --phone:#141917; --screen:#FBFCF9;
+  --display:"Barlow Condensed","Arial Narrow",sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#121614; --panel:#1A201D; --ink:#E6EBE6; --muted:#9AA5A0; --line:#2E3733;
+    --tape:#F5C230; --tape-ink:#2A2200; --ref:#4FB8AD; --phone:#050706; --screen:#1C2320;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#121614; --panel:#1A201D; --ink:#E6EBE6; --muted:#9AA5A0; --line:#2E3733;
+  --tape:#F5C230; --tape-ink:#2A2200; --ref:#4FB8AD; --phone:#050706; --screen:#1C2320;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;padding-inline:16px;padding-block:32px 48px}
+.wrap{max-width:1040px;margin:0 auto;display:grid;grid-template-columns:1fr 380px;gap:48px;align-items:start}
+@media (max-width:860px){.wrap{grid-template-columns:1fr}.phone-col{order:-1}}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(40px,6vw,64px);line-height:.95;letter-spacing:.01em;margin:0 0 12px;text-wrap:balance;text-transform:uppercase}
+h1 span{background:var(--tape);color:var(--tape-ink);padding:0 .15em}
+.lede{color:var(--muted);max-width:52ch;margin:0 0 28px}
+.tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--line);padding:3px 8px;border-radius:3px;color:var(--muted);margin-bottom:16px}
+.steps{list-style:none;padding:0;margin:0 0 28px;display:grid;gap:4px}
+.steps button{all:unset;cursor:pointer;display:grid;grid-template-columns:40px 1fr;gap:12px;padding:12px 14px;border-radius:6px;width:100%;box-sizing:border-box}
+.steps button:hover{background:var(--panel)}
+.steps button:focus-visible{outline:2px solid var(--tape);outline-offset:2px}
+.steps button[aria-current="step"]{background:var(--panel);box-shadow:inset 3px 0 0 var(--tape)}
+.steps .n{font-family:var(--display);font-weight:700;font-size:28px;line-height:1;color:var(--muted)}
+.steps [aria-current="step"] .n{color:var(--ink)}
+.steps b{display:block;font-weight:600}
+.steps small{color:var(--muted);font-size:13.5px}
+.note{font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px;max-width:60ch}
+.note b{color:var(--ink)}
+
+/* phone */
+.phone{width:100%;max-width:380px;margin:0 auto;background:var(--phone);border-radius:44px;padding:12px;box-shadow:0 30px 60px -30px rgba(0,0,0,.45)}
+.screen{background:var(--screen);border-radius:34px;overflow:hidden;height:720px;display:flex;flex-direction:column;position:relative}
+@media (max-width:420px){.screen{height:660px}}
+.status{display:flex;justify-content:space-between;padding:12px 24px 4px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:90px;height:24px;background:var(--phone);border-radius:14px}
+.appbar{display:flex;align-items:center;gap:8px;padding:8px 16px 10px}
+.appbar h2{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:.02em;text-transform:uppercase;margin:0;flex:1}
+.icon-btn{all:unset;cursor:pointer;width:34px;height:34px;display:grid;place-items:center;border-radius:50%;font-size:20px;color:var(--ink)}
+.icon-btn:focus-visible{outline:2px solid var(--tape)}
+.view{flex:1;overflow-y:auto;padding:4px 16px 16px;display:flex;flex-direction:column;gap:14px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.kinds{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kind{all:unset;cursor:pointer;border:1.5px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;background:var(--panel)}
+.kind svg{width:36px;height:36px;stroke:var(--ink);fill:none;stroke-width:1.6}
+.kind b{font-weight:600}
+.kind[aria-pressed="true"]{border-color:var(--tape);box-shadow:0 0 0 2px var(--tape) inset}
+.kind:focus-visible{outline:2px solid var(--tape);outline-offset:2px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+.card h3{margin:0 0 6px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.last{display:flex;justify-content:space-between;align-items:baseline}
+.last .dims{font-family:var(--display);font-weight:700;font-size:30px}
+.btn{all:unset;cursor:pointer;text-align:center;padding:14px;border-radius:12px;font-weight:600;background:var(--tape);color:var(--tape-ink)}
+.btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
+.btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.btn-row{display:grid;gap:10px;margin-top:auto}
+.tips{margin:0;padding-left:18px;font-size:13.5px;display:grid;gap:6px}
+.viewfinder{border-radius:14px;overflow:hidden;background:#0d1110;aspect-ratio:3/4;display:grid;place-items:center;position:relative;max-width:100%}
+.viewfinder svg{width:70%;opacity:.9}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:3px}
+.seg button{all:unset;cursor:pointer;text-align:center;padding:7px;border-radius:8px;font-size:13px;font-weight:500;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--screen);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.seg .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.canvas-box{border-radius:12px;overflow:hidden;touch-action:none;background:#0d1110;max-width:100%;display:flex;justify-content:center;flex:none}
+/* the whole photo always fits on screen: tall photos shrink to the height limit */
+#cv{display:block;max-width:100%;max-height:420px;width:auto;height:auto;touch-action:none;cursor:grab}
+@media (max-width:420px){#cv{max-height:380px}}
+.readout{display:flex;flex-wrap:wrap;gap:4px 14px;justify-content:space-between;font-family:var(--mono);font-size:13px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-variant-numeric:tabular-nums}
+.big{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.big .card{padding:14px 14px 12px}
+.big .v{font-family:var(--display);font-weight:700;font-size:44px;line-height:1;font-variant-numeric:tabular-nums}
+.big .u{font-family:var(--mono);font-size:14px;color:var(--muted);margin-left:4px}
+.rows{display:grid;gap:0}
+.rows div{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.rows div:last-child{border-bottom:0}
+.rows span:last-child{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.auto{border-radius:10px;padding:9px 12px;font-size:13.5px;background:#DDF1EC;color:#0E4A44;border:1px solid #9FD3C9}
+.auto.miss{background:#FFF1C7;color:#5A4300;border-color:#EBCF74}
+.nudge{display:flex;align-items:center;gap:10px;justify-content:space-between;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.nudge .small{flex:1;min-width:0}
+#lp{width:72px;height:72px;border-radius:50%;flex:none;background:#000;border:2px solid var(--line)}
+.pad{display:grid;grid-template-columns:repeat(2,38px);gap:6px}
+.nb{all:unset;cursor:pointer;width:38px;height:38px;display:grid;place-items:center;border-radius:9px;background:var(--screen);border:1.5px solid var(--line);font-size:14px;color:var(--ink);touch-action:manipulation;user-select:none}
+.nb:active{background:var(--tape);color:var(--tape-ink)}
+.nb:disabled{opacity:.35;cursor:default}
+.nb:focus-visible{outline:2px solid var(--tape)}
+.hint{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.warn{background:#FCE3DC;color:#7A1E08;border:1px solid #E9A08C;border-radius:10px;padding:10px 12px;font-size:13.5px}
+.thumb{border-radius:12px;overflow:hidden;max-width:100%}
+.thumb img{display:block;width:100%}
+.toast{position:absolute;left:16px;right:16px;bottom:22px;background:var(--ink);color:var(--screen);padding:12px 14px;border-radius:12px;font-size:14px;transition:opacity .25s, transform .25s}
+.toast[hidden]{display:none!important}
+.demo-flag{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:var(--tape);color:var(--tape-ink);padding:2px 6px;border-radius:3px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* on a real phone: the app fills the screen, no phone frame */
+@media (max-width:560px){
+  body{padding:0}
+  .wrap{display:block}
+  .wrap > section{display:none}
+  .phone{max-width:none;border-radius:0;padding:0;background:none;box-shadow:none}
+  .screen{border-radius:0;height:100vh;height:100dvh;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+  .notch,.status{display:none}
+  #cv{max-height:52vh}
+}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <section>
+    <span class="tag">Clickable demo · not a real app yet</span>
+    <h1>Photo in, <span>size</span> out</h1>
+    <p class="lede">A customer photographs a door or window opening with an A4 sheet taped beside it. They drag the corners into place, and the app works out the width and height using the A4 sheet as a ruler. Try it on the phone. The sample photo is already loaded.</p>
+
+    <ol class="steps" id="steps">
+      <li><button data-go="home"><span class="n">1</span><span><b>Choose what to measure</b><small>Door, window, garage door or any other opening</small></span></button></li>
+      <li><button data-go="capture"><span class="n">2</span><span><b>Take a photo</b><small>Tape a plain A4 sheet (210 × 297 mm) flat on the wall next to the opening</small></span></button></li>
+      <li><button data-go="mark"><span class="n">3</span><span><b>Check the corners</b><small>The app finds the corners automatically. You only fix them if needed</small></span></button></li>
+      <li><button data-go="result"><span class="n">4</span><span><b>Get the size</b><small>Width, height, area and the nearest standard size, ready for a quote</small></span></button></li>
+    </ol>
+
+    <p class="note"><b>How the real app would work.</b> This demo finds the door frame and the A4 sheet automatically from their edges, then scales from the sheet. It's accurate to about ±1 to 2 cm when the photo is taken straight on. To make a dot exact, tap it and use the arrow buttons while the magnifier shows the corner up close. The finished app can use a trained AI model for more reliable detection, perspective correction, and AR depth sensing (ARKit on iPhone, ARCore on Android) so customers don't need a reference sheet. It would be built with Flutter or React Native for iOS and Android.</p>
+  </section>
+
+  <div class="phone-col">
+    <div class="phone">
+      <div class="screen">
+        <div class="notch"></div>
+        <div class="status"><span>9:41</span><span>5G ▮▮▮</span></div>
+
+        <!-- HOME -->
+        <div class="scr" data-screen="home">
+          <div class="appbar"><h2>OpenSize</h2><span class="demo-flag">Demo</span></div>
+          <div class="view">
+            <div>
+              <b style="font-size:18px">What are you measuring?</b>
+              <div class="muted small">Pick one, then take a photo.</div>
+            </div>
+            <div class="kinds" id="kinds">
+              <button class="kind" data-kind="Door" aria-pressed="true"><svg viewBox="0 0 36 36"><rect x="9" y="3" width="18" height="30"/><circle cx="23" cy="19" r="1.2"/></svg><b>Door</b></button>
+              <button class="kind" data-kind="Window" aria-pressed="false"><svg viewBox="0 0 36 36"><rect x="5" y="7" width="26" height="22"/><path d="M18 7v22M5 18h26"/></svg><b>Window</b></button>
+              <button class="kind" data-kind="Garage door" aria-pressed="false"><svg viewBox="0 0 36 36"><path d="M3 14 18 5l15 9v18H3z"/><path d="M8 18h20M8 23h20M8 28h20"/></svg><b>Garage door</b></button>
+              <button class="kind" data-kind="Other opening" aria-pressed="false"><svg viewBox="0 0 36 36"><path d="M6 30V12a12 8 0 0 1 24 0v18z"/></svg><b>Other opening</b></button>
+            </div>
+            <div class="card">
+              <h3>Last measurement</h3>
+              <div class="last"><span class="dims" id="lastDims">90 × 210 cm</span><span class="muted small" id="lastKind">Door · sample</span></div>
+            </div>
+            <div class="btn-row"><button class="btn" data-go="capture">Continue</button></div>
+          </div>
+        </div>
+
+        <!-- CAPTURE -->
+        <div class="scr" data-screen="capture" hidden>
+          <div class="appbar"><button class="icon-btn" data-go="home" aria-label="Back">‹</button><h2 id="capTitle">Photo of door</h2></div>
+          <div class="view">
+            <div class="viewfinder">
+              <svg viewBox="0 0 200 260" fill="none" stroke="#F2B705" stroke-width="3"><path d="M10 40V10h30M160 10h30v30M190 220v30h-30M40 250H10v-30"/><rect x="150" y="110" width="30" height="42" stroke="#4FB8AD" stroke-dasharray="4 3"/><text x="165" y="170" fill="#4FB8AD" stroke="none" font-size="10" text-anchor="middle" font-family="monospace">A4</text></svg>
+            </div>
+            <ol class="tips">
+              <li>Tape an A4 sheet flat on the wall, close to the opening.</li>
+              <li>Stand straight in front and fit the whole opening in the frame.</li>
+              <li>Use good light and hold the phone level.</li>
+            </ol>
+            <div class="btn-row">
+              <label class="btn" for="file">Take or upload photo</label>
+              <input id="file" type="file" accept="image/*" capture="environment" hidden>
+              <button class="btn ghost" id="useSample">Use sample photo</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- MARK -->
+        <div class="scr" data-screen="mark" hidden>
+          <div class="appbar"><button class="icon-btn" data-go="capture" aria-label="Back">‹</button><h2>Mark corners</h2></div>
+          <div class="view">
+            <div class="seg" id="seg">
+              <button data-layer="open" aria-pressed="true"><span class="dot" style="background:var(--tape)"></span>Opening</button>
+              <button data-layer="ref" aria-pressed="false"><span class="dot" style="background:var(--ref)"></span>A4 sheet</button>
+            </div>
+            <div class="auto" id="auto" hidden></div>
+            <div class="hint small" id="hint">Drag the <b>yellow dots</b> to the 4 inside corners of the door or window.</div>
+            <div class="canvas-box"><canvas id="cv"></canvas></div>
+            <div class="nudge" id="nudge">
+              <canvas id="lp" width="160" height="160" hidden></canvas>
+              <span class="small" id="selName">Tap a dot to select it, then use the arrows for exact placement.</span>
+              <div class="pad">
+                <button class="nb" data-nx="0" data-ny="-1" aria-label="Move up" disabled>▲</button>
+                <button class="nb" data-nx="0" data-ny="1" aria-label="Move down" disabled>▼</button>
+                <button class="nb" data-nx="-1" data-ny="0" aria-label="Move left" disabled>◀</button>
+                <button class="nb" data-nx="1" data-ny="0" aria-label="Move right" disabled>▶</button>
+              </div>
+            </div>
+            <div class="warn" id="warn" hidden></div>
+            <div class="readout"><span>W <b id="rw">–</b></span><span>H <b id="rh">–</b></span><span id="rscale" class="muted">–</span></div>
+            <div class="btn-row"><button class="btn ghost" id="redetect">Find corners automatically</button><button class="btn" data-go="result">Calculate size</button></div>
+          </div>
+        </div>
+
+        <!-- RESULT -->
+        <div class="scr" data-screen="result" hidden>
+          <div class="appbar"><button class="icon-btn" data-go="mark" aria-label="Back">‹</button><h2 id="resTitle">Door size</h2>
+          </div>
+          <div class="view">
+            <div class="seg" id="units" style="grid-template-columns:repeat(4,1fr)"><button data-u="mm" aria-pressed="false">mm</button><button data-u="cm" aria-pressed="true">cm</button><button data-u="m" aria-pressed="false">m</button><button data-u="in" aria-pressed="false">in</button></div>
+            <div class="big">
+              <div class="card"><h3>Width</h3><span class="v" id="vw">–</span><span class="u" data-unit>cm</span></div>
+              <div class="card"><h3>Height</h3><span class="v" id="vh">–</span><span class="u" data-unit>cm</span></div>
+            </div>
+            <div class="thumb"><img id="thumb" alt="Photo with the measured opening outlined"></div>
+            <div class="card rows">
+              <div><span>Size in mm</span><span id="vmm">–</span></div>
+              <div><span>Size in metres</span><span id="vmeters">–</span></div>
+              <div><span>Area</span><span id="varea">–</span></div>
+              <div><span>Nearest standard size</span><span id="vstd">–</span></div>
+              <div><span>Accuracy</span><span>± 1.5 cm</span></div>
+            </div>
+            <div class="btn-row">
+              <button class="btn" id="quote">Request a quote</button>
+              <button class="btn ghost" data-go="home">Measure another</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="toast" id="toast" hidden></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Finds the A4 sheet (brightest paper-shaped rectangle) and the door/window
+// opening (two long vertical frame edges joined by a horizontal top edge).
+window.OpenSizeDetect = (function(){
+  function prep(img, maxSide){
+    const W = img.naturalWidth || img.width, H = img.naturalHeight || img.height;
+    const s = Math.min(1, maxSide/Math.max(W,H));
+    const w = Math.round(W*s), h = Math.round(H*s);
+    const c = document.createElement('canvas'); c.width=w; c.height=h;
+    const g = c.getContext('2d',{willReadFrequently:true}); g.drawImage(img,0,0,w,h);
+    const px = g.getImageData(0,0,w,h).data;
+    const L = new Float32Array(w*h), Wh = new Float32Array(w*h), Cool = new Float32Array(w*h);
+    for(let i=0,j=0;i<w*h;i++,j+=4){
+      const r=px[j],gg=px[j+1],b=px[j+2];
+      const l=.299*r+.587*gg+.114*b, sat=Math.max(r,gg,b)-Math.min(r,gg,b);
+      L[i]=l; Wh[i]=l-1.5*sat; Cool[i]=(b-r)+.25*l;
+    }
+    // paper can stand out as whiter, brighter, or cooler (bluish) than a warm wall
+    return {w,h,s,L,Wh,feats:[Wh,L,Cool]};
+  }
+  function pct(arr, p){
+    const step=Math.max(1,Math.floor(arr.length/20000)), a=[];
+    for(let i=0;i<arr.length;i+=step) a.push(arr[i]);
+    a.sort((x,y)=>x-y); return a[Math.min(a.length-1,Math.floor(p*a.length))];
+  }
+  const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+  function quadArea(q){let a=0;for(let i=0;i<4;i++){const p=q[i],r=q[(i+1)%4];a+=p[0]*r[1]-r[0]*p[1];}return Math.abs(a)/2;}
+
+  function findA4(P, open){
+    const {w,h}=P, N=w*h;
+    let best=null;
+    for(const Wh of P.feats){
+    let mu=0,m2=0,cnt=0; for(let i=0;i<N;i+=7){mu+=Wh[i];m2+=Wh[i]*Wh[i];cnt++;} mu/=cnt; const sd=Math.sqrt(Math.max(1,m2/cnt-mu*mu));
+    for(const p of [.995,.99,.98,.96,.93,.9,.85,.8]){
+      const t=pct(Wh,p);
+      const mask=new Uint8Array(N); for(let i=0;i<N;i++) mask[i]=Wh[i]>=t?1:0;
+      const seen=new Uint8Array(N), stack=new Int32Array(N);
+      for(let i0=0;i0<N;i0++){
+        if(!mask[i0]||seen[i0]) continue;
+        let sp=0, n=0; stack[sp++]=i0; seen[i0]=1;
+        let a=[1e9,0],b=[-1e9,0],c=[-1e9,0],e=[1e9,0]; // min x+y, max x-y, max x+y, min x-y
+        let tl=null,tr=null,br=null,bl=null;
+        while(sp){
+          const i=stack[--sp], x=i%w, y=(i/w)|0; n++;
+          const sm=x+y, df=x-y;
+          if(sm<a[0]){a=[sm];tl=[x,y];} if(df>b[0]){b=[df];tr=[x,y];}
+          if(sm>c[0]){c=[sm];br=[x,y];} if(df<e[0]){e=[df];bl=[x,y];}
+          if(x>0&&mask[i-1]&&!seen[i-1]){seen[i-1]=1;stack[sp++]=i-1;}
+          if(x<w-1&&mask[i+1]&&!seen[i+1]){seen[i+1]=1;stack[sp++]=i+1;}
+          if(y>0&&mask[i-w]&&!seen[i-w]){seen[i-w]=1;stack[sp++]=i-w;}
+          if(y<h-1&&mask[i+w]&&!seen[i+w]){seen[i+w]=1;stack[sp++]=i+w;}
+        }
+        if(n<0.0012*N||n>0.15*N) continue;
+        const q=[tl,tr,br,bl], qa=quadArea(q); if(qa<1) continue;
+        // the paper is taped on the wall beside the opening, never inside it
+        if(open){ const cx=(tl[0]+br[0])/2, cy=(tl[1]+br[1])/2;
+          if(cx>Math.min(open[0][0],open[3][0])&&cx<Math.max(open[1][0],open[2][0])&&cy>open[0][1]&&cy<open[3][1]) continue; }
+        const fill=n/qa;
+        const sw=(dist(q[0],q[1])+dist(q[3],q[2]))/2, sh=(dist(q[0],q[3])+dist(q[1],q[2]))/2;
+        const ratio=Math.max(sw,sh)/Math.min(sw,sh);
+        if(fill<0.88||fill>1.12||ratio<1.2||ratio>1.65) continue;
+        // paper should stand out clearly from what surrounds it
+        let x0=w,x1=0,y0=h,y1=0; q.forEach(p=>{x0=Math.min(x0,p[0]);x1=Math.max(x1,p[0]);y0=Math.min(y0,p[1]);y1=Math.max(y1,p[1]);});
+        const mx=(x1-x0)*.25+2, my=(y1-y0)*.25+2; let so=0,no=0,si=0,ni=0;
+        for(let y=Math.max(0,Math.round(y0-my));y<=Math.min(h-1,y1+my);y++)for(let x=Math.max(0,Math.round(x0-mx));x<=Math.min(w-1,x1+mx);x++){
+          const k=y*w+x; if(x>=x0&&x<=x1&&y>=y0&&y<=y1){si+=Wh[k];ni++;} else {so+=Wh[k];no++;}
+        }
+        const contrast=no?(si/ni-so/no)/sd:0; if(contrast<.9) continue;
+        const score=Math.sqrt(n)*fill*(1-Math.abs(ratio-1.414))*contrast;
+        if(!best||score>best.score) best={q,score};
+      }
+    }
+    }
+    return best&&best.q;
+  }
+
+  function findOpening(P, seed){
+    const {w,h,L}=P, N=w*h;
+    // light blur
+    const B=new Float32Array(N);
+    B.set(L);
+    for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){let s=0;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++)s+=L[(y+dy)*w+x+dx];B[y*w+x]=s/9;}
+    const GX=new Float32Array(N), GY=new Float32Array(N);
+    for(let y=3;y<h-3;y++)for(let x=3;x<w-3;x++){
+      const i=y*w+x;
+      GX[i]=Math.abs((B[i-w+1]+2*B[i+1]+B[i+w+1])-(B[i-w-1]+2*B[i-1]+B[i+w-1]));
+      GY[i]=Math.abs((B[i+w-1]+2*B[i+w]+B[i+w+1])-(B[i-w-1]+2*B[i-w]+B[i-w+1]));
+    }
+    const T=Math.max(24, pct(GX,.85));
+    const V=new Uint8Array(N), Hh=new Uint8Array(N);
+    for(let i=0;i<N;i++){ V[i]=GX[i]>T&&GX[i]>GY[i]?1:0; Hh[i]=GY[i]>T&&GY[i]>GX[i]?1:0; }
+    const gap=Math.max(2,Math.round(.015*h));
+    // trace near-vertical edge lines downwards (they may lean a little)
+    const seen=new Uint8Array(N), lines=[];
+    for(let y=0;y<h;y++)for(let x=5;x<w-5;x++){
+      const i=y*w+x; if(!V[i]||seen[i]) continue;
+      let cx=x, last=y, cur=y;
+      while(++cur<h){
+        let nx=-1; for(const dx of [0,-1,1]){const xx=cx+dx; if(xx>3&&xx<w-4&&V[cur*w+xx]){nx=xx;break;}}
+        if(nx>=0){cx=nx;last=cur;seen[cur*w+cx]=seen[cur*w+cx-1]=seen[cur*w+cx+1]=1;}
+        else if(cur-last>gap) break;
+      }
+      const len=last-y;
+      if(len>=.28*h&&Math.abs(cx-x)<.1*len){ const xm=(x+cx)/2; lines.push({x:xm,xt:x,xb:cx,y0:y,y1:last,len}); }
+    }
+    lines.sort((a,b)=>a.x-b.x);
+    // merge lines of the same edge (keep the longest)
+    const cl=[];
+    lines.forEach(c=>{ const p=cl[cl.length-1]; if(p&&c.x-p.x<=3&&Math.min(c.y1,p.y1)-Math.max(c.y0,p.y0)>0){ if(c.len>p.len) cl[cl.length-1]=c; } else cl.push(c); });
+    const xAt=(l,y)=>l.xt+(l.xb-l.xt)*((y-l.y0)/Math.max(1,l.y1-l.y0));
+    function rowFrac(y,L,R){
+      if(y<1||y>=h-1) return 0; let n=0,t=0;
+      const xa=Math.round(xAt(L,y))+3, xb=Math.round(xAt(R,y))-3;
+      for(let x=xa;x<=xb;x++){t++; if(Hh[y*w+x]||Hh[(y-1)*w+x]||Hh[(y+1)*w+x]) n++;}
+      return t?n/t:0;
+    }
+    // try every left/right pair of long lines around the start point. A door or window frame is
+    // two sides that start at the same horizontal top edge and end at about the same height;
+    // panel lines, furniture and room corners fail one of those tests.
+    const sx=seed[0], sy=seed[1];
+    const near=l=>l.y0-.15*h<=sy&&l.y1+.15*h>=sy&&l.len>=.25*h;
+    const Ls=cl.filter(l=>near(l)&&xAt(l,sy)<sx), Rs=cl.filter(l=>near(l)&&xAt(l,sy)>sx);
+    let best=null; const all=[];
+    Ls.forEach(Lc=>Rs.forEach(Rc=>{
+      if(xAt(Rc,sy)-xAt(Lc,sy)<.12*w) return;
+      const y0=Math.max(Lc.y0,Rc.y0); let tf=0, top=y0;
+      for(let y=Math.round(Math.min(Lc.y0,Rc.y0)-.06*h);y<=Math.min(y0+.06*h,sy);y++){ const f=rowFrac(y,Lc,Rc); if(f>tf+.02||(f>=tf-.02&&f>=.85&&y>top)){tf=Math.max(tf,f);top=y;} }
+      if(top>=sy) return;
+      const ext=(Math.max(0,top-Lc.y0)+Math.max(0,top-Rc.y0))/h;   // sides running on above the top edge
+      const bottom=(Lc.y1+Rc.y1)/2, span=(bottom-top)/h, mis=Math.abs(Lc.y1-Rc.y1)/h;
+      const score=tf*span*Math.max(0,1-3*ext)*Math.max(0,1-3*mis);
+      all.push({Lc,Rc,top,bottom,score,xl:xAt(Lc,sy),xr:xAt(Rc,sy)});
+    }));
+    if(!all.length) return null;
+    best=all.reduce((m,c)=>c.score>m.score?c:m);
+    // a frame has an outer and an inner outline; when a nearly-as-good pair sits inside the best
+    // one, the inner one is the opening
+    const floor=.85*best.score;
+    for(let step=0;step<6;step++){
+      const cur=best, inner=all.filter(c=>c.score>=floor&&c.xl>=cur.xl-1&&c.xr<=cur.xr+1&&(c.xl>cur.xl+2||c.xr<cur.xr-2));
+      if(!inner.length) break;
+      best=inner.reduce((m,c)=>c.score>m.score?c:m);
+    }
+    const {Lc,Rc,top,bottom}=best;
+    return [[xAt(Lc,top),top],[xAt(Rc,top),top],[xAt(Rc,bottom),bottom],[xAt(Lc,bottom),bottom]];
+  }
+
+  // ---- sharpen a rough quad on a larger copy of the photo: each side snaps to the strongest
+  // nearby edge along its whole length, then corners are where the sharpened sides meet
+  function refine(img, q, frac){
+    const W0=img.naturalWidth||img.width, H0=img.naturalHeight||img.height;
+    const s=Math.min(1,1800/Math.max(W0,H0)), w=Math.round(W0*s), h=Math.round(H0*s);
+    const c=document.createElement('canvas'); c.width=w; c.height=h;
+    const g=c.getContext('2d',{willReadFrequently:true}); g.drawImage(img,0,0,w,h);
+    const px=g.getImageData(0,0,w,h).data, L=new Float32Array(w*h);
+    for(let i=0,j=0;i<w*h;i++,j+=4) L[i]=.299*px[j]+.587*px[j+1]+.114*px[j+2];
+    const at=(x,y)=>L[Math.max(0,Math.min(h-1,y))*w+Math.max(0,Math.min(w-1,x))];
+    const gx=(x,y)=>Math.abs(at(x+1,y-1)+2*at(x+1,y)+at(x+1,y+1)-at(x-1,y-1)-2*at(x-1,y)-at(x-1,y+1));
+    const gy=(x,y)=>Math.abs(at(x-1,y+1)+2*at(x,y+1)+at(x+1,y+1)-at(x-1,y-1)-2*at(x,y-1)-at(x+1,y-1));
+    const Q=q.map(p=>[p[0]*s,p[1]*s]);
+    if(frac>.01){ // photos are taken straight on: start from an upright rectangle
+      const xl=(Q[0][0]+Q[3][0])/2, xr=(Q[1][0]+Q[2][0])/2, yt=(Q[0][1]+Q[1][1])/2, yb=(Q[2][1]+Q[3][1])/2;
+      Q.splice(0,4,[xl,yt],[xr,yt],[xr,yb],[xl,yb]);
+    }
+    // For one side a->b: average the edge strength along the side at each offset, pick the
+    // right edge in that profile, then fit a line through per-point edge positions near it.
+    // out = +1/-1: which way is "outside" the shape. For a door frame seen from the front the
+    // edges from the inside out are: back of the frame depth, front of the frame, frame/wall.
+    // The front one is the true opening, so with 3+ edges we take the second.
+    function side(a,b,vertical,out,rin,rout,pickSecond){
+      const N=23, base=[];
+      for(let k=1;k<=N;k++){ const t=.1+.8*k/(N+1); base.push([a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t]); }
+      const G=(p,o)=>vertical?gx(Math.round(p[0]+o),Math.round(p[1])):gy(Math.round(p[0]),Math.round(p[1]+o));
+      const lo=out<0?-rout:-rin, hi=out<0?rin:rout, prof=[];
+      for(let o=lo;o<=hi;o++){ let t=0; base.forEach(p=>t+=G(p,o)); prof.push([o,t/N]); }
+      const mx=Math.max(...prof.map(p=>p[1])); if(mx<20) return null;
+      let peaks=[];
+      for(let i=2;i<prof.length-2;i++){ const v=prof[i][1];
+        if(v>=.35*mx&&v>=prof[i-1][1]&&v>=prof[i+1][1]&&v>=prof[i-2][1]&&v>=prof[i+2][1]) peaks.push(prof[i]); }
+      peaks=peaks.filter(p=>!peaks.some(q=>q!==p&&Math.abs(q[0]-p[0])<=4&&q[1]>p[1]));
+      if(!peaks.length) return null;
+      peaks.sort((m,n)=>(m[0]-n[0])*out); // inside first
+      // with 3+ edges the innermost is the back of the frame depth: take the strongest of the rest
+      const pool=pickSecond&&peaks.length>=3?peaks.slice(1):peaks.slice(0,pickSecond?peaks.length:1);
+      const chosen=pool.reduce((m,p)=>p[1]>m[1]?p:m)[0];
+      const pts=[];
+      base.forEach(p=>{ let bv=0,bo=chosen; for(let o=chosen-3;o<=chosen+3;o++){const v=G(p,o); if(v>bv){bv=v;bo=o;}}
+        if(bv>20) pts.push(vertical?[p[1],p[0]+bo]:[p[0],p[1]+bo]); }); // (along, across)
+      if(pts.length<6) return null;
+      let n=pts.length,su=0,sv=0,suu=0,suv=0; pts.forEach(([u,v])=>{su+=u;sv+=v;suu+=u*u;suv+=u*v;});
+      const den=n*suu-su*su, m=den?(n*suv-su*sv)/den:0, k0=(sv-m*su)/n;
+      return {vertical,m,k0}; // across = m*along + k0
+    }
+    const Rin=Math.max(3,Math.round(.005*Math.max(w,h))), Rout=Math.max(6,Math.round(frac*Math.max(w,h)));
+    const two=frac>.01;
+    const Ls=side(Q[0],Q[3],true,-1,Rin,Rout,two), Rs=side(Q[1],Q[2],true,1,Rin,Rout,two),
+          Ts=side(Q[0],Q[1],false,-1,Rin,Rout,two), Bs=side(Q[3],Q[2],false,1,Rin,Rin*2,false);
+    function meet(V,Hl,fallback){
+      if(!V||!Hl) return fallback;
+      // x = V.m*y + V.k0 ; y = Hl.m*x + Hl.k0
+      const y=(Hl.m*V.k0+Hl.k0)/(1-Hl.m*V.m), x=V.m*y+V.k0;
+      return Math.hypot(x-fallback[0],y-fallback[1])<3*Rout?[x,y]:fallback;
+    }
+    const out=[meet(Ls,Ts,Q[0]),meet(Rs,Ts,Q[1]),meet(Rs,Bs,Q[2]),meet(Ls,Bs,Q[3])];
+    return out.map(p=>[p[0]/s,p[1]/s]);
+  }
+
+  // seed: a point inside the opening, in image pixels (defaults to the photo centre)
+  function detect(img, seed){
+    const P=prep(img,480), inv=1/P.s;
+    const sd=seed?[seed[0]*P.s,seed[1]*P.s]:[P.w/2,P.h/2];
+    const open=findOpening(P,sd);
+    const ref=findA4(P,open);
+    const up=q=>q&&q.map(p=>[p[0]*inv,p[1]*inv]);
+    const o=up(open), f=up(ref);
+    return {open:o&&refine(img,o,.045), ref:f&&refine(img,f,.006)};
+  }
+  return {detect, refine};
+})();
+</script>
+<script>
+(function(){
+  const A4W = 210, A4H = 297; // mm
+  const state = { sel:null, kind:'Door', unit:'cm', layer:'open', img:null, open:[], ref:[], sample:true };
+
+  // ---------- sample photo (drawn, 600x800, ~3.5 mm per px) ----------
+  function makeSample(){
+    const c = document.createElement('canvas'); c.width=600; c.height=800;
+    const g = c.getContext('2d');
+    let gr = g.createLinearGradient(0,0,600,0); gr.addColorStop(0,'#d9d4c7'); gr.addColorStop(1,'#cbc5b6');
+    g.fillStyle=gr; g.fillRect(0,0,600,800);
+    g.fillStyle='#8b7a64'; g.fillRect(0,722,600,78);             // floor
+    g.fillStyle='#e9e6de'; g.fillRect(0,706,600,16);             // skirting
+    g.fillStyle='#f3f1ea'; g.fillRect(150,100,297,622);          // casing
+    g.fillStyle='#3c342c'; g.fillRect(170,120,257,602);          // opening shadow
+    g.fillStyle='#6f5641'; g.fillRect(174,124,249,598);          // door leaf
+    g.strokeStyle='#5d4735'; g.lineWidth=4;
+    [[196,150,205,200],[196,390,205,300]].forEach(r=>g.strokeRect(...r));
+    g.fillStyle='#d8c9a0'; g.beginPath(); g.arc(398,430,8,0,7); g.fill(); g.fillRect(380,426,18,8);
+    g.fillStyle='rgba(0,0,0,.18)'; g.fillRect(473,383,60,85);    // A4 shadow
+    g.fillStyle='#ffffff'; g.fillRect(470,380,60,85);
+    g.fillStyle='#b8b8b8'; g.font='12px monospace'; g.fillText('A4',490,428);
+    g.fillStyle='rgba(242,183,5,.8)'; g.fillRect(488,375,24,8);  // tape strip
+    return c.toDataURL('image/jpeg',.9);
+  }
+  function loadImage(src, sample){
+    const im = new Image();
+    im.onload = () => {
+      state.img = im; state.sample = sample;
+      const W = im.naturalWidth, H = im.naturalHeight;
+      if(sample){
+        state.open = [[170,120],[427,120],[427,722],[170,722]];
+        state.ref  = [[470,380],[530,380],[530,465],[470,465]];
+      } else {
+        state.open = [[.22*W,.12*H],[.68*W,.12*H],[.68*W,.9*H],[.22*W,.9*H]];
+        state.ref  = [[.78*W,.45*H],[.92*W,.45*H],[.92*W,.58*H],[.78*W,.58*H]];
+      }
+      cv.width = W; cv.height = H;
+      autoDetect(); go('mark');
+    };
+    im.src = src;
+  }
+
+  // ---------- automatic corners ----------
+  function autoDetect(seed){
+    let res={}; try{ res=OpenSizeDetect.detect(state.img, seed); }catch(e){}
+    const box=document.getElementById('auto'), got=[];
+    if(res.open){ state.open=res.open; got.push('the opening'); }
+    if(res.ref && !seed){ state.ref=res.ref; got.push('the A4 paper'); }
+    const missing=[]; if(!res.open) missing.push('the opening'); if(!res.ref && !seed) missing.push('the A4 paper');
+    let msg = got.length ? `Found ${got.join(' and ')}. Check the dots are on the corners.` : '';
+    if(!res.open) msg += (msg?' ':'') + "Couldn't find the opening. Drag the yellow dots onto the door corners.";
+    if(!res.ref && !seed) msg += (msg?' ':'') + "No A4 paper found. Tape one on the wall next to the door and retake the photo, or drag the green dots onto it.";
+    box.textContent=msg; box.className='auto'+(missing.length?' miss':''); box.hidden=false;
+    document.getElementById('hint').hidden=true;
+    select(null);
+  }
+  document.getElementById('redetect').onclick=()=>autoDetect();
+
+  // ---------- geometry ----------
+  const d = (a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+  function measure(){
+    const [a,b,c,e] = state.ref;
+    const rw=(d(a,b)+d(e,c))/2, rh=(d(a,e)+d(b,c))/2;
+    const [pw,ph] = rw>rh ? [A4H,A4W] : [A4W,A4H]; // paper may be taped sideways
+    // if tape or a shadow hides part of the paper, its shape stops matching A4:
+    // then trust the side that looks longest (a hidden edge only makes a side look shorter)
+    const off = Math.abs((rh/rw)/(ph/pw) - 1);
+    const mmPerPx = off > .015 ? Math.min(pw/rw, ph/rh) : (pw/rw + ph/rh)/2;
+    const [p,q,r,s] = state.open;
+    const w = (d(p,q)+d(s,r))/2*mmPerPx, h = (d(p,s)+d(q,r))/2*mmPerPx;
+    return {w, h, mmPerPx};
+  }
+  function area(p){let a=0;for(let i=0;i<4;i++){const q=p[i],r=p[(i+1)%4];a+=q[0]*r[1]-r[0]*q[1];}return Math.abs(a)/2;}
+  function inside(pt,poly){let c=false;for(let i=0,j=3;i<4;j=i++){const a=poly[i],b=poly[j];if(((a[1]>pt[1])!==(b[1]>pt[1]))&&(pt[0]<(b[0]-a[0])*(pt[1]-a[1])/(b[1]-a[1])+a[0]))c=!c;}return c;}
+  function problem(){
+    const ra=area(state.ref), oa=area(state.open);
+    const cen=[state.ref.reduce((s,p)=>s+p[0],0)/4,state.ref.reduce((s,p)=>s+p[1],0)/4];
+    if(ra>0.5*oa || inside(cen,state.open))
+      return 'The green dots must go on an A4 paper taped on the wall, not on the door. If there is no A4 paper in your photo, tape one next to the door and take the photo again.';
+    return '';
+  }
+  const fmt = (mm,u) => u==='mm' ? Math.round(mm).toString() : u==='cm' ? (mm/10).toFixed(1) : u==='m' ? (mm/1000).toFixed(2) : (mm/25.4).toFixed(1);
+
+  // ---------- canvas ----------
+  const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+  function draw(target, forThumb){
+    const c = target||ctx, W=cv.width;
+    const cw = cv.getBoundingClientRect().width;
+    const k = forThumb||!cw ? W/320 : W/cw; // keep dots and labels the same size on screen
+    c.drawImage(state.img,0,0);
+    poly(c,state.ref,'#4FB8AD','rgba(79,184,173,.18)',k, !forThumb && state.layer==='ref', !forThumb&&state.sel&&state.sel.layer==='ref'?state.sel.i:-1);
+    poly(c,state.open,'#F2B705','rgba(242,183,5,.16)',k, !forThumb && state.layer==='open', !forThumb&&state.sel&&state.sel.layer==='open'?state.sel.i:-1);
+    const m = measure(), [p,q,r2,s] = state.open;
+    label(c, (p[0]+q[0])/2, (p[1]+q[1])/2 - 14*k, fmt(m.w,state.unit)+' '+state.unit, k);
+    // height label just inside the right edge, so it never covers the A4 paper beside the door
+    c.save(); c.translate((q[0]+r2[0])/2 - 16*k,(q[1]+r2[1])/2); c.rotate(-Math.PI/2);
+    label(c,0,0,fmt(m.h,state.unit)+' '+state.unit,k); c.restore();
+    if(!forThumb && drag!==null) loupe(c, state[state.layer][drag], k);
+    if(!forThumb) sideLoupe();
+    if(!forThumb){
+      document.getElementById('rw').textContent = fmt(m.w,'cm')+' cm · '+fmt(m.w,'mm')+' mm';
+      document.getElementById('rh').textContent = fmt(m.h,'cm')+' cm · '+fmt(m.h,'mm')+' mm';
+      document.getElementById('rscale').textContent = m.mmPerPx.toFixed(2)+' mm/px';
+      const pr=problem(), w=document.getElementById('warn'); w.textContent=pr; w.hidden=!pr;
+    }
+  }
+  function poly(c,pts,stroke,fill,k,active,sel){
+    c.beginPath(); pts.forEach((p,i)=>i?c.lineTo(...p):c.moveTo(...p)); c.closePath();
+    c.fillStyle=fill; c.fill(); c.lineWidth=2.5*k; c.strokeStyle=stroke; c.stroke();
+    pts.forEach((p,i)=>{
+      if(i===sel){ c.beginPath(); c.arc(p[0],p[1],15*k,0,7); c.lineWidth=2*k; c.strokeStyle='#fff'; c.stroke(); }
+      c.beginPath(); c.arc(p[0],p[1],(active?9:5)*k,0,7);
+      c.fillStyle=active?'#fff':stroke; c.fill(); c.lineWidth=3*k; c.strokeStyle=stroke; c.stroke();
+    });
+  }
+  // magnifier shown while dragging a corner, in the corner of the photo away from the finger
+  function loupe(c,p,k,layer){
+    const R=58*k, z=3, W=cv.width;
+    const cx = p[0] < W/2 ? W-R-10*k : R+10*k, cy = R+10*k;
+    c.save(); c.beginPath(); c.arc(cx,cy,R,0,7); c.clip();
+    c.fillStyle='#000'; c.fillRect(cx-R,cy-R,2*R,2*R);
+    c.drawImage(state.img, p[0]-R/z, p[1]-R/z, 2*R/z, 2*R/z, cx-R, cy-R, 2*R, 2*R);
+    c.strokeStyle=(layer||state.layer)==='open'?'#F2B705':'#4FB8AD'; c.lineWidth=1.5*k;
+    c.beginPath(); c.moveTo(cx-R,cy); c.lineTo(cx+R,cy); c.moveTo(cx,cy-R); c.lineTo(cx,cy+R); c.stroke();
+    c.restore();
+    c.beginPath(); c.arc(cx,cy,R,0,7); c.lineWidth=3*k; c.strokeStyle='#fff'; c.stroke();
+  }
+  // small magnifier next to the arrow buttons, so the corner stays visible while nudging
+  function sideLoupe(){
+    const lp=document.getElementById('lp'); lp.hidden=!state.sel; if(!state.sel) return;
+    const g=lp.getContext('2d'), p=state[state.sel.layer][state.sel.i], S=160, span=cv.width/12;
+    g.fillStyle='#000'; g.fillRect(0,0,S,S);
+    g.drawImage(state.img, p[0]-span/2, p[1]-span/2, span, span, 0, 0, S, S);
+    // show the outline edges passing through this corner
+    const pts=state[state.sel.layer], i=state.sel.i, tf=q=>[(q[0]-p[0])/span*S+S/2,(q[1]-p[1])/span*S+S/2];
+    g.strokeStyle=state.sel.layer==='open'?'#F2B705':'#4FB8AD'; g.lineWidth=2;
+    g.beginPath(); g.moveTo(...tf(pts[(i+3)%4])); g.lineTo(S/2,S/2); g.lineTo(...tf(pts[(i+1)%4])); g.stroke();
+    g.strokeStyle='rgba(255,255,255,.9)'; g.lineWidth=1;
+    g.beginPath(); g.moveTo(S/2,S/2-14); g.lineTo(S/2,S/2+14); g.moveTo(S/2-14,S/2); g.lineTo(S/2+14,S/2); g.stroke();
+  }
+  function label(c,x,y,t,k){
+    c.font=`600 ${13*k}px "IBM Plex Mono", monospace`;
+    const w=c.measureText(t).width+12*k, h=20*k;
+    c.fillStyle='#F2B705'; c.fillRect(x-w/2,y-h/2,w,h);
+    c.fillStyle='#2A2200'; c.textAlign='center'; c.textBaseline='middle'; c.fillText(t,x,y+1*k);
+  }
+
+  let drag=null;
+  function pt(ev){ const r=cv.getBoundingClientRect(); return [(ev.clientX-r.left)*cv.width/r.width,(ev.clientY-r.top)*cv.height/r.height]; }
+  cv.addEventListener('pointerdown',ev=>{
+    const p=pt(ev), k=cv.width/cv.getBoundingClientRect().width;
+    const pts=state[state.layer]; let best=-1,bd=28*k;
+    pts.forEach((q,i)=>{const dd=d(p,q); if(dd<bd){bd=dd;best=i;}});
+    if(best<0){ // tap near the other layer switches to it; a tap elsewhere clears the selection
+      const other=state.layer==='open'?'ref':'open';
+      const oi=state[other].findIndex(q=>d(p,q)<28*k);
+      if(oi>=0){ setLayer(other); select(other,oi); return; }
+      select(null); return;
+    }
+    select(state.layer,best);
+    drag=best; cv.setPointerCapture(ev.pointerId); cv.style.cursor='grabbing';
+  });
+  cv.addEventListener('pointermove',ev=>{
+    if(drag===null) return; const p=pt(ev);
+    p[0]=Math.max(0,Math.min(cv.width,p[0])); p[1]=Math.max(0,Math.min(cv.height,p[1]));
+    state[state.layer][drag]=p; draw();
+  });
+  const end=()=>{ if(drag!==null){ drag=null; draw(); } cv.style.cursor='grab'; };
+  cv.addEventListener('pointerup',end); cv.addEventListener('pointercancel',end);
+
+  const CORNER=['top-left','top-right','bottom-right','bottom-left'];
+  function select(layer,i){
+    state.sel = layer ? {layer,i} : null;
+    document.getElementById('selName').innerHTML = layer
+      ? `<b>${CORNER[i][0].toUpperCase()+CORNER[i].slice(1)}</b> ${layer==='open'?'door':'paper'} corner`
+      : 'Tap a dot to select it, then use the arrows for exact placement.';
+    document.querySelectorAll('.nb').forEach(b=>b.disabled=!layer);
+    draw();
+  }
+  let rep=null;
+  function nudge(dx,dy){
+    if(!state.sel) return;
+    const st=Math.max(1,cv.width/900), q=state[state.sel.layer][state.sel.i];
+    q[0]=Math.max(0,Math.min(cv.width,q[0]+dx*st)); q[1]=Math.max(0,Math.min(cv.height,q[1]+dy*st)); draw();
+  }
+  document.querySelectorAll('.nb').forEach(b=>{
+    const dx=+b.dataset.nx, dy=+b.dataset.ny;
+    b.addEventListener('pointerdown',e=>{ e.preventDefault(); nudge(dx,dy); clearInterval(rep); let n=0; rep=setInterval(()=>{ if(++n>4) nudge(dx,dy); },70); });
+    ['pointerup','pointerleave','pointercancel'].forEach(t=>b.addEventListener(t,()=>clearInterval(rep)));
+    b.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); nudge(dx,dy); } });
+  });
+  function setLayer(l){
+    state.layer=l; document.getElementById('hint').hidden=false; document.getElementById('auto').hidden=true;
+    document.getElementById('hint').innerHTML = l==='open'
+      ? 'Drag the <b>yellow dots</b> to the 4 inside corners of the door or window.'
+      : 'Drag the <b>green dots</b> to the 4 corners of the <b>A4 paper</b> in the photo (not the door).';
+    document.querySelectorAll('#seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.layer===l));
+    draw();
+  }
+  document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>setLayer(b.dataset.layer));
+
+  // ---------- result ----------
+  const STD = {
+    'Door':[[70,200],[80,200],[80,210],[90,210],[100,210],[120,210]],
+    'Window':[[60,90],[90,120],[120,120],[120,150],[150,150],[180,150]],
+    'Garage door':[[240,210],[250,215],[300,215],[480,215],[500,225]],
+    'Other opening':[]
+  };
+  function renderResult(){
+    const m=measure(), u=state.unit;
+    document.getElementById('vw').textContent=fmt(m.w,u);
+    document.getElementById('vh').textContent=fmt(m.h,u);
+    document.getElementById('vmm').textContent=`${fmt(m.w,'mm')} × ${fmt(m.h,'mm')} mm`;
+    document.getElementById('vmeters').textContent=`${fmt(m.w,'m')} × ${fmt(m.h,'m')} m`;
+    document.querySelectorAll('[data-unit]').forEach(e=>e.textContent=u);
+    const area=m.w*m.h/1e6;
+    document.getElementById('varea').textContent = u!=='in' ? area.toFixed(2)+' m²' : (area*10.7639).toFixed(1)+' ft²';
+    const list=STD[state.kind]; let std='Custom size';
+    if(list.length){
+      const wc=m.w/10,hc=m.h/10; let best=list[0],bd=1e9;
+      list.forEach(s=>{const dd=Math.hypot(s[0]-wc,s[1]-hc); if(dd<bd){bd=dd;best=s;}});
+      std = u==='mm' ? `${best[0]*10} × ${best[1]*10} mm` : u==='cm' ? `${best[0]} × ${best[1]} cm` : u==='m' ? `${(best[0]/100).toFixed(2)} × ${(best[1]/100).toFixed(2)} m` : `${(best[0]/2.54).toFixed(0)} × ${(best[1]/2.54).toFixed(0)} in`;
+      if(bd>8) std+=' (custom advised)';
+    }
+    document.getElementById('vstd').textContent=std;
+    document.getElementById('resTitle').textContent=state.kind+' size';
+    const t=document.createElement('canvas'); t.width=cv.width; t.height=cv.height;
+    draw(t.getContext('2d'),true);
+    document.getElementById('thumb').src=t.toDataURL('image/jpeg',.8);
+    document.getElementById('lastDims').textContent=`${(m.w/10).toFixed(0)} × ${(m.h/10).toFixed(0)} cm`;
+    document.getElementById('lastKind').textContent=state.kind+(state.sample?' · sample':'');
+  }
+  document.querySelectorAll('#units button').forEach(b=>b.onclick=()=>{
+    state.unit=b.dataset.u;
+    document.querySelectorAll('#units button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+    renderResult();
+  });
+
+  // ---------- navigation ----------
+  function go(name){
+    if(name==='result' && state.img && problem()){ showToast(problem()); return; }
+    if((name==='mark'||name==='result') && !state.img){ loadImage(makeSample(),true); if(name==='mark') return; }
+    document.querySelectorAll('.scr').forEach(s=>s.hidden = s.dataset.screen!==name);
+    document.querySelectorAll('#steps button').forEach(b=>b.dataset.go===name?b.setAttribute('aria-current','step'):b.removeAttribute('aria-current'));
+    if(name==='mark') draw();
+    if(name==='result') renderResult();
+    document.querySelectorAll('.scr .view').forEach(v=>v.scrollTop=0);
+  }
+  document.addEventListener('click',e=>{ const g=e.target.closest('[data-go]'); if(g){ go(g.dataset.go); } });
+
+  document.querySelectorAll('.kind').forEach(b=>b.onclick=()=>{
+    state.kind=b.dataset.kind;
+    document.querySelectorAll('.kind').forEach(x=>x.setAttribute('aria-pressed',x===b));
+    document.getElementById('capTitle').textContent='Photo of '+state.kind.toLowerCase();
+  });
+  document.getElementById('useSample').onclick=()=>{ selectKind('Door'); loadImage(makeSample(),true); };
+  function selectKind(k){ document.querySelector(`.kind[data-kind="${k}"]`).click(); }
+  document.getElementById('file').onchange=e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const r=new FileReader(); r.onload=()=>loadImage(r.result,false); r.readAsDataURL(f); e.target.value='';
+  };
+
+  const toast=document.getElementById('toast'); let tt;
+  function showToast(t){ toast.textContent=t; toast.hidden=false; clearTimeout(tt); tt=setTimeout(()=>toast.hidden=true,4500); }
+  document.getElementById('quote').onclick=()=>{
+    const m=measure();
+    toast.textContent=`Demo only: a real app would send ${(m.w/10).toFixed(1)} × ${(m.h/10).toFixed(1)} cm and the photo to your sales team.`;
+    toast.hidden=false; clearTimeout(tt); tt=setTimeout(()=>toast.hidden=true,3800);
+  };
+
+  // start: sample loaded in the background, app on the home screen
+  const im=new Image(); im.onload=()=>{state.img=im; state.open=[[170,120],[427,120],[427,722],[170,722]]; state.ref=[[470,380],[530,380],[530,465],[470,465]]; cv.width=600; cv.height=800;};
+  im.src=makeSample();
+  go('home');
+})();
+</script>
+
+</body>
+</html>
