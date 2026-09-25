@@ -371,9 +371,11 @@
   let site = null;
   let me = null;
 
-  // Company logo (public/img/logo.*). Hidden if the file is missing; the name is always shown beside it.
-  function logoMark() {
-    return site.company.logo ? `<img class="logo-img" src="${esc(site.company.logo)}" alt="" onerror="this.remove()">` : '';
+  // Company logo. The artwork already contains the name, so it is used on its own.
+  // variant 'white' is for dark backgrounds (footer, back-office sidebar).
+  function logoMark(variant = '') {
+    const src = variant === 'white' ? '/img/logo-white.png' : site.company.logo;
+    return `<img class="logo-full" src="${esc(src)}" alt="${esc(lang === 'ar' ? site.company.nameAr : site.company.nameEn)}" width="508" height="160">`;
   }
 
   function header(active) {
@@ -386,10 +388,7 @@
         <div class="flex"><span class="hide-sm">✓ ${esc(t('licensed'))}${c.tourismLicense ? ` · ${esc(t('license'))} <span class="num">${esc(c.tourismLicense)}</span>` : ''}</span></div>
       </div></div>
       <header class="site-header"><div class="container">
-        <a href="/" class="logo" aria-label="${esc(t('brand'))}">
-          ${logoMark()}
-          <span>${esc(t('brand'))}<small>${esc(t('brandSub'))}</small></span>
-        </a>
+        <a href="/" class="logo">${logoMark()}</a>
         <nav class="main-nav" id="main-nav">${nav.map(([h, k]) => `<a href="${h}" class="${active === k ? 'active' : ''}">${esc(t(k))}</a>`).join('')}</nav>
         <div class="header-actions">
           <button class="btn btn-outline btn-sm lang-toggle" id="lang-btn" type="button" lang="${lang === 'ar' ? 'en' : 'ar'}">${esc(t('lang_switch'))}</button>
@@ -404,7 +403,7 @@
     const c = site.company;
     return `<footer class="site-footer"><div class="container">
       <div class="footer-grid">
-        <div><a href="/" class="logo" style="color:#fff">${logoMark()}${esc(t('brand'))}</a>
+        <div><a href="/" class="logo">${logoMark('white')}</a>
           <p class="mt-2">${esc(t('footer_about'))}</p>${payLogos()}</div>
         <div><h4>${esc(t('quick_links'))}</h4><ul>
           <li><a href="/packages.html?category=umrah">${esc(t('nav_umrah'))}</a></li><li><a href="/packages.html">${esc(t('nav_packages'))}</a></li>

@@ -479,5 +479,5 @@ test('pages and scripts are revalidated so updates reach visitors immediately', 
     });
     assert.equal(status, 304, `${f} unchanged → 304`);
   }
-  assert.match((await realFetch(`${base}/img/logo.svg`)).headers.get('cache-control'), /max-age=86400/);
+  assert.match((await realFetch(`${base}/img/logo.png`)).headers.get('cache-control'), /max-age=86400/);
 });

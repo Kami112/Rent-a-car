@@ -14,7 +14,7 @@
     const box = $('#login');
     box.classList.remove('hidden');
     box.innerHTML = `<div class="login-wrap"><form class="card panel" id="lf" style="width:min(420px,100%)">
-      <div class="logo"><img class="logo-img" src="/img/logo.svg" alt=""><span>Ezhar Travel<small>Back-office</small></span></div>
+      <div class="logo"><img class="logo-full" src="/img/logo.png" alt="Ezhar Travel and Tourism"></div><div class="muted small" style="margin-top:4px">Back-office</div>
       <h2 class="mt-3" style="font-size:1.4rem">Staff sign in</h2>
       ${me ? '<div class="alert alert-warn">Your account does not have back-office access.</div>' : ''}
       <div class="field mt-2"><label>Email</label><input class="input" name="email" type="email" required autocomplete="username"></div>

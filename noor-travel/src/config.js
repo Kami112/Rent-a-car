@@ -40,7 +40,7 @@ const config = {
     phone2: env.COMPANY_PHONE_2 || '+966 59 353 5610',
     whatsapp: env.COMPANY_WHATSAPP || '966593658904',
     email: env.COMPANY_EMAIL || 'info@ezhartravels.com',
-    logo: env.COMPANY_LOGO || '/img/logo.svg',
+    logo: env.COMPANY_LOGO || '/img/logo.png',
     branches: [
       { en: 'Al Aziziyah', ar: 'العزيزية' }, { en: 'Al Mansourah', ar: 'المنصورة' }, { en: 'Al Nadwa', ar: 'الندوة' },
       { en: 'Al Naheel', ar: 'النخيل' }, { en: 'Exit 25', ar: 'مخرج 25' }, { en: 'Al Shumaisi', ar: 'الشميسي' }, { en: 'Exit 29', ar: 'مخرج 29' },
