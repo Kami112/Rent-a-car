@@ -193,8 +193,10 @@ h1 span{background:var(--tape);color:var(--tape-ink);padding:0 .15em}
               <li>Use good light and hold the phone level.</li>
             </ol>
             <div class="btn-row">
-              <label class="btn" for="file">Take or upload photo</label>
-              <input id="file" type="file" accept="image/*" capture="environment" hidden>
+              <label class="btn" for="camera">Take photo</label>
+              <input id="camera" type="file" accept="image/*" capture="environment" hidden>
+              <label class="btn ghost" for="file">Upload from gallery</label>
+              <input id="file" type="file" accept="image/*" hidden>
               <button class="btn ghost" id="useSample">Use sample photo</button>
             </div>
           </div>
@@ -738,10 +740,13 @@ window.OpenSizeDetect = (function(){
   });
   document.getElementById('useSample').onclick=()=>{ selectKind('Door'); loadImage(makeSample(),true); };
   function selectKind(k){ document.querySelector(`.kind[data-kind="${k}"]`).click(); }
-  document.getElementById('file').onchange=e=>{
+  // camera opens the phone camera; gallery lets the customer pick an existing photo
+  const onPick=e=>{
     const f=e.target.files[0]; if(!f) return;
     const r=new FileReader(); r.onload=()=>loadImage(r.result,false); r.readAsDataURL(f); e.target.value='';
   };
+  document.getElementById('camera').onchange=onPick;
+  document.getElementById('file').onchange=onPick;
 
   const toast=document.getElementById('toast'); let tt;
   function showToast(t){ toast.textContent=t; toast.hidden=false; clearTimeout(tt); tt=setTimeout(()=>toast.hidden=true,4500); }
