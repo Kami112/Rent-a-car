@@ -42,7 +42,14 @@ function createApp(db) {
   app.use('/api/admin', require('./src/routes/admin')(db));
   app.use('/api', (_req, res) => res.status(404).json({ error: 'Not found' }));
 
-  app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'], maxAge: config.isProd ? '1h' : 0 }));
+  // Pages, scripts and styles are revalidated on every visit (cheap 304 via ETag) so updates reach
+  // visitors immediately; images and fonts may be cached for a day.
+  app.use(express.static(path.join(__dirname, 'public'), {
+    extensions: ['html'],
+    setHeaders(res, file) {
+      res.setHeader('Cache-Control', /\.(html|js|css|json)$/.test(file) ? 'no-cache' : 'public, max-age=86400');
+    },
+  }));
   app.use((_req, res) => res.status(404).sendFile(path.join(__dirname, 'public', '404.html')));
 
   // eslint-disable-next-line no-unused-vars

@@ -467,3 +467,17 @@ test('password reset by email', async () => {
     config.mail.resendApiKey = '';
   }
 });
+
+test('pages and scripts are revalidated so updates reach visitors immediately', async () => {
+  for (const f of ['/', '/js/app.js', '/css/style.css']) {
+    const r = await realFetch(`${base}${f}`);
+    assert.equal(r.headers.get('cache-control'), 'no-cache', f);
+    assert.ok(r.headers.get('etag'), `${f} has an ETag`);
+    // Raw HTTP (fetch adds its own no-cache header to conditional requests).
+    const status = await new Promise((resolve, reject) => {
+      require('node:http').get(`${base}${f}`, { headers: { 'If-None-Match': r.headers.get('etag') } }, (res) => { res.resume(); resolve(res.statusCode); }).on('error', reject);
+    });
+    assert.equal(status, 304, `${f} unchanged → 304`);
+  }
+  assert.match((await realFetch(`${base}/img/logo.svg`)).headers.get('cache-control'), /max-age=86400/);
+});
