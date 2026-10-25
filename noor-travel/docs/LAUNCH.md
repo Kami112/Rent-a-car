@@ -13,7 +13,7 @@ accounts; everything else is configuration.
 | Upgrade the service | Render dashboard → `noor-travel` → **Settings → Instance type → Starter** (≈ $7/month). Free instances sleep after 15 min, lose data on every deploy and **block outgoing SMTP email**. |
 | Keep data | **Disks → Add disk**: mount path `/var/data`, 1 GB. Then **Environment**: `DB_PATH=/var/data/noor.db`. Render snapshots disks daily. |
 | Production mode | Environment: `NODE_ENV=production`, `PAYMENTS_MODE=live` (hides any payment method without live keys). |
-| Deploy from `main` | Merge branch `claude/bold-knuth-4ksku4` into `main`, then **Settings → Branch → main**. Every push to `main` redeploys automatically. |
+| Deploy from `main` | Make sure your latest code is on `main`, then **Settings → Branch → main**. Every push to `main` redeploys automatically. |
 | Admin password | Change it after first login (**My account**) or set `ADMIN_PASSWORD` before the first deploy on the new disk. |
 
 **Data residency:** Render runs in Frankfurt (closest region to Riyadh). If you need data hosted
